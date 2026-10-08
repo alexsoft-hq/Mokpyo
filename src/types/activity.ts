@@ -1,3 +1,4 @@
+import { t, getLocale } from '@/i18n';
 // Field change tracking types
 export interface FieldChange {
   field: string;
@@ -74,11 +75,11 @@ export function formatActivitySummary(activity: ActivityLog): string {
     return activity.summary;
   }
 
-  const action = ACTION_LABELS[activity.action] || activity.action;
-  const entityType = ENTITY_TYPE_LABELS[activity.entityType] || activity.entityType;
+  const action = getLocale() === 'en-US' ? ({ CREATE: 'Created', UPDATE: 'Updated', DELETE: 'Deleted', REORDER: 'Reordered' }[activity.action]) : t(ACTION_LABELS[activity.action] || activity.action);
+  const entityType = t(ENTITY_TYPE_LABELS[activity.entityType] || activity.entityType);
   const entityTitle = activity.entityTitle || '';
 
-  return `${entityType} '${entityTitle}' ${action}`;
+  return getLocale() === 'ko-KR' ? `${entityType} '${entityTitle}' ${action}` : `${action} ${entityType.toLowerCase()} '${entityTitle}'`;
 }
 
 // Helper function to format relative time
@@ -92,15 +93,15 @@ export function formatRelativeTime(dateString: string): string {
   const diffDay = Math.floor(diffHour / 24);
 
   if (diffSec < 60) {
-    return '방금 전';
+    return t("방금 전");
   } else if (diffMin < 60) {
-    return `${diffMin}분 전`;
+    return new Intl.RelativeTimeFormat(getLocale()).format(-diffMin, 'minute');
   } else if (diffHour < 24) {
-    return `${diffHour}시간 전`;
+    return new Intl.RelativeTimeFormat(getLocale()).format(-diffHour, 'hour');
   } else if (diffDay < 7) {
-    return `${diffDay}일 전`;
+    return new Intl.RelativeTimeFormat(getLocale()).format(-diffDay, 'day');
   } else {
-    return date.toLocaleDateString('ko-KR', {
+    return date.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -122,11 +123,11 @@ export function groupActivitiesByDate(activities: ActivityLog[]): Record<string,
 
     let groupKey: string;
     if (activityDate.getTime() === today.getTime()) {
-      groupKey = '오늘';
+      groupKey = t("오늘");
     } else if (activityDate.getTime() === yesterday.getTime()) {
-      groupKey = '어제';
+      groupKey = t("어제");
     } else {
-      groupKey = activityDate.toLocaleDateString('ko-KR', {
+      groupKey = activityDate.toLocaleDateString(getLocale(), {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

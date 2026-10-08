@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useRef } from 'react';
 import {
   Dialog,
@@ -34,6 +35,7 @@ interface ProfileDialogProps {
 }
 
 export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDeleted, hasPassword = true }: ProfileDialogProps) {
+  useTranslation();
   const { toast } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -77,12 +79,12 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드할 수 있습니다.');
+      setError(t("이미지 파일만 업로드할 수 있습니다."));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('파일 크기는 5MB 이하여야 합니다.');
+      setError(t("파일 크기는 5MB 이하여야 합니다."));
       return;
     }
 
@@ -110,8 +112,8 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>프로필 편집</DialogTitle>
-          <DialogDescription>프로필 사진과 이름을 변경할 수 있습니다.</DialogDescription>
+          <DialogTitle>{t("프로필 편집")}</DialogTitle>
+          <DialogDescription>{t("프로필 사진과 이름을 변경할 수 있습니다.")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -148,7 +150,7 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
 
           {/* Default Avatar Grid */}
           <div>
-            <Label className="text-sm font-medium mb-2 block">기본 아바타 선택</Label>
+            <Label className="text-sm font-medium mb-2 block">{t("기본 아바타 선택")}</Label>
             <div className="grid grid-cols-6 gap-2">
               {DEFAULT_AVATARS.map((avatar) => (
                 <button
@@ -174,13 +176,13 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="profile-name">이름</Label>
+            <Label htmlFor="profile-name">{t("이름")}</Label>
             <div className="flex gap-2">
               <Input
                 id="profile-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="이름을 입력하세요"
+                placeholder={t("이름을 입력하세요")}
                 disabled={isLoading}
               />
               <Button
@@ -188,14 +190,14 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
                 disabled={isLoading || !name.trim() || name.trim() === user.name}
                 size="sm"
               >
-                저장
+                {t("저장")}
               </Button>
             </div>
           </div>
 
           {/* Email (read-only) */}
           <div className="space-y-2">
-            <Label>이메일</Label>
+            <Label>{t("이메일")}</Label>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
 
@@ -205,8 +207,8 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
           <div className="space-y-3 border-t pt-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium">내 데이터 내보내기</p>
-                <p className="text-xs text-muted-foreground">프로필, 소속 워크스페이스, 담당 목표, 댓글을 JSON 으로 받습니다.</p>
+                <p className="text-sm font-medium">{t("내 데이터 내보내기")}</p>
+                <p className="text-xs text-muted-foreground">{t("프로필, 소속 워크스페이스, 담당 목표, 댓글을 JSON 으로 받습니다.")}</p>
               </div>
               <Button
                 variant="outline"
@@ -217,25 +219,25 @@ export function ProfileDialog({ open, onClose, user, onUserUpdate, onAccountDele
                   try {
                     await downloadAccountExport();
                   } catch (e: any) {
-                    toast({ title: '내보내기 실패', description: e.message, variant: 'destructive' });
+                    toast({ title: t("내보내기 실패"), description: e.message, variant: 'destructive' });
                   } finally {
                     setExporting(false);
                   }
                 }}
               >
                 <Download className="mr-2 h-4 w-4" />
-                내보내기
+                {t("내보내기")}
               </Button>
             </div>
             {onAccountDeleted && (
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium">계정 삭제</p>
-                  <p className="text-xs text-muted-foreground">되돌릴 수 없습니다. 혼자 쓰는 워크스페이스도 함께 삭제됩니다.</p>
+                  <p className="text-sm font-medium">{t("계정 삭제")}</p>
+                  <p className="text-xs text-muted-foreground">{t("되돌릴 수 없습니다. 혼자 쓰는 워크스페이스도 함께 삭제됩니다.")}</p>
                 </div>
                 <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteOpen(true)}>
                   <Trash2 className="mr-2 h-4 w-4" />
-                  삭제
+                  {t("삭제")}
                 </Button>
               </div>
             )}

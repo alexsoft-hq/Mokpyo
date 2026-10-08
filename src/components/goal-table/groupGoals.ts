@@ -1,3 +1,4 @@
+import { getLocale, t } from '@/i18n';
 import { Goal } from '@/types/goal';
 import { StatusLabel } from '@/types/fields';
 
@@ -27,7 +28,7 @@ export interface GroupContext {
  */
 export function groupGoals(goals: Goal[], groupBy: GroupByKey, ctx: GroupContext): GoalGroup[] {
   if (groupBy === 'none') {
-    return [buildGroup(NONE_KEY, '전체', goals, undefined, 0)];
+    return [buildGroup(NONE_KEY, t("전체"), goals, undefined, 0)];
   }
 
   const buckets = new Map<string, Goal[]>();
@@ -49,19 +50,19 @@ export function groupGoals(goals: Goal[], groupBy: GroupByKey, ctx: GroupContext
     if (groupBy === 'status') {
       const label = g.statusId ? ctx.statusById.get(g.statusId) : undefined;
       if (label) pushTo(label.id, label.name, g, label.order, label.color);
-      else pushTo(NONE_KEY, '상태 없음', g, Number.MAX_SAFE_INTEGER);
+      else pushTo(NONE_KEY, t("상태 없음"), g, Number.MAX_SAFE_INTEGER);
     } else if (groupBy === 'category') {
       const cat = g.categories?.[0];
       if (cat) pushTo(cat, cat, g, 0);
-      else pushTo(NONE_KEY, '분류 없음', g, Number.MAX_SAFE_INTEGER);
+      else pushTo(NONE_KEY, t("분류 없음"), g, Number.MAX_SAFE_INTEGER);
     } else if (groupBy === 'owner') {
       const owner = g.owners?.[0] ?? g.owner;
       if (owner) pushTo(owner, owner, g, 0);
-      else pushTo(NONE_KEY, '담당자 없음', g, Number.MAX_SAFE_INTEGER);
+      else pushTo(NONE_KEY, t("담당자 없음"), g, Number.MAX_SAFE_INTEGER);
     } else if (groupBy === 'cycle') {
       const cyc = g.cycleId ? ctx.cycleById.get(g.cycleId) : undefined;
       if (cyc) pushTo(cyc.id, cyc.name, g, 0);
-      else pushTo(NONE_KEY, '사이클 없음', g, Number.MAX_SAFE_INTEGER);
+      else pushTo(NONE_KEY, t("사이클 없음"), g, Number.MAX_SAFE_INTEGER);
     }
   }
 
@@ -75,7 +76,7 @@ export function groupGoals(goals: Goal[], groupBy: GroupByKey, ctx: GroupContext
     const bNone = b.key === NONE_KEY ? 1 : 0;
     if (aNone !== bNone) return aNone - bNone;
     if (groupBy === 'status') return (a.sortWeight ?? 0) - (b.sortWeight ?? 0);
-    return a.label.localeCompare(b.label, 'ko');
+    return a.label.localeCompare(b.label, getLocale());
   });
 
   return groups;

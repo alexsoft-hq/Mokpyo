@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Folder, Keyboard, Plus, Target } from 'lucide-react';
@@ -36,6 +37,7 @@ export interface CommandPaletteProps {
  * 검색은 cmdk 기본 필터 대신 직접 처리한다(한글 부분일치 + 결과 개수 제한).
  */
 export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPaletteProps) {
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { projects, currentProject, setCurrentProject } = useProject();
@@ -50,8 +52,9 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
   const normalized = query.trim().toLowerCase();
 
   const navItems = useMemo(
-    () => NAV_COMMANDS.filter((c) => matches(c.label, normalized)),
-    [normalized]
+    () => NAV_COMMANDS.filter((c) => matches(t(c.label), normalized)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+    [normalized, i18n.language]
   );
 
   const projectItems = useMemo(
@@ -78,10 +81,11 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
   const actionItems = useMemo(
     () =>
       [
-        { id: 'new-goal', label: '새 목표', icon: Plus, run: () => navigate('/?new=1') },
-        { id: 'help', label: '단축키 도움말', icon: Keyboard, run: onOpenHelp },
+        { id: 'new-goal', label: t("새 목표"), icon: Plus, run: () => navigate('/?new=1') },
+        { id: 'help', label: t("단축키 도움말"), icon: Keyboard, run: onOpenHelp },
       ].filter((a) => matches(a.label, normalized)),
-    [normalized, navigate, onOpenHelp]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+    [normalized, navigate, onOpenHelp, i18n.language]
   );
 
   const totalCount = navItems.length + projectItems.length + goalItems.length + actionItems.length;
@@ -105,9 +109,9 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
           /* 바깥 클릭으로 닫히도록 기본 동작을 막지 않는다 */
         }}
       >
-        <DialogTitle className="sr-only">명령 팔레트</DialogTitle>
+        <DialogTitle className="sr-only">{t("명령 팔레트")}</DialogTitle>
         <DialogDescription className="sr-only">
-          화면 이동, 프로젝트 전환, 목표 검색을 한 곳에서 실행합니다.
+          {t("화면 이동, 프로젝트 전환, 목표 검색을 한 곳에서 실행합니다.")}
         </DialogDescription>
         <Command
           shouldFilter={false}
@@ -117,18 +121,18 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
           <CommandInput
             value={query}
             onValueChange={setQuery}
-            placeholder="이동할 화면, 프로젝트, 목표를 검색하세요"
+            placeholder={t("이동할 화면, 프로젝트, 목표를 검색하세요")}
             className="pr-8"
           />
           <CommandList className="max-h-[360px]">
             {totalCount === 0 && (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                검색 결과가 없습니다.
+                {t("검색 결과가 없습니다.")}
               </div>
             )}
 
             {navItems.length > 0 && (
-              <CommandGroup heading="이동">
+              <CommandGroup heading={t("이동")}>
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   return (
@@ -139,7 +143,7 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
                       className="gap-2 cursor-pointer"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span className="truncate">{item.label}</span>
+                      <span className="truncate">{t(item.label)}</span>
                       {item.seqKey && (
                         <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                           G {item.seqKey.toUpperCase()}
@@ -154,7 +158,7 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
             {projectItems.length > 0 && (
               <>
                 <CommandSeparator />
-                <CommandGroup heading="프로젝트 전환">
+                <CommandGroup heading={t("프로젝트 전환")}>
                   {projectItems.map((project) => (
                     <CommandItem
                       key={project.id}
@@ -173,7 +177,7 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
             {goalItems.length > 0 && (
               <>
                 <CommandSeparator />
-                <CommandGroup heading="목표">
+                <CommandGroup heading={t("목표")}>
                   {goalItems.map((goal) => (
                     <CommandItem
                       key={goal.id}
@@ -197,7 +201,7 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
             {actionItems.length > 0 && (
               <>
                 <CommandSeparator />
-                <CommandGroup heading="작업">
+                <CommandGroup heading={t("작업")}>
                   {actionItems.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -218,10 +222,10 @@ export function CommandPalette({ open, onOpenChange, onOpenHelp }: CommandPalett
           </CommandList>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3 py-2 text-xs text-muted-foreground">
-            <span>↑ ↓ 이동</span>
-            <span>↵ 선택</span>
-            <span>Esc 닫기</span>
-            <span className="ml-auto">{modKeyLabel()}K 팔레트 · ? 도움말</span>
+            <span>{t("↑ ↓ 이동")}</span>
+            <span>{t("↵ 선택")}</span>
+            <span>{t("Esc 닫기")}</span>
+            <span className="ml-auto">{modKeyLabel()}{t("K 팔레트 · ? 도움말")}</span>
           </div>
         </Command>
       </DialogContent>

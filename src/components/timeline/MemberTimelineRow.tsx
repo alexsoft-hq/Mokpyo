@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { memo, useState, useEffect } from 'react';
 import { User, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ export const MemberTimelineRow = memo(function MemberTimelineRow({
   isEven,
   showSubGoals,
 }: MemberTimelineRowProps) {
+  useTranslation();
   const goalsWithDates = member.goals.filter((g) => g.startDate && g.dueDate);
   const subGoalsWithDates = member.subGoals.filter((s) => s.startDate && s.dueDate);
   const hasSubGoals = member.subGoals.length > 0;
@@ -72,7 +74,7 @@ export const MemberTimelineRow = memo(function MemberTimelineRow({
         <div className="min-w-0">
           <p className="text-sm font-medium truncate">{member.name}</p>
           <p className="text-[10px] text-muted-foreground">
-            {member.totalCount}개 · {member.avgProgress}%
+            {t("목표 {{count}}건 · 진행률 {{progress}}%", { count: member.totalCount, progress: member.avgProgress })}
           </p>
         </div>
       </div>

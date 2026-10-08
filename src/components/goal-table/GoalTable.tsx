@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useMemo, useState } from 'react';
 import {
   useReactTable, getCoreRowModel, getSortedRowModel,
@@ -36,6 +37,7 @@ export interface GoalTableProps {
 }
 
 export function GoalTable(props: GoalTableProps) {
+  const { i18n } = useTranslation();
   const { goals, schema, users, cycles, groupBy, sorting, onSortingChange, columnVisibility, onColumnVisibilityChange } = props;
   const statusById = useMemo(() => new Map(schema.statusLabels.map((l) => [l.id, l])), [schema.statusLabels]);
   const cycleById = useMemo(() => new Map(cycles.map((c) => [c.id, c])), [cycles]);
@@ -44,12 +46,12 @@ export function GoalTable(props: GoalTableProps) {
   const columns = useMemo<ColumnDef<Goal>[]>(() => {
     const core: ColumnDef<Goal>[] = [
       {
-        id: 'status', header: '상태',
+        id: 'status', header: t("상태"),
         accessorFn: (g) => (g.statusId ? statusById.get(g.statusId)?.order ?? 999 : 1000),
         meta: { width: 130, cell: (g: Goal) => <StatusCell goal={g} labels={schema.statusLabels} onChange={(sid) => props.onStatusChange(g, sid)} /> },
       },
       {
-        id: 'title', header: '목표',
+        id: 'title', header: t("목표"),
         accessorFn: (g) => g.title,
         meta: { width: 320, cell: (g: Goal) => (
           <div className="flex items-center gap-1.5 min-w-0">
@@ -63,32 +65,32 @@ export function GoalTable(props: GoalTableProps) {
         ) },
       },
       {
-        id: 'owners', header: '담당자',
+        id: 'owners', header: t("담당자"),
         accessorFn: (g) => g.owners?.[0] ?? g.owner ?? '',
         meta: { width: 150, cell: (g: Goal) => <PersonCell owners={g.owners ?? []} users={users} onChange={(o) => props.onPatch(g, { owners: o, owner: o[0] ?? '' } as Partial<Goal>)} /> },
       },
       {
-        id: 'progress', header: '진행률',
+        id: 'progress', header: t("진행률"),
         accessorFn: (g) => g.progress,
         meta: { width: 140, cell: (g: Goal) => <ProgressCell goal={g} onCommit={(p) => props.onPatch(g, { progress: p })} /> },
       },
       {
-        id: 'size', header: '중요도',
+        id: 'size', header: t("중요도"),
         accessorFn: (g) => SIZE_RANK[g.size] ?? 0,
         meta: { width: 90, cell: (g: Goal) => <SizeCell size={g.size} onChange={(s) => props.onPatch(g, { size: s })} /> },
       },
       {
-        id: 'startDate', header: '시작일',
+        id: 'startDate', header: t("시작일"),
         accessorFn: (g) => g.startDate ?? '',
         meta: { width: 120, cell: (g: Goal) => <DateCell value={g.startDate} onChange={(v) => props.onPatch(g, { startDate: v ?? undefined })} /> },
       },
       {
-        id: 'dueDate', header: '마감일',
+        id: 'dueDate', header: t("마감일"),
         accessorFn: (g) => g.dueDate ?? '',
         meta: { width: 120, cell: (g: Goal) => <DateCell value={g.dueDate} onChange={(v) => props.onPatch(g, { dueDate: v ?? undefined })} /> },
       },
       {
-        id: 'categories', header: '분류',
+        id: 'categories', header: t("분류"),
         accessorFn: (g) => g.categories?.[0] ?? '',
         enableSorting: false,
         meta: { width: 160, cell: (g: Goal) => (
@@ -98,7 +100,7 @@ export function GoalTable(props: GoalTableProps) {
         ) },
       },
       {
-        id: 'cycle', header: '사이클',
+        id: 'cycle', header: t("사이클"),
         accessorFn: (g) => (g.cycleId ? cycleById.get(g.cycleId)?.name ?? '' : ''),
         meta: { width: 110, cell: (g: Goal) => <span className="text-xs text-muted-foreground">{g.cycleId ? cycleById.get(g.cycleId)?.name ?? '-' : '-'}</span> },
       },
@@ -112,7 +114,8 @@ export function GoalTable(props: GoalTableProps) {
       ) },
     }));
     return [...core, ...customCols];
-  }, [schema, statusById, cycleById, users, props]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+  }, [schema, statusById, cycleById, users, props, i18n.language]);
 
   const table = useReactTable({
     data: goals,
@@ -125,7 +128,8 @@ export function GoalTable(props: GoalTableProps) {
   });
 
   const sortedGoals = table.getRowModel().rows.map((r) => r.original);
-  const groups = useMemo(() => groupGoals(sortedGoals, groupBy, { statusById, cycleById }), [sortedGoals, groupBy, statusById, cycleById]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+  const groups = useMemo(() => groupGoals(sortedGoals, groupBy, { statusById, cycleById }), [sortedGoals, groupBy, statusById, cycleById, i18n.language]);
   const visibleCols = table.getVisibleLeafColumns();
 
   return (
@@ -177,7 +181,7 @@ export function GoalTable(props: GoalTableProps) {
             );
           })}
           {goals.length === 0 && (
-            <TableRow><TableCell colSpan={visibleCols.length} className="text-center text-muted-foreground py-10">목표가 없습니다.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={visibleCols.length} className="text-center text-muted-foreground py-10">{t("목표가 없습니다.")}</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
@@ -197,6 +201,7 @@ function GroupBlock({
   showGroupHeader: boolean;
   statusById: Map<string, StatusLabel>;
 }) {
+  useTranslation();
   return (
     <>
       {showGroupHeader && (
@@ -206,9 +211,9 @@ function GroupBlock({
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               {group.color && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: group.color }} />}
               <span>{group.label}</span>
-              <span className="text-muted-foreground font-normal">{`${group.count}건`}</span>
-              <span className="text-muted-foreground font-normal text-xs">{`· 평균 ${group.avgProgress}%`}</span>
-              <span className="text-muted-foreground font-normal text-xs">{`· 완료 ${group.doneCount}/${group.count}`}</span>
+              <span className="text-muted-foreground font-normal">{t("{{value0}}건", { value0: group.count })}</span>
+              <span className="text-muted-foreground font-normal text-xs">{t("· 평균 {{value0}}%", { value0: group.avgProgress })}</span>
+              <span className="text-muted-foreground font-normal text-xs">{t("· 완료 {{value0}}/{{value1}}", { value0: group.doneCount, value1: group.count })}</span>
             </button>
           </TableCell>
         </TableRow>

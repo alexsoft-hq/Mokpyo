@@ -1,3 +1,4 @@
+import { formatNumber, t, useTranslation } from '@/i18n';
 import { Tag } from 'lucide-react';
 import { useFieldSchema } from '@/hooks/useFieldSchema';
 import { OptionChip } from '@/components/common/StatusPill';
@@ -8,6 +9,7 @@ import { CustomFieldDefinition, DropdownOption, PersonValue } from '@/types/fiel
  * 커스텀 필드가 /table 에서만 보이던 구멍을 막는다(적대적 검증 medium). 정의가 없으면 렌더 안 함.
  */
 export function CustomFieldsSection({ customFields }: { customFields?: Record<string, unknown> }) {
+  useTranslation();
   const { data: schema } = useFieldSchema();
   const defs = schema?.customFields ?? [];
   if (defs.length === 0) return null;
@@ -16,7 +18,7 @@ export function CustomFieldsSection({ customFields }: { customFields?: Record<st
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
         <Tag className="h-4 w-4" />
-        커스텀 필드
+        {t("커스텀 필드")}
       </h3>
       <div className="grid grid-cols-2 gap-x-6 gap-y-2">
         {defs.map((def) => (
@@ -31,13 +33,14 @@ export function CustomFieldsSection({ customFields }: { customFields?: Record<st
 }
 
 function FieldValue({ def, value }: { def: CustomFieldDefinition; value: unknown }) {
+  useTranslation();
   if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) {
     return <span className="text-sm text-muted-foreground">-</span>;
   }
   const options: DropdownOption[] = def.config?.options ?? [];
 
   if (def.type === 'number') {
-    return <span className="text-sm">{String(value)}{def.config?.unit ? ` ${def.config.unit}` : ''}</span>;
+    return <span className="text-sm">{typeof value === 'number' ? formatNumber(value) : String(value)}{def.config?.unit ? ` ${def.config.unit}` : ''}</span>;
   }
   if (def.type === 'text' || def.type === 'date') {
     return <span className="text-sm">{String(value)}</span>;

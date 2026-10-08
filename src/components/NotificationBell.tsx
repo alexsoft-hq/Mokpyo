@@ -1,3 +1,4 @@
+import { getLocale, t, useTranslation } from '@/i18n';
 import { useEffect, useState, useCallback } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -6,14 +7,16 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
 
 function timeAgo(iso: string): string {
   const diff = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
-  if (diff < 60) return '방금 전';
-  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}일 전`;
-  return new Date(iso).toLocaleDateString('ko-KR');
+  if (diff < 60) return t("방금 전");
+  const relative = new Intl.RelativeTimeFormat(getLocale(), { numeric: 'always' });
+  if (diff < 3600) return relative.format(-Math.floor(diff / 60), 'minute');
+  if (diff < 86400) return relative.format(-Math.floor(diff / 3600), 'hour');
+  if (diff < 604800) return relative.format(-Math.floor(diff / 86400), 'day');
+  return new Date(iso).toLocaleDateString(getLocale());
 }
 
 export function NotificationBell() {
+  useTranslation();
   const { currentOrganization } = useWorkspace();
   const [unread, setUnread] = useState(0);
   const [items, setItems] = useState<AppNotification[]>([]);
@@ -94,7 +97,7 @@ export function NotificationBell() {
       <PopoverTrigger asChild>
         <button
           className="relative flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
-          aria-label={unread > 0 ? `알림 (안 읽음 ${unread}건)` : '알림'}
+          aria-label={unread > 0 ? t("알림 (안 읽음 {{value0}}건)", { value0: unread }) : t("알림")}
         >
           <Bell className="h-5 w-5" />
           {unread > 0 && (
@@ -106,21 +109,21 @@ export function NotificationBell() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 max-w-[calc(100vw-2rem)] p-0">
         <div className="flex items-center justify-between border-b px-4 py-2.5">
-          <span className="text-sm font-semibold">알림</span>
+          <span className="text-sm font-semibold">{t("알림")}</span>
           {unread > 0 && (
             <button
               onClick={handleReadAll}
               className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              <CheckCheck className="h-3.5 w-3.5" /> 모두 읽음
+              <CheckCheck className="h-3.5 w-3.5" /> {t("모두 읽음")}
             </button>
           )}
         </div>
         <div className="max-h-96 overflow-y-auto">
           {loading ? (
-            <div className="px-4 py-8 text-center text-sm text-muted-foreground">불러오는 중…</div>
+            <div className="px-4 py-8 text-center text-sm text-muted-foreground">{t("불러오는 중…")}</div>
           ) : items.length === 0 ? (
-            <div className="px-4 py-10 text-center text-sm text-muted-foreground">새 알림이 없습니다.</div>
+            <div className="px-4 py-10 text-center text-sm text-muted-foreground">{t("새 알림이 없습니다.")}</div>
           ) : (
             <ul className="divide-y">
               {items.map((n) => (
@@ -135,7 +138,7 @@ export function NotificationBell() {
                     />
                     <span className="min-w-0 flex-1">
                       <span className={`block text-sm leading-snug line-clamp-2 ${n.read ? 'font-medium' : 'font-semibold'}`}>
-                        {!n.read && <span className="sr-only">안 읽음: </span>}
+                        {!n.read && <span className="sr-only">{t("안 읽음:")} </span>}
                         {n.title}
                       </span>
                       {n.body && (

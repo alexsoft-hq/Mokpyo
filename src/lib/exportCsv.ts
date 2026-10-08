@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 // 테이블 뷰의 CSV 내보내기.
 // Excel(한국어 Windows 포함)이 UTF-8 로 열도록 BOM 을 붙이고, 줄바꿈은 CRLF 를 쓴다.
 
@@ -89,8 +90,8 @@ export function formatCustomFieldValue(def: CustomFieldDefinition, value: unknow
 function statusText(goal: Goal, statusLabels: StatusLabel[]): string {
   const label = statusLabels.find((l) => l.id === goal.statusId);
   if (label) return label.name;
-  if (goal.completed) return '완료';
-  if (goal.onHold) return '보류';
+  if (goal.completed) return t("완료");
+  if (goal.onHold) return t("보류");
   return '';
 }
 
@@ -100,7 +101,7 @@ export function goalsToCsv(goals: Goal[], options: GoalsToCsvOptions = {}): stri
   const statusLabels = options.statusLabels ?? [];
   const cycles = options.cycles ?? [];
 
-  const headers = [...BASE_HEADERS, ...fieldDefs.map((f) => f.name)];
+  const headers = [...BASE_HEADERS.map(header => t(header)), ...fieldDefs.map((f) => f.name)];
 
   const rows = goals.map((goal) => {
     const owners = goal.owners && goal.owners.length > 0 ? goal.owners : goal.owner ? [goal.owner] : [];
@@ -109,7 +110,7 @@ export function goalsToCsv(goals: Goal[], options: GoalsToCsvOptions = {}): stri
       statusText(goal, statusLabels),
       owners.join(MULTI_VALUE_SEPARATOR),
       String(goal.progress ?? 0),
-      SIZE_LABELS[goal.size] ?? '',
+      t(SIZE_LABELS[goal.size] ?? ''),
       formatDate(goal.startDate),
       formatDate(goal.dueDate),
       (goal.categories ?? []).join(MULTI_VALUE_SEPARATOR),
@@ -141,5 +142,5 @@ export function csvFileName(projectName: string | undefined, date: Date = new Da
   const pad = (n: number) => String(n).padStart(2, '0');
   const stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
   const safeName = (projectName ?? '').trim().replace(/[\\/:*?"<>|\s]+/g, '-').replace(/^-+|-+$/g, '');
-  return `mokpyo-${safeName || '목표'}-${stamp}.csv`;
+  return `mokpyo-${safeName || t("목표")}-${stamp}.csv`;
 }

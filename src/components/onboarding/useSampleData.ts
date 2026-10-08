@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -13,6 +14,7 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
  * 백엔드 엔드포인트가 아직 없을 수 있으므로 실패는 토스트로만 알린다.
  */
 export function useSampleData() {
+  useTranslation();
   const { currentOrganization } = useWorkspace();
   const { refreshProjects, setCurrentProject } = useProject();
   const queryClient = useQueryClient();
@@ -20,7 +22,7 @@ export function useSampleData() {
 
   const loadSample = async () => {
     if (!currentOrganization) {
-      toast.error('워크스페이스를 먼저 선택하세요.');
+      toast.error(t("워크스페이스를 먼저 선택하세요."));
       return;
     }
     setLoading(true);
@@ -38,14 +40,14 @@ export function useSampleData() {
       queryClient.invalidateQueries({ queryKey: ['fieldSchema'] });
 
       toast.success(
-        created ? '샘플 데이터를 만들었습니다.' : '이미 만들어 둔 샘플 프로젝트로 이동했습니다.'
+        created ? t("샘플 데이터를 만들었습니다.") : t("이미 만들어 둔 샘플 프로젝트로 이동했습니다.")
       );
     } catch (error) {
       // 샘플 생성은 워크스페이스 관리자만 할 수 있다.
       if (error instanceof ApiError && error.status === 403) {
-        toast.error('샘플 데이터는 워크스페이스 관리자만 만들 수 있습니다.');
+        toast.error(t("샘플 데이터는 워크스페이스 관리자만 만들 수 있습니다."));
       } else {
-        toast.error(error instanceof Error ? error.message : '샘플 데이터를 불러오지 못했습니다.');
+        toast.error(error instanceof Error ? error.message : t("샘플 데이터를 불러오지 못했습니다."));
       }
     } finally {
       setLoading(false);

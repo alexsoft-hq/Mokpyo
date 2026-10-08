@@ -1,3 +1,5 @@
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -35,6 +37,7 @@ interface AppHeaderProps {
  * 뷰별 컨트롤은 actions 슬롯 또는 각 페이지가 이 아래에 두는 전용 툴바(Tier-2)로.
  */
 export function AppHeader({ title, subtitle, backTo, showProjectSelector = true, showTabs = false, actions }: AppHeaderProps) {
+  useTranslation();
   const navigate = useNavigate();
   const { user, logout, updateUser } = useAuth();
   const { settings, updateSettings } = useUserSettings();
@@ -42,26 +45,32 @@ export function AppHeader({ title, subtitle, backTo, showProjectSelector = true,
 
   return (
     <div className="border-b bg-card sticky top-0 z-30">
-      <div className="px-3 md:px-6 min-h-14 py-2 flex items-center gap-2 md:gap-3">
+      <div className="px-3 md:px-6 min-h-14 py-2 flex flex-wrap sm:flex-nowrap items-center gap-2 md:gap-3">
         {backTo && (
-          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate(backTo)} aria-label="뒤로">
+          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate(backTo)} aria-label={t("뒤로")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
-        <Link to="/" aria-label="Mokpyo 홈" className="shrink-0"><LogoMark size={22} /></Link>
-        {showProjectSelector && <div className="min-w-0"><ProjectSelector /></div>}
+        <Link to="/" aria-label={t("Mokpyo 홈")} className="shrink-0"><LogoMark size={22} /></Link>
+        {showProjectSelector && <div className="min-w-0 flex-1 sm:flex-initial"><ProjectSelector /></div>}
         {title && (
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1 sm:flex-initial">
             <h1 className="text-lg font-bold leading-tight truncate">{title}</h1>
             {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
           </div>
         )}
 
-        <div className="flex-1" />
+        <div className="hidden sm:block flex-1" />
 
-        <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-          {actions}
-          {actions && <div className="mx-0.5 h-7 w-px self-center bg-border" aria-hidden />}
+        {actions && (
+          <div className="order-last flex w-full flex-wrap items-center gap-2 pt-1 sm:order-none sm:w-auto sm:flex-nowrap sm:pt-0">
+            {actions}
+            <div className="hidden sm:block mx-0.5 h-7 w-px self-center bg-border" aria-hidden />
+          </div>
+        )}
+
+        <div className="ml-auto flex items-center gap-1.5 md:gap-2 shrink-0">
+          <LanguageSwitcher />
           <QuickNavMenu />
           <NotificationBell />
           {/* 워크스페이스 전환: 데스크톱은 헤더, 모바일은 계정 메뉴 안(MobileWorkspaceItems) */}

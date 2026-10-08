@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { Goal, GoalCategory } from '@/types/goal';
 import { Progress } from '@/components/ui/progress';
@@ -84,6 +85,7 @@ export const CompactOverallSummary = ({
   onCyclesChange,
   onGoalsChange,
 }: CompactOverallSummaryProps) => {
+  useTranslation();
   const [showFilters, setShowFilters] = useState(false);
 
   // Filter goals based on showCompleted toggle
@@ -117,11 +119,11 @@ export const CompactOverallSummary = ({
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-primary whitespace-nowrap">
-              전체 평균: {overallAverage}%
+              {t("전체 평균:")} {overallAverage}%
             </span>
           </div>
           <div className="text-sm text-muted-foreground whitespace-nowrap">
-            총 {displayGoals.length}개 목표
+            {t("총 {{count}}개 목표", { count: displayGoals.length })}
           </div>
         </div>
 
@@ -156,7 +158,7 @@ export const CompactOverallSummary = ({
             variant={showFilters || hasActiveFilters ? 'default' : 'outline'}
             className="shadow-sm"
             onClick={() => setShowFilters(!showFilters)}
-            title="필터"
+            title={t("필터")}
           >
             <Filter className="w-4 h-4" />
             {hasActiveFilters && (
@@ -169,26 +171,26 @@ export const CompactOverallSummary = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="default" variant="outline" className="whitespace-nowrap">
-                  {viewMode === 'normal' && <><Maximize2 className="w-4 h-4 mr-2" />상세보기</>}
-                  {viewMode === 'compact' && <><Minimize2 className="w-4 h-4 mr-2" />요약보기</>}
+                  {viewMode === 'normal' && <><Maximize2 className="w-4 h-4 mr-2" />{t("상세보기")}</>}
+                  {viewMode === 'compact' && <><Minimize2 className="w-4 h-4 mr-2" />{t("요약보기")}</>}
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => onViewModeChange('compact')}>
                   <Minimize2 className="w-4 h-4 mr-2" />
-                  요약보기
+                  {t("요약보기")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onViewModeChange('normal')}>
                   <Maximize2 className="w-4 h-4 mr-2" />
-                  상세보기
+                  {t("상세보기")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
           <Button onClick={onAddGoal} size="sm" className="shadow-md whitespace-nowrap">
             <Plus className="w-4 h-4 mr-2" />
-            새 목표
+            {t("새 목표")}
           </Button>
         </div>
       </div>
@@ -214,7 +216,7 @@ export const CompactOverallSummary = ({
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="목표 검색..."
+              placeholder={t("목표 검색...")}
               value={searchText}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-9 h-9"
@@ -229,8 +231,8 @@ export const CompactOverallSummary = ({
               >
                 <span className="text-sm truncate">
                   {selectedOwners.length === 0
-                    ? "담당자 선택"
-                    : `${selectedOwners.length}명 선택`}
+                    ? t("담당자 선택")
+                    : t("{{value0}}명 선택", { value0: selectedOwners.length })}
                 </span>
                 <ChevronDown className="w-4 h-4 ml-2 opacity-50 shrink-0" />
               </Button>
@@ -238,7 +240,7 @@ export const CompactOverallSummary = ({
             <PopoverContent className="w-64 p-3">
               {owners.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  담당자가 없습니다
+                  {t("담당자가 없습니다")}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -253,7 +255,7 @@ export const CompactOverallSummary = ({
                         }
                       })}
                     >
-                      전체 선택
+                      {t("전체 선택")}
                     </Button>
                     <Button
                       variant="outline"
@@ -263,7 +265,7 @@ export const CompactOverallSummary = ({
                         selectedOwners.forEach(owner => onOwnerToggle(owner));
                       }}
                     >
-                      전체 해제
+                      {t("전체 해제")}
                     </Button>
                   </div>
                   <div className="space-y-1 max-h-64 overflow-y-auto">

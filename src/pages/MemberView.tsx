@@ -1,3 +1,4 @@
+import { useTranslation, t, getLocale } from '@/i18n';
 import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -45,6 +46,7 @@ import {
 
 
 export default function MemberView() {
+  useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { currentProject } = useProject();
@@ -210,19 +212,19 @@ export default function MemberView() {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader
-        title="담당자별 현황"
-        subtitle={currentProject ? `${currentProject.name} · ${members.length}명` : undefined}
+        title={t("담당자별 현황")}
+        subtitle={currentProject ? t("{{value0}} · {{value1}}명", { value0: currentProject.name, value1: members.length }) : undefined}
         backTo="/dashboard"
         showProjectSelector={false}
         actions={
           <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-            <Button variant={viewMode === 'dashboard' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('dashboard')} title="대시보드">
+            <Button variant={viewMode === 'dashboard' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('dashboard')} title={t("대시보드")}>
               <LayoutDashboard className="h-4 w-4" />
             </Button>
-            <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('card')} title="카드뷰">
+            <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('card')} title={t("카드뷰")}>
               <LayoutGrid className="h-4 w-4" />
             </Button>
-            <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')} title="목록뷰">
+            <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')} title={t("목록뷰")}>
               <List className="h-4 w-4" />
             </Button>
           </div>
@@ -236,7 +238,7 @@ export default function MemberView() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="담당자 검색..."
+                placeholder={t("담당자 검색...")}
                 value={memberSearch}
                 onChange={(e) => setMemberSearch(e.target.value)}
                 className="pl-9 pr-8"
@@ -250,7 +252,7 @@ export default function MemberView() {
             <div className="relative flex-1">
               <Target className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="목표/하위목표 검색..."
+                placeholder={t("목표/하위목표 검색...")}
                 value={goalSearch}
                 onChange={(e) => setGoalSearch(e.target.value)}
                 className="pl-9 pr-8"
@@ -267,7 +269,7 @@ export default function MemberView() {
                 size="icon"
                 className="h-9 w-9"
                 onClick={() => setExpandAll(true)}
-                title="전체 펼치기"
+                title={t("전체 펼치기")}
               >
                 <ChevronsUpDown className="h-4 w-4" />
               </Button>
@@ -276,7 +278,7 @@ export default function MemberView() {
                 size="icon"
                 className="h-9 w-9"
                 onClick={() => setExpandAll(false)}
-                title="전체 접기"
+                title={t("전체 접기")}
               >
                 <ChevronsDownUp className="h-4 w-4" />
               </Button>
@@ -284,8 +286,7 @@ export default function MemberView() {
           </div>
           {hasActiveFilter && (
             <p className="text-xs text-muted-foreground mt-2">
-              {filteredMembers.length}명 표시 (전체 {members.length}명)
-            </p>
+              {t("{{shown}}명 표시 (전체 {{total}}명)", { shown: filteredMembers.length, total: members.length })}</p>
           )}
         </div>
       )}
@@ -299,15 +300,11 @@ export default function MemberView() {
         )}
 
         {!isLoading && members.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            담당자가 없습니다.
-          </div>
+          <div className="text-center py-12 text-muted-foreground">{t("담당자가 없습니다.")}</div>
         )}
 
         {!isLoading && filteredMembers.length === 0 && members.length > 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            검색 결과가 없습니다.
-          </div>
+          <div className="text-center py-12 text-muted-foreground">{t("검색 결과가 없습니다.")}</div>
         )}
 
         {!isLoading && filteredMembers.length > 0 && viewMode === 'dashboard' && (
@@ -331,12 +328,10 @@ export default function MemberView() {
         )}
       >
         <div className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center justify-between">
-          <h2 className="font-semibold text-lg">목표 상세</h2>
+          <h2 className="font-semibold text-lg">{t("목표 상세")}</h2>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={handleEditGoal} disabled={isLoadingDetail || !selectedGoal}>
-              <FileText className="h-4 w-4 mr-1" />
-              편집
-            </Button>
+              <FileText className="h-4 w-4 mr-1" />{t("편집")}</Button>
             <Button variant="ghost" size="icon" onClick={() => handleSheetClose(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -393,6 +388,7 @@ function CardView({
   expandAll: boolean | null;
   onExpandApplied: () => void;
 }) {
+  useTranslation();
   useEffect(() => {
     if (expandAll !== null) onExpandApplied();
   }, [expandAll]);
@@ -417,6 +413,7 @@ function MemberCard({
   highlightItemId: string | null;
   expandAll: boolean | null;
 }) {
+  useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -435,8 +432,7 @@ function MemberCard({
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Target className="h-3 w-3" />
-              {member.totalCount}건
-            </span>
+              {t('목표 {{count}}건', { count: member.totalCount })}</span>
             <span className="flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3 text-green-500" />
               {member.completedCount}
@@ -463,7 +459,7 @@ function MemberCard({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm" className="w-full justify-between text-xs">
-            <span>목표 {member.goals.length}건 · 하위목표 {member.subGoals.length}건</span>
+            <span>{t("목표 {{goals}}건 · 하위목표 {{subgoals}}건", { goals: member.goals.length, subgoals: member.subGoals.length })}</span>
             {isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
           </Button>
         </CollapsibleTrigger>
@@ -502,6 +498,7 @@ function ListView({
   expandAll: boolean | null;
   onExpandApplied: () => void;
 }) {
+  useTranslation();
   useEffect(() => {
     if (expandAll !== null) onExpandApplied();
   }, [expandAll]);
@@ -526,6 +523,7 @@ function MemberListSection({
   highlightItemId: string | null;
   expandAll: boolean | null;
 }) {
+  useTranslation();
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
@@ -544,8 +542,7 @@ function MemberListSection({
           <span className="font-semibold flex-1">{member.name}</span>
           <div className="flex items-center gap-4 text-sm">
             <span className="text-muted-foreground">
-              {member.totalCount}건
-            </span>
+              {t('목표 {{count}}건', { count: member.totalCount })}</span>
             <div className="flex items-center gap-2 w-32">
               <Progress value={member.avgProgress} className="h-2 flex-1" />
               <span className={`text-sm font-medium w-10 text-right ${getProgressColor(member.avgProgress)}`}>
@@ -619,30 +616,28 @@ function GoalDetailPanel({
   goalId: string;
   itemId: string;
 }) {
+  useTranslation();
   return (
     <div className="mt-1 mb-1 mx-1 p-3 bg-muted/30 border rounded-md text-xs space-y-2">
       {/* Status badges */}
       <div className="flex items-center gap-2 flex-wrap">
         {completed && (
           <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-            <CheckCircle2 className="h-3 w-3 mr-1" /> 완료
-          </Badge>
+            <CheckCircle2 className="h-3 w-3 mr-1" />{t("완료")}</Badge>
         )}
         {onHold && (
           <Badge variant="secondary" className="text-[10px] bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-            <PauseCircle className="h-3 w-3 mr-1" /> 보류
-          </Badge>
+            <PauseCircle className="h-3 w-3 mr-1" />{t("보류")}</Badge>
         )}
         {parentGoalTitle && (
-          <Badge variant="outline" className="text-[10px]">
-            상위: {parentGoalTitle}
+          <Badge variant="outline" className="text-[10px]">{t("상위:")}{parentGoalTitle}
           </Badge>
         )}
       </div>
 
       {/* Progress */}
       <div className="flex items-center gap-2">
-        <span className="text-muted-foreground w-12 shrink-0">진행률</span>
+        <span className="text-muted-foreground w-12 shrink-0">{t("진행률")}</span>
         <Progress value={progress} className="h-1.5 flex-1" />
         <span className={`font-medium w-8 text-right ${getProgressColor(progress)}`}>{progress}%</span>
       </div>
@@ -675,7 +670,7 @@ function GoalDetailPanel({
       {/* Sub-goals of this goal (card view) */}
       {subGoals && subGoals.length > 0 && (
         <div className="space-y-1 pt-1 border-t">
-          <span className="text-muted-foreground font-medium">하위목표 ({subGoals.length})</span>
+          <span className="text-muted-foreground font-medium">{t("하위목표 (")}{subGoals.length})</span>
           {subGoals.map((sub) => (
             <div key={sub.id} className="pl-2 space-y-0.5">
               <div className="flex items-center gap-2">
@@ -704,9 +699,7 @@ function GoalDetailPanel({
         onClick={(e) => { e.stopPropagation(); onOpenDetail(goalId, itemId); }}
         className="flex items-center gap-1 text-primary hover:underline pt-1"
       >
-        <ExternalLink className="h-3 w-3" />
-        목표 상세 보기
-      </button>
+        <ExternalLink className="h-3 w-3" />{t("목표 상세 보기")}</button>
     </div>
   );
 }
@@ -724,6 +717,7 @@ function GoalItem({
   onOpenDetail: (goalId: string, itemId?: string) => void;
   highlightItemId: string | null;
 }) {
+  useTranslation();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   return (
     <div data-highlight-id={goal.id}>
@@ -770,6 +764,7 @@ function SubGoalItem({
   onOpenDetail: (goalId: string, itemId?: string) => void;
   highlightItemId: string | null;
 }) {
+  useTranslation();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const isCompleted = subGoal.progress === 100;
 
@@ -827,6 +822,7 @@ function GoalRow({
   onOpenDetail: (goalId: string, itemId?: string) => void;
   highlightItemId: string | null;
 }) {
+  useTranslation();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   return (
@@ -883,6 +879,7 @@ function SubGoalRow({
   onOpenDetail: (goalId: string, itemId?: string) => void;
   highlightItemId: string | null;
 }) {
+  useTranslation();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const isCompleted = subGoal.progress === 100;
 
@@ -946,6 +943,7 @@ function GoalSheetContent({
   highlightSubGoalId?: string | null;
   onEdit: () => void;
 }) {
+  useTranslation();
   // Scroll to highlighted sub-goal inside the side panel
   useEffect(() => {
     if (!highlightSubGoalId) return;
@@ -970,13 +968,11 @@ function GoalSheetContent({
         </Badge>
         {goal.completed && (
           <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-            <CheckCircle2 className="h-3 w-3 mr-1" /> 완료
-          </Badge>
+            <CheckCircle2 className="h-3 w-3 mr-1" />{t("완료")}</Badge>
         )}
         {goal.onHold && (
           <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-            <PauseCircle className="h-3 w-3 mr-1" /> 보류
-          </Badge>
+            <PauseCircle className="h-3 w-3 mr-1" />{t("보류")}</Badge>
         )}
         {goal.categories?.map((cat) => (
           <Badge key={cat} variant="secondary" className="text-xs">
@@ -988,7 +984,7 @@ function GoalSheetContent({
       {/* Progress */}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">진행률</span>
+          <span className="text-muted-foreground">{t("진행률")}</span>
           <span className={`font-semibold ${getProgressColor(goal.progress)}`}>{goal.progress}%</span>
         </div>
         <Progress value={goal.progress} className="h-2" />
@@ -1008,8 +1004,7 @@ function GoalSheetContent({
       {goal.description && (
         <div className="space-y-1">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <FileText className="h-4 w-4" /> 설명
-          </h4>
+            <FileText className="h-4 w-4" />{t("설명")}</h4>
           <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words bg-muted/30 rounded-md p-3">
             {goal.description}
           </p>
@@ -1019,7 +1014,7 @@ function GoalSheetContent({
       {/* Status Note */}
       {goal.statusNote && (
         <div className="space-y-1">
-          <h4 className="text-sm font-medium">상태 메모</h4>
+          <h4 className="text-sm font-medium">{t("상태 메모")}</h4>
           <div className="text-sm text-muted-foreground italic whitespace-pre-wrap break-words bg-muted/30 rounded-md p-3 border-l-2 border-primary/30">
             {goal.statusNote}
           </div>
@@ -1030,7 +1025,7 @@ function GoalSheetContent({
       {goal.subGoals && goal.subGoals.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <Target className="h-4 w-4" /> 하위목표 ({goal.subGoals.length})
+            <Target className="h-4 w-4" />{t("하위목표 (")}{goal.subGoals.length})
           </h4>
           <div className="space-y-2">
             {goal.subGoals.map((sub) => {
@@ -1081,14 +1076,14 @@ function GoalSheetContent({
       {goal.notes && goal.notes.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <StickyNote className="h-4 w-4" /> 메모 ({goal.notes.length})
+            <StickyNote className="h-4 w-4" />{t("메모 (")}{goal.notes.length})
           </h4>
           <div className="space-y-2">
             {goal.notes.map((note) => (
               <div key={note.id} className="bg-muted/30 rounded-md p-3 text-sm">
                 <p className="whitespace-pre-wrap break-words">{note.content}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(note.createdAt).toLocaleDateString('ko-KR')}
+                  {new Date(note.createdAt).toLocaleDateString(getLocale())}
                 </p>
               </div>
             ))}
@@ -1100,7 +1095,7 @@ function GoalSheetContent({
       {goal.attachments && goal.attachments.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <Paperclip className="h-4 w-4" /> 첨부파일 ({goal.attachments.length})
+            <Paperclip className="h-4 w-4" />{t("첨부파일 (")}{goal.attachments.length})
           </h4>
           <div className="space-y-1">
             {goal.attachments.map((att) => (
@@ -1117,9 +1112,7 @@ function GoalSheetContent({
       {/* Navigate to edit */}
       <div className="pt-2 border-t">
         <Button variant="default" size="sm" className="w-full" onClick={onEdit}>
-          <FileText className="h-4 w-4 mr-2" />
-          편집
-        </Button>
+          <FileText className="h-4 w-4 mr-2" />{t("편집")}</Button>
       </div>
     </div>
   );

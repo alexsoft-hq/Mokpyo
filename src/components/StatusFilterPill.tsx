@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { CheckCircle2, PauseCircle, UserCheck } from 'lucide-react';
 
 interface StatusFilterPillProps {
@@ -23,6 +24,7 @@ export const StatusFilterPill = ({
   onShowMineToggle,
   mineCount = 0,
 }: StatusFilterPillProps) => {
+  useTranslation();
   return (
     <div className="inline-flex items-center rounded-full border bg-background/50 shadow-sm overflow-hidden">
       {onShowMineToggle && (
@@ -30,7 +32,7 @@ export const StatusFilterPill = ({
           <button
             onClick={onShowMineToggle}
             aria-pressed={showMineOnly}
-            title="내 목표만 보기"
+            title={t("내 목표만 보기")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
               showMineOnly
                 ? 'bg-primary/10 text-primary dark:bg-primary/20'
@@ -38,7 +40,7 @@ export const StatusFilterPill = ({
             }`}
           >
             <UserCheck className="w-3.5 h-3.5" />
-            <span>내 목표{mineCount > 0 ? ` ${mineCount}` : ''}</span>
+            <span>{t("내 목표")}{mineCount > 0 ? ` ${mineCount}` : ''}</span>
           </button>
           <div className="w-px h-5 bg-border" />
         </>

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Project } from '@/types/goal';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ export function ProjectInfoPanel({
   onRemoveParent,
   canDelete,
 }: ProjectInfoPanelProps) {
+  useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -68,7 +70,7 @@ export function ProjectInfoPanel({
     if (!project || !isDirty) return;
 
     if (!name.trim()) {
-      alert('프로젝트 이름을 입력해주세요.');
+      alert(t("프로젝트 이름을 입력해주세요."));
       return;
     }
 
@@ -81,7 +83,7 @@ export function ProjectInfoPanel({
       setIsDirty(false);
     } catch (error) {
       console.error('Failed to save project:', error);
-      alert('프로젝트 저장에 실패했습니다.');
+      alert(t("프로젝트 저장에 실패했습니다."));
     } finally {
       setIsSaving(false);
     }
@@ -96,7 +98,7 @@ export function ProjectInfoPanel({
   const handleDeleteConfirm = async () => {
     if (!project) return;
     if (confirmName.trim() !== project.name) {
-      setDeleteError('프로젝트 이름이 일치하지 않습니다.');
+      setDeleteError(t("프로젝트 이름이 일치하지 않습니다."));
       return;
     }
 
@@ -109,10 +111,10 @@ export function ProjectInfoPanel({
     } catch (error: any) {
       console.error('Failed to delete project:', error);
       const message: string = error?.message || '';
-      if (message.includes('child project') || message.includes('하위 프로젝트')) {
-        setDeleteError('하위 프로젝트가 있어 삭제할 수 없습니다. 먼저 하위 프로젝트를 삭제하거나 이동해주세요.');
+      if (message.includes('child project') || message.includes(t("하위 프로젝트"))) {
+        setDeleteError(t("하위 프로젝트가 있어 삭제할 수 없습니다. 먼저 하위 프로젝트를 삭제하거나 이동해주세요."));
       } else {
-        setDeleteError(message || '프로젝트 삭제에 실패했습니다.');
+        setDeleteError(message || t("프로젝트 삭제에 실패했습니다."));
       }
     } finally {
       setIsDeleting(false);
@@ -124,7 +126,7 @@ export function ProjectInfoPanel({
       <div className="h-full flex items-center justify-center text-muted-foreground">
         <div className="text-center">
           <Folder className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>프로젝트를 선택하세요</p>
+          <p>{t("프로젝트를 선택하세요")}</p>
         </div>
       </div>
     );
@@ -136,35 +138,35 @@ export function ProjectInfoPanel({
         {/* 헤더 */}
         <div className="flex items-center gap-2 pb-2 border-b">
           <Folder className="h-5 w-5 text-amber-500" />
-          <h3 className="font-semibold">프로젝트 정보</h3>
+          <h3 className="font-semibold">{t("프로젝트 정보")}</h3>
         </div>
 
         {/* 이름 */}
         <div className="space-y-2">
-          <Label htmlFor="projectName">프로젝트 이름 *</Label>
+          <Label htmlFor="projectName">{t("프로젝트 이름 *")}</Label>
           <Input
             id="projectName"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="프로젝트 이름"
+            placeholder={t("프로젝트 이름")}
           />
         </div>
 
         {/* 설명 */}
         <div className="space-y-2">
-          <Label htmlFor="projectDescription">설명</Label>
+          <Label htmlFor="projectDescription">{t("설명")}</Label>
           <Textarea
             id="projectDescription"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="프로젝트 설명 (선택사항)"
+            placeholder={t("프로젝트 설명 (선택사항)")}
             rows={3}
           />
         </div>
 
         {/* 부모 프로젝트 정보 */}
         <div className="space-y-2">
-          <Label>부모 프로젝트</Label>
+          <Label>{t("부모 프로젝트")}</Label>
           <div className="flex items-center gap-2">
             <div className="flex-1 text-sm px-3 py-2 bg-muted rounded-md">
               {parentProject ? (
@@ -173,7 +175,7 @@ export function ProjectInfoPanel({
                   {parentProject.name}
                 </span>
               ) : (
-                <span className="text-muted-foreground">없음 (최상위)</span>
+                <span className="text-muted-foreground">{t("없음 (최상위)")}</span>
               )}
             </div>
             {parentProject && (
@@ -186,17 +188,17 @@ export function ProjectInfoPanel({
                       await onRemoveParent(project.id);
                     } catch (error) {
                       console.error('Failed to remove parent:', error);
-                      alert('부모 제거에 실패했습니다.');
+                      alert(t("부모 제거에 실패했습니다."));
                     }
                   }
                 }}
               >
-                부모 제거
+                {t("부모 제거")}
               </Button>
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            트리에서 드래그 앤 드롭으로도 위치를 변경할 수 있습니다.
+            {t("트리에서 드래그 앤 드롭으로도 위치를 변경할 수 있습니다.")}
           </p>
         </div>
       </div>
@@ -210,7 +212,7 @@ export function ProjectInfoPanel({
           disabled={!canDelete || isSaving}
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          삭제
+          {t("삭제")}
         </Button>
         <Button
           size="sm"
@@ -222,7 +224,7 @@ export function ProjectInfoPanel({
           ) : (
             <Save className="h-4 w-4 mr-2" />
           )}
-          저장
+          {t("저장")}
         </Button>
       </div>
 
@@ -230,22 +232,22 @@ export function ProjectInfoPanel({
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>프로젝트 삭제</AlertDialogTitle>
+            <AlertDialogTitle>{t("프로젝트 삭제")}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4">
                 <div>
-                  "{project.name}" 프로젝트를 삭제하시겠습니까?
+                  {t("{{name}} 프로젝트를 삭제하시겠습니까?", { name: project.name })}
                   <br />
                   <br />
                   <strong className="text-destructive">
-                    이 프로젝트의 모든 목표, 카테고리, 데이터가 영구적으로 삭제됩니다.
+                    {t("이 프로젝트의 모든 목표, 카테고리, 데이터가 영구적으로 삭제됩니다.")}
                   </strong>
                   <br />
-                  이 작업은 취소할 수 없습니다.
+                  {t("이 작업은 취소할 수 없습니다.")}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="confirmProjectName" className="text-foreground">
-                    확인을 위해 프로젝트 이름을 입력하세요
+                    {t("확인을 위해 프로젝트 이름을 입력하세요")}
                   </Label>
                   <Input
                     id="confirmProjectName"
@@ -261,13 +263,13 @@ export function ProjectInfoPanel({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t("취소")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               disabled={isDeleting || confirmName.trim() !== project.name}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? '삭제 중...' : '삭제'}
+              {isDeleting ? t("삭제 중...") : t("삭제")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

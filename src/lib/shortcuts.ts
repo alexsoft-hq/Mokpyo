@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 // 단축키·명령 팔레트의 단일 정의처.
 // CommandPalette(팔레트 목록), useKeyboardShortcuts(실제 키 처리),
 // ShortcutHelpDialog(도움말)가 모두 이 파일을 참조한다 — 세 곳이 어긋나지 않게.
@@ -79,26 +80,26 @@ export function getShortcutGroups(): ShortcutGroup[] {
   const mod = modKeyLabel();
   return [
     {
-      title: '일반',
+      title: t("일반"),
       items: [
-        { keys: [`${mod}K`], label: '명령 팔레트 열기' },
-        { keys: ['?'], label: '단축키 도움말' },
-        { keys: ['N'], label: '새 목표' },
-        { keys: ['Esc'], label: '닫기' },
+        { keys: [`${mod}K`], label: t("명령 팔레트 열기") },
+        { keys: ['?'], label: t("단축키 도움말") },
+        { keys: ['N'], label: t("새 목표") },
+        { keys: ['Esc'], label: t("닫기") },
       ],
     },
     {
-      title: '이동',
+      title: t("이동"),
       items: NAV_COMMANDS.filter((c) => c.seqKey).map((c) => ({
         keys: ['G', c.seqKey!.toUpperCase()],
-        label: `${c.label} 보기`,
+        label: t('{{view}} 보기', { view: t(c.label) }),
       })),
     },
     {
-      title: '팔레트 안에서',
+      title: t("팔레트 안에서"),
       items: [
-        { keys: ['↑ ↓'], label: '항목 이동' },
-        { keys: ['↵'], label: '선택' },
+        { keys: ['↑ ↓'], label: t("항목 이동") },
+        { keys: ['↵'], label: t("선택") },
       ],
     },
   ];

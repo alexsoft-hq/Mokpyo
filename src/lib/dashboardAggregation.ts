@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { Goal } from '@/types/goal';
 import { StatusLabel } from '@/types/fields';
 
@@ -24,31 +25,31 @@ export function byStatus(goals: Goal[], labels: StatusLabel[]): Bucket[] {
   const result: Bucket[] = ordered
     .filter((l) => counts.has(l.id))
     .map((l) => ({ key: l.id, label: l.name, count: counts.get(l.id)!, color: l.color }));
-  if (counts.has('__none__')) result.push({ key: '__none__', label: '상태 없음', count: counts.get('__none__')!, color: '#9ca3af' });
+  if (counts.has('__none__')) result.push({ key: '__none__', label: t("상태 없음"), count: counts.get('__none__')!, color: '#9ca3af' });
   return result;
 }
 
 /** 담당자별(첫 담당자) 집계 — 상위 N. */
 export function byOwner(goals: Goal[], topN = 10): Bucket[] {
-  const counts = new Map<string, number>();
+  const counts = new Map<string | null, number>();
   for (const g of goals) {
-    const owner = g.owners?.[0] ?? g.owner ?? '미지정';
+    const owner = g.owners?.[0] ?? g.owner ?? null;
     counts.set(owner, (counts.get(owner) ?? 0) + 1);
   }
   return [...counts.entries()]
-    .map(([label, count]) => ({ key: label, label, count }))
+    .map(([owner, count]) => ({ key: JSON.stringify(['owner', owner]), label: owner ?? t('미지정'), count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, topN);
 }
 
 /** 카테고리별(첫 카테고리) 집계. */
 export function byCategory(goals: Goal[]): Bucket[] {
-  const counts = new Map<string, number>();
+  const counts = new Map<string | null, number>();
   for (const g of goals) {
-    const cat = g.categories?.[0] ?? '미분류';
+    const cat = g.categories?.[0] ?? null;
     counts.set(cat, (counts.get(cat) ?? 0) + 1);
   }
-  return [...counts.entries()].map(([label, count]) => ({ key: label, label, count })).sort((a, b) => b.count - a.count);
+  return [...counts.entries()].map(([category, count]) => ({ key: JSON.stringify(['category', category]), label: category ?? t('미분류'), count })).sort((a, b) => b.count - a.count);
 }
 
 /** YYYY-MM-DD 에 일수를 더한 날짜 문자열(UTC 파싱·포맷 일관 — 타임존 off-by-one 방지). */

@@ -1,3 +1,5 @@
+import { useAuthFeedback } from './authFeedback';
+import { useTranslation, t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +10,7 @@ import { Loader2, CircleCheck } from 'lucide-react';
 import { AuthLayout, AuthAlert } from '@/components/auth/AuthLayout';
 
 export default function InviteAccept() {
+  useTranslation();
   const { token: inviteToken } = useParams<{ token: string }>();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { refreshOrganizations, setCurrentOrganization } = useWorkspace();
@@ -16,24 +19,24 @@ export default function InviteAccept() {
   const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError, setLocalError] = useAuthFeedback();
   const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
     if (!inviteToken) return;
-    loadInvitation();
-  }, [inviteToken]);
-
-  const loadInvitation = async () => {
-    try {
-      const data = await api.getInvitation(inviteToken!);
-      setInvitation(data);
-    } catch (err: any) {
-      setError(err.message || '초대를 불러올 수 없습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const loadInvitation = async () => {
+      try {
+        const data = await api.getInvitation(inviteToken);
+        setInvitation(data);
+      } catch (err: any) {
+        if (err.message) setError(err.message);
+        else setLocalError("초대를 불러올 수 없습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    void loadInvitation();
+  }, [inviteToken, setError, setLocalError]);
 
   const handleAccept = async () => {
     if (!inviteToken) return;
@@ -55,7 +58,8 @@ export default function InviteAccept() {
       // Redirect to dashboard after short delay
       setTimeout(() => navigate('/'), 1500);
     } catch (err: any) {
-      setError(err.message || '초대 수락에 실패했습니다.');
+      if (err.message) setError(err.message);
+      else setLocalError("초대 수락에 실패했습니다.");
     } finally {
       setIsAccepting(false);
     }
@@ -63,15 +67,13 @@ export default function InviteAccept() {
 
   const inviteDescription = invitation ? (
     <>
-      <strong className="font-medium text-foreground">{invitation.invitedBy}</strong>님이{' '}
-      <strong className="font-medium text-foreground">{invitation.organization.name}</strong> 워크스페이스에 초대했습니다.
-    </>
+      {t("{{name}}님이 {{workspace}} 워크스페이스에 초대했습니다.", { name: invitation.invitedBy, workspace: invitation.organization.name })}</>
   ) : null;
 
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-label="불러오는 중" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-label={t("불러오는 중")} />
       </div>
     );
   }
@@ -80,16 +82,12 @@ export default function InviteAccept() {
   if (!isAuthenticated) {
     return (
       <AuthLayout
-        title="워크스페이스 초대"
-        description={inviteDescription ?? (error || '초대 정보를 불러오는 중입니다.')}
+        title={t("워크스페이스 초대")}
+        description={inviteDescription ?? (error || t("초대 정보를 불러오는 중입니다."))}
       >
         <div className="space-y-3">
-          <Button className="h-11 w-full" onClick={() => navigate(`/login?redirect=/invite/${inviteToken}`)}>
-            로그인하고 초대 수락
-          </Button>
-          <Button variant="outline" className="h-11 w-full" onClick={() => navigate(`/register?redirect=/invite/${inviteToken}`)}>
-            회원가입하고 초대 수락
-          </Button>
+          <Button className="h-11 w-full" onClick={() => navigate(`/login?redirect=/invite/${inviteToken}`)}>{t("로그인하고 초대 수락")}</Button>
+          <Button variant="outline" className="h-11 w-full" onClick={() => navigate(`/register?redirect=/invite/${inviteToken}`)}>{t("회원가입하고 초대 수락")}</Button>
         </div>
       </AuthLayout>
     );
@@ -98,12 +96,12 @@ export default function InviteAccept() {
   if (accepted) {
     return (
       <AuthLayout
-        title="초대를 수락했습니다"
-        description={`${invitation?.organization.name ?? '워크스페이스'}로 이동합니다.`}
+        title={t("초대를 수락했습니다")}
+        description={t("{{value0}}로 이동합니다.", { value0: invitation?.organization.name ?? t('워크스페이스') })}
       >
         <div className="flex items-center justify-center gap-3 rounded-lg border border-border bg-muted/50 p-4">
           <CircleCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-          <span className="text-sm text-muted-foreground">잠시만 기다려주세요.</span>
+          <span className="text-sm text-muted-foreground">{t("잠시만 기다려주세요.")}</span>
         </div>
       </AuthLayout>
     );
@@ -111,31 +109,25 @@ export default function InviteAccept() {
 
   if (error && !invitation) {
     return (
-      <AuthLayout title="초대를 확인할 수 없습니다" description={error}>
-        <Button className="h-11 w-full" onClick={() => navigate('/')}>
-          대시보드로 이동
-        </Button>
+      <AuthLayout title={t("초대를 확인할 수 없습니다")} description={error}>
+        <Button className="h-11 w-full" onClick={() => navigate('/')}>{t("대시보드로 이동")}</Button>
       </AuthLayout>
     );
   }
 
   return (
-    <AuthLayout title="워크스페이스 초대" description={inviteDescription}>
+    <AuthLayout title={t("워크스페이스 초대")} description={inviteDescription}>
       <div className="space-y-3">
         {error && <AuthAlert>{error}</AuthAlert>}
         <Button className="h-11 w-full" onClick={handleAccept} disabled={isAccepting}>
           {isAccepting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-              수락 중...
-            </>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />{t("수락 중...")}</>
           ) : (
-            '초대 수락'
+            t("초대 수락")
           )}
         </Button>
-        <Button variant="outline" className="h-11 w-full" onClick={() => navigate('/')}>
-          나중에 하기
-        </Button>
+        <Button variant="outline" className="h-11 w-full" onClick={() => navigate('/')}>{t("나중에 하기")}</Button>
       </div>
     </AuthLayout>
   );

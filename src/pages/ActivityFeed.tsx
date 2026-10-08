@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -44,6 +45,7 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 export default function ActivityFeed() {
+  useTranslation();
   const navigate = useNavigate();
   const { currentProject } = useProject();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
@@ -81,7 +83,7 @@ export default function ActivityFeed() {
 
       setHasMore(data.length === limit);
     } catch (err) {
-      setError('활동 내역을 불러오는 데 실패했습니다.');
+      setError(t("활동 내역을 불러오는 데 실패했습니다."));
       console.error('Error loading activities:', err);
     } finally {
       setIsLoading(false);
@@ -105,7 +107,7 @@ export default function ActivityFeed() {
         (chunk) => setAISummary((prev) => (prev || '') + chunk),
       );
     } catch (err: any) {
-      setAISummary((prev) => (prev || '') + '\n\n요약 생성에 실패했습니다: ' + (err.message || ''));
+      setAISummary((prev) => (prev || '') + t("\n\n요약 생성에 실패했습니다: ") + (err.message || ''));
     } finally {
       setIsSummarizing(false);
     }
@@ -122,15 +124,13 @@ export default function ActivityFeed() {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader
-        title="활동 내역"
+        title={t("활동 내역")}
         subtitle={currentProject?.name}
         backTo="/"
         showProjectSelector={false}
         actions={aiAvailable && activities.length > 0 ? (
           <Button variant="outline" size="sm" onClick={handleAISummarize} disabled={isSummarizing} className="shrink-0">
-            {isSummarizing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
-            AI 요약
-          </Button>
+            {isSummarizing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}{t("AI 요약")}</Button>
         ) : undefined}
       />
 
@@ -143,9 +143,7 @@ export default function ActivityFeed() {
               className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium"
             >
               <span className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                AI 활동 요약
-              </span>
+                <Sparkles className="h-4 w-4 text-primary" />{t("AI 활동 요약")}</span>
               {summaryOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
             {summaryOpen && (
@@ -164,9 +162,7 @@ export default function ActivityFeed() {
         )}
 
         {activities.length === 0 && !isLoading && (
-          <div className="text-center py-12 text-muted-foreground">
-            활동 내역이 없습니다.
-          </div>
+          <div className="text-center py-12 text-muted-foreground">{t("활동 내역이 없습니다.")}</div>
         )}
 
         {Object.entries(groupedActivities).map(([dateLabel, dateActivities]) => (
@@ -197,9 +193,7 @@ export default function ActivityFeed() {
             <Button
               variant="outline"
               onClick={() => loadActivities(false)}
-            >
-              더 불러오기
-            </Button>
+            >{t("더 불러오기")}</Button>
           </div>
         )}
       </div>
@@ -213,9 +207,10 @@ interface ActivityCardProps {
 }
 
 function ActivityCard({ activity, onGoalClick }: ActivityCardProps) {
+  useTranslation();
   const actionColor = ACTION_COLORS[activity.action] || ACTION_COLORS.UPDATE;
   const actionIcon = ACTION_ICONS[activity.action] || ACTION_ICONS.UPDATE;
-  const actionLabel = ACTION_LABELS[activity.action] || activity.action;
+  const actionLabel = t(ACTION_LABELS[activity.action] || activity.action);
 
   return (
     <div className="bg-card rounded-lg border p-4 hover:bg-muted/50 transition-colors">
@@ -275,6 +270,7 @@ function ActivityCard({ activity, onGoalClick }: ActivityCardProps) {
 }
 
 function ActivityAvatar({ activity }: { activity: ActivityLog }) {
+  useTranslation();
   const avatarInfo = getAvatarInfo(activity.user?.picture);
 
   if (!activity.user) {

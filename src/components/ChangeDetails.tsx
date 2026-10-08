@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { ChangesData } from '@/types/activity';
 
 interface ChangeDetailsProps {
@@ -6,6 +7,7 @@ interface ChangeDetailsProps {
 }
 
 export const ChangeDetails = ({ changes, compact = false }: ChangeDetailsProps) => {
+  useTranslation();
   if (!changes) return null;
 
   // 문자열인 경우 파싱 시도
@@ -42,13 +44,13 @@ export const ChangeDetails = ({ changes, compact = false }: ChangeDetailsProps) 
       {changesData.categories?.added?.map((cat, idx) => (
         <div key={`cat-add-${idx}`} className="flex items-center gap-1 text-green-600 dark:text-green-400">
           <span>+</span>
-          <span>카테고리 추가: {cat}</span>
+          <span>{t("카테고리 추가:")} {cat}</span>
         </div>
       ))}
       {changesData.categories?.removed?.map((cat, idx) => (
         <div key={`cat-rm-${idx}`} className="flex items-center gap-1 text-red-600 dark:text-red-400">
           <span>-</span>
-          <span>카테고리 삭제: {cat}</span>
+          <span>{t("카테고리 삭제:")} {cat}</span>
         </div>
       ))}
 
@@ -56,14 +58,14 @@ export const ChangeDetails = ({ changes, compact = false }: ChangeDetailsProps) 
       {changesData.subGoals?.added?.map((sg, idx) => (
         <div key={`sg-add-${idx}`} className="flex items-center gap-1 text-green-600 dark:text-green-400">
           <span>+</span>
-          <span>하위 목표 추가: {sg.title}</span>
+          <span>{t("하위 목표 추가:")} {sg.title}</span>
         </div>
       ))}
       {changesData.subGoals?.updated?.map((sg, idx) => (
         <div key={`sg-upd-${idx}`} className="flex items-start gap-1 text-blue-600 dark:text-blue-400">
           <span>~</span>
           <div>
-            <span>하위 목표 수정: {sg.title}</span>
+            <span>{t("하위 목표 수정:")} {sg.title}</span>
             {sg.changes?.length > 0 && (
               <div className="ml-2 text-muted-foreground">
                 {sg.changes.map((c, cIdx) => (
@@ -79,7 +81,7 @@ export const ChangeDetails = ({ changes, compact = false }: ChangeDetailsProps) 
       {changesData.subGoals?.deleted?.map((sg, idx) => (
         <div key={`sg-del-${idx}`} className="flex items-center gap-1 text-red-600 dark:text-red-400">
           <span>-</span>
-          <span>하위 목표 삭제: {sg.title}</span>
+          <span>{t("하위 목표 삭제:")} {sg.title}</span>
         </div>
       ))}
 
@@ -87,19 +89,19 @@ export const ChangeDetails = ({ changes, compact = false }: ChangeDetailsProps) 
       {changesData.notes?.added?.map((note, idx) => (
         <div key={`note-add-${idx}`} className="flex items-center gap-1 text-green-600 dark:text-green-400">
           <span>+</span>
-          <span>메모 추가: "{note.content}"</span>
+          <span>{t("메모 추가: \"")}{note.content}"</span>
         </div>
       ))}
       {changesData.notes?.updated?.map((note, idx) => (
         <div key={`note-upd-${idx}`} className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
           <span>~</span>
-          <span>메모 수정: "{note.contentPreview}"</span>
+          <span>{t("메모 수정: \"")}{note.contentPreview}"</span>
         </div>
       ))}
       {changesData.notes?.deleted?.map((note, idx) => (
         <div key={`note-del-${idx}`} className="flex items-center gap-1 text-red-600 dark:text-red-400">
           <span>-</span>
-          <span>메모 삭제: "{note.contentPreview}"</span>
+          <span>{t("메모 삭제: \"")}{note.contentPreview}"</span>
         </div>
       ))}
     </div>

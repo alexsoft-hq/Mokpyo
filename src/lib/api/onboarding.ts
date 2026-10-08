@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 // 온보딩(빈 상태에서 샘플 데이터 불러오기) API.
 // src/lib/api.ts 는 건드리지 않고 별도 모듈로 둔다.
 
@@ -18,6 +19,6 @@ export async function loadSampleData(orgId: string): Promise<SampleDataResult> {
     method: 'POST',
     headers: getAuthHeaders(),
   });
-  if (!response.ok) await throwApiError(response, '샘플 데이터를 불러오지 못했습니다.');
+  if (!response.ok) await throwApiError(response, t("샘플 데이터를 불러오지 못했습니다."));
   return response.json();
 }

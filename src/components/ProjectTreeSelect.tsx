@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { Project } from '@/types/goal';
 import { ChevronRight, ChevronDown } from 'lucide-react';
@@ -52,6 +53,7 @@ interface TreeNodeProps {
 }
 
 function TreeNode({ project, depth, expandedIds, onToggle, onSelect, selectedId, excludeIds }: TreeNodeProps) {
+  useTranslation();
   const hasChildren = project.children && project.children.length > 0;
   const isExpanded = expandedIds.has(project.id);
   const isDisabled = excludeIds.has(project.id);
@@ -115,8 +117,9 @@ export function ProjectTreeSelect({
   value,
   onChange,
   excludeIds = [],
-  placeholder = '부모 프로젝트 선택',
+  placeholder = t("부모 프로젝트 선택"),
 }: ProjectTreeSelectProps) {
+  useTranslation();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => loadExpandedIds());
   const excludeSet = new Set(excludeIds);
 
@@ -165,7 +168,7 @@ export function ProjectTreeSelect({
       </SelectTrigger>
       <SelectContent className="max-h-[300px]">
         <SelectItem value="none">
-          <span className="text-muted-foreground">부모 없음 (최상위)</span>
+          <span className="text-muted-foreground">{t("부모 없음 (최상위)")}</span>
         </SelectItem>
         <div className="border-t my-1" />
         <div className="max-h-[250px] overflow-y-auto">

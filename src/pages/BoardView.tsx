@@ -1,3 +1,4 @@
+import { useTranslation, t, getLocale } from '@/i18n';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
@@ -32,6 +33,8 @@ import { toast } from 'sonner';
 const DONE_CAP = 20;
 
 export default function BoardView() {
+  useTranslation();
+  const locale = getLocale();
   const qc = useQueryClient();
   const { currentProject } = useProject();
   const { currentOrganization } = useWorkspace();
@@ -92,9 +95,9 @@ export default function BoardView() {
       id: l.id, name: l.name, color: l.color, kind: l.kind, isSystem: l.isSystem, goals: byStatus.get(l.id) ?? [],
     }));
     // 상태 없음(NULL statusId) 폴백 컬럼 — 목표가 화면에서 사라지지 않게
-    if (noneGoals.length > 0) cols.push({ id: '__none__', name: '상태 없음', goals: noneGoals });
+    if (noneGoals.length > 0) cols.push({ id: '__none__', name: t("상태 없음"), goals: noneGoals });
     return cols;
-  }, [labels, goals]);
+  }, [labels, goals, locale]);
 
   const findGoal = (id: string) => goals.find((g) => g.id === id);
 
@@ -121,27 +124,27 @@ export default function BoardView() {
     try {
       if (labelDialog.label) {
         await fieldsApi.updateStatusLabel(labelDialog.label.id, data);
-        toast.success('상태를 수정했습니다.');
+        toast.success(t("상태를 수정했습니다."));
       } else {
         await fieldsApi.createStatusLabel(data.name, data.color);
-        toast.success('상태를 추가했습니다.');
+        toast.success(t("상태를 추가했습니다."));
       }
       qc.invalidateQueries({ queryKey: ['fieldSchema'] });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '저장에 실패했습니다.');
+      toast.error(e instanceof Error ? e.message : t("저장에 실패했습니다."));
       throw e;
     }
   };
 
   const handleDeleteLabel = async (label: StatusLabel) => {
-    if (!confirm(`'${label.name}' 상태를 삭제할까요? 이 상태의 목표는 '시작 전'으로 이동합니다.`)) return;
+    if (!confirm(t("'{{value0}}' 상태를 삭제할까요? 이 상태의 목표는 '시작 전'으로 이동합니다.", { value0: label.name }))) return;
     try {
       await fieldsApi.deleteStatusLabel(label.id);
       qc.invalidateQueries({ queryKey: ['fieldSchema'] });
       qc.invalidateQueries({ queryKey: ['goals'] });
-      toast.success('상태를 삭제했습니다.');
+      toast.success(t("상태를 삭제했습니다."));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '삭제에 실패했습니다.');
+      toast.error(e instanceof Error ? e.message : t("삭제에 실패했습니다."));
     }
   };
 
@@ -153,8 +156,7 @@ export default function BoardView() {
         showTabs
         actions={canManage ? (
           <Button size="sm" variant="outline" className="h-9" onClick={() => setLabelDialog({ open: true, label: null })}>
-            <Plus className="h-4 w-4 mr-1" />상태 추가
-          </Button>
+            <Plus className="h-4 w-4 mr-1" />{t("상태 추가")}</Button>
         ) : undefined}
       />
 
@@ -162,14 +164,14 @@ export default function BoardView() {
         {loading ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !projectId ? (
-          <div className="text-center text-muted-foreground py-20">프로젝트를 선택하세요.</div>
+          <div className="text-center text-muted-foreground py-20">{t("프로젝트를 선택하세요.")}</div>
         ) : goals.length === 0 ? (
           <EmptyState
             icon={Kanban}
-            title="보드에 올릴 목표가 없습니다"
-            description="목표를 추가하면 상태별 칸에 카드로 나타나고, 끌어다 놓아 상태를 바꿀 수 있습니다."
-            primaryAction={{ label: '새 목표', onClick: () => setAddOpen(true) }}
-            secondaryAction={{ label: '샘플 데이터로 둘러보기', onClick: loadSample, loading: sampleLoading }}
+            title={t("보드에 올릴 목표가 없습니다")}
+            description={t("목표를 추가하면 상태별 칸에 카드로 나타나고, 끌어다 놓아 상태를 바꿀 수 있습니다.")}
+            primaryAction={{ label: t("새 목표"), onClick: () => setAddOpen(true) }}
+            secondaryAction={{ label: t("샘플 데이터로 둘러보기"), onClick: loadSample, loading: sampleLoading }}
           />
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -215,8 +217,8 @@ export default function BoardView() {
               await api.createGoal({ ...goal, projectId: projectId ?? undefined } as Goal);
               qc.invalidateQueries({ queryKey: ['goals'] });
               setAddOpen(false);
-              toast.success('목표가 추가되었습니다.');
-            } catch (e) { toast.error(e instanceof Error ? e.message : '추가 실패'); }
+              toast.success(t("목표가 추가되었습니다."));
+            } catch (e) { toast.error(e instanceof Error ? e.message : t("추가 실패")); }
           }}
           categories={(categoriesQuery.data ?? []).map((c) => c.name)}
           categoryColors={Object.fromEntries((categoriesQuery.data ?? []).map((c) => [c.name, c.color]))}

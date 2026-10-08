@@ -1,3 +1,4 @@
+import { getLocale, t, useTranslation } from '@/i18n';
 import { Goal, GoalCategory, GoalSize } from '@/types/goal';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -73,6 +74,7 @@ const getSizeClass = (size: GoalSize) => {
 
 
 export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onToggleComplete, onToggleOnHold, onUpdateCategories, onAddCategory, onUpdateCategoryColor, onUpdateCategoryName, onDeleteCategory, categoryUsageCount, registeredUsers }: GoalCardProps) => {
+  useTranslation();
   const {
     attributes,
     listeners,
@@ -89,7 +91,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('ko-KR', {
+    return new Date(dateStr).toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -116,17 +118,17 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
       )}
     >
       {/* 상단 헤더: 담당자, 첨부파일, 완료, 드래그 */}
-      <div className="flex items-center justify-between gap-2 mb-3">
+      <div className="flex flex-col items-stretch gap-2 mb-3">
         <div className="flex items-center gap-3 text-sm text-foreground/70 flex-1 min-w-0">
           <div className="flex items-center gap-1 min-w-0">
             {(goal.owners && goal.owners.length > 0 ? goal.owners : [goal.owner]).map((name, idx) => (
               <span key={idx} className={cn('flex items-center gap-0.5', idx === 0 ? 'min-w-0' : 'shrink-0')}>
                 <OwnerAvatar ownerName={name} registeredUsers={registeredUsers} size="sm" />
-                {idx === 0 && <span className="font-medium truncate whitespace-nowrap">{name}</span>}
+                {idx === 0 && <span className="font-medium truncate whitespace-nowrap" title={name}>{name}</span>}
               </span>
             ))}
             {goal.owners && goal.owners.length > 1 && (
-              <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">외 {goal.owners.length - 1}명</span>
+              <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{t("외 {{count}}명", { count: goal.owners.length - 1 })}</span>
             )}
           </div>
           {goal.attachments && goal.attachments.length > 0 && (
@@ -136,9 +138,12 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
             </div>
           )}
         </div>
-        <div className="flex gap-2 items-center flex-shrink-0">
+        <div className="flex gap-2 items-center justify-end flex-shrink-0">
           {onToggleComplete && (
             <button
+                  aria-pressed={!!goal.completed}
+                  aria-label={goal.completed ? t("완료 취소") : t("완료로 표시")}
+                  title={goal.completed ? t("완료 취소") : t("완료로 표시")}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleComplete(goal.id, !goal.completed);
@@ -156,18 +161,21 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
               {goal.completed ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 animate-in zoom-in duration-300" />
-                  <span className="text-xs font-semibold">완료</span>
+                  <span className="text-xs font-semibold">{t("완료")}</span>
                 </>
               ) : (
                 <>
                   <Circle className="w-4 h-4 text-muted-foreground group-hover:text-green-500 transition-colors" />
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-green-600 transition-colors">완료</span>
+                  <span className="text-xs font-medium text-muted-foreground group-hover:text-green-600 transition-colors">{t("완료")}</span>
                 </>
               )}
             </button>
           )}
           {onToggleOnHold && (
             <button
+                  aria-pressed={!!goal.onHold}
+                  aria-label={goal.onHold ? t("보류 해제") : t("보류로 표시")}
+                  title={goal.onHold ? t("보류 해제") : t("보류로 표시")}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleOnHold(goal.id, !goal.onHold);
@@ -185,12 +193,12 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
               {goal.onHold ? (
                 <>
                   <PauseCircle className="w-4 h-4 animate-in zoom-in duration-300" />
-                  <span className="text-xs font-semibold">보류</span>
+                  <span className="text-xs font-semibold">{t("보류")}</span>
                 </>
               ) : (
                 <>
                   <PauseCircle className="w-4 h-4 text-muted-foreground group-hover:text-amber-500 transition-colors" />
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-amber-600 transition-colors">보류</span>
+                  <span className="text-xs font-medium text-muted-foreground group-hover:text-amber-600 transition-colors">{t("보류")}</span>
                 </>
               )}
             </button>
@@ -250,7 +258,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-semibold flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
-              진행률
+              {t("진행률")}
             </span>
             <span className="text-lg font-bold">{goal.progress}%</span>
           </div>
@@ -268,7 +276,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
 
         {goal.statusNote && (
           <div className="text-sm">
-            <span className="font-medium">상태: </span>
+            <span className="font-medium">{t("상태:")} </span>
             <span className="text-foreground/70">
               <LinkifiedText text={goal.statusNote} />
             </span>
@@ -280,7 +288,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
         <div className="pt-4 border-t border-foreground/10">
           <div className="flex items-center gap-2 mb-2">
             <StickyNote className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold">중요 메모</p>
+            <p className="text-sm font-semibold">{t("중요 메모")}</p>
           </div>
           <div className="space-y-2">
             {goal.notes
@@ -293,7 +301,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
                   </p>
                   <p className="text-[10px] text-foreground/50 mt-1">
                     {note.updatedAt
-                      ? `수정: ${formatDate(note.updatedAt)}`
+                      ? t("수정: {{value0}}", { value0: formatDate(note.updatedAt) })
                       : formatDate(note.createdAt)}
                   </p>
                 </div>
@@ -305,7 +313,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
       {goal.subGoals && goal.subGoals.length > 0 && (
         <div className="pt-4 border-t border-foreground/10">
           <p className="text-sm font-semibold mb-2">
-            하위 목표 {goal.subGoals.length}개
+            {t("하위 목표 {{count}}개", { count: goal.subGoals.length })}
           </p>
           <div className="space-y-2">
             {goal.subGoals.slice(0, 3).map((subGoal) => (
@@ -327,7 +335,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
             ))}
             {goal.subGoals.length > 3 && (
               <p className="text-xs text-primary font-medium">
-                +{goal.subGoals.length - 3}개 더보기
+                {t("{{count}}개 더보기", { count: goal.subGoals.length - 3 })}
               </p>
             )}
           </div>
@@ -339,7 +347,7 @@ export const GoalCard = ({ goal, onClick, categories = [], categoryColors, onTog
           <div className="flex items-center gap-2">
             <Paperclip className="w-4 h-4 text-primary" />
             <p className="text-sm font-semibold">
-              첨부파일 {goal.attachments.length}개
+              {t("첨부파일 {{count}}개", { count: goal.attachments.length })}
             </p>
           </div>
         </div>

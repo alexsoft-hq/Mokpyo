@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { Link } from 'react-router-dom';
 import {
   AtSign,
@@ -168,6 +169,7 @@ const FAQS: FaqItem[] = [
 ];
 
 export default function Landing() {
+  useTranslation();
   usePageTitle();
 
   return (
@@ -176,23 +178,17 @@ export default function Landing() {
       <section className="border-b border-border">
         <div className="mx-auto w-full max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16">
           <div className="max-w-3xl">
-            <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight text-foreground">
-              팀의 목표를 한 화면에서.
-              <br />
-              계획부터 달성까지.
-            </h1>
-            <p className="mt-5 text-base md:text-lg leading-relaxed text-muted-foreground">
-              ALEXSOFT가 만든 오픈소스 목표·OKR 도구입니다. 조직의 서버에 설치하고, 팀의 방식에 맞게 수정해 쓰세요.
-            </p>
+            <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight text-foreground">{t("팀의 목표를 한 화면에서.")}<br />{t("계획부터 달성까지.")}</h1>
+            <p className="mt-5 text-base md:text-lg leading-relaxed text-muted-foreground">{t("ALEXSOFT가 만든 오픈소스 목표·OKR 도구입니다. 조직의 서버에 설치하고, 팀의 방식에 맞게 수정해 쓰세요.")}</p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Button asChild size="lg">
-                <a href={INSTALL_GUIDE_URL}>설치 가이드</a>
+                <a href={INSTALL_GUIDE_URL}>{t("설치 가이드")}</a>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href={CONSULTING_URL}>ALEXSOFT 상담</a>
+                <a href={CONSULTING_URL}>{t("ALEXSOFT 상담")}</a>
               </Button>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">{OPEN_SOURCE_NOTICE}</p>
+            <p className="mt-4 text-sm text-muted-foreground">{t(OPEN_SOURCE_NOTICE)}</p>
           </div>
 
           <div className="mt-12 md:mt-16">
@@ -204,9 +200,9 @@ export default function Landing() {
       {/* 5개 뷰 */}
       <Section id="features">
         <SectionHeading
-          eyebrow="뷰"
-          title="같은 목표를 다섯 가지로 봅니다."
-          description="보는 방식만 바뀔 뿐 데이터는 하나입니다. 어느 뷰에서 고쳐도 나머지 뷰에 그대로 반영됩니다."
+          eyebrow={t("뷰")}
+          title={t("같은 목표를 다섯 가지로 봅니다.")}
+          description={t("보는 방식만 바뀔 뿐 데이터는 하나입니다. 어느 뷰에서 고쳐도 나머지 뷰에 그대로 반영됩니다.")}
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {VIEWS.map(({ icon: Icon, title, description }) => (
@@ -218,9 +214,9 @@ export default function Landing() {
       {/* 협업·자동화 */}
       <Section muted>
         <SectionHeading
-          eyebrow="협업과 자동화"
-          title="사람 손이 덜 가게 만듭니다."
-          description="상태를 옮기고 알리고 정리하는 반복 작업은 규칙으로 넘깁니다."
+          eyebrow={t("협업과 자동화")}
+          title={t("사람 손이 덜 가게 만듭니다.")}
+          description={t("상태를 옮기고 알리고 정리하는 반복 작업은 규칙으로 넘깁니다.")}
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {COLLABORATION.map(({ icon: Icon, title, description }) => (
@@ -233,8 +229,8 @@ export default function Landing() {
       <Section>
         <SectionHeading
           eyebrow="OKR"
-          title="목표를 숫자로 관리합니다."
-          description="선언에서 끝나지 않도록 지표와 체크인을 목표에 붙입니다."
+          title={t("목표를 숫자로 관리합니다.")}
+          description={t("선언에서 끝나지 않도록 지표와 체크인을 목표에 붙입니다.")}
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {OKR.map(({ icon: Icon, title, description }) => (
@@ -246,9 +242,9 @@ export default function Landing() {
       {/* 신뢰 */}
       <Section muted>
         <SectionHeading
-          eyebrow="보안과 운영"
-          title="운영은 조직의 환경에 맞게."
-          description="권한과 기록을 제품 기본값으로 둡니다."
+          eyebrow={t("보안과 운영")}
+          title={t("운영은 조직의 환경에 맞게.")}
+          description={t("권한과 기록을 제품 기본값으로 둡니다.")}
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {TRUST.map(({ icon: Icon, title, description }) => (
@@ -259,7 +255,7 @@ export default function Landing() {
 
       {/* 도입 안내 */}
       <Section id="adoption">
-        <SectionHeading eyebrow="오픈소스 도입" title="직접 쓰고, 고치고, 함께 만듭니다." description={OPEN_SOURCE_NOTICE} />
+        <SectionHeading eyebrow={t("오픈소스 도입")} title={t("직접 쓰고, 고치고, 함께 만듭니다.")} description={t(OPEN_SOURCE_NOTICE)} />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} maxFeatures={4} />
@@ -268,36 +264,30 @@ export default function Landing() {
         <div className="mt-8">
           <Button asChild variant="outline">
             <Link to="/pricing">
-              <ListChecks aria-hidden="true" />
-              도입과 지원 안내
-            </Link>
+              <ListChecks aria-hidden="true" />{t("도입과 지원 안내")}</Link>
           </Button>
         </div>
       </Section>
 
       {/* FAQ */}
       <Section muted>
-        <SectionHeading title="자주 묻는 질문" />
+        <SectionHeading title={t("자주 묻는 질문")} />
         <div className="mt-8 max-w-3xl">
-          <FaqList items={FAQS} />
+          <FaqList items={FAQS.map(item => ({ question: t(item.question), answer: t(item.answer) }))} />
         </div>
       </Section>
 
       {/* 마지막 CTA */}
       <Section>
         <div className="rounded-xl border border-border bg-card p-8 md:p-12 shadow-sm">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            이번 분기 목표부터 옮겨 보세요.
-          </h2>
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-            소스를 살펴보고 직접 설치해 보세요. 조직에 맞는 설계·개발·연동이 필요하면 ALEXSOFT와 상담할 수 있습니다.
-          </p>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">{t("이번 분기 목표부터 옮겨 보세요.")}</h2>
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">{t("소스를 살펴보고 직접 설치해 보세요. 조직에 맞는 설계·개발·연동이 필요하면 ALEXSOFT와 상담할 수 있습니다.")}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button asChild size="lg">
-              <a href={INSTALL_GUIDE_URL}>설치 가이드</a>
+              <a href={INSTALL_GUIDE_URL}>{t("설치 가이드")}</a>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href={CONSULTING_URL}>ALEXSOFT 상담</a>
+              <a href={CONSULTING_URL}>{t("ALEXSOFT 상담")}</a>
             </Button>
           </div>
         </div>
@@ -315,6 +305,7 @@ interface FeatureCardProps {
 }
 
 function FeatureCard({ Icon, title, description, surface = 'card' }: FeatureCardProps) {
+  useTranslation();
   return (
     <div
       className={`h-full rounded-xl border border-border p-5 shadow-sm transition-shadow hover:shadow-md ${
@@ -324,8 +315,8 @@ function FeatureCard({ Icon, title, description, surface = 'card' }: FeatureCard
       <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
-      <h3 className="mt-4 text-base font-semibold text-foreground">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <h3 className="mt-4 text-base font-semibold text-foreground">{t(title)}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(description)}</p>
     </div>
   );
 }

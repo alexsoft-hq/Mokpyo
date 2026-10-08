@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -45,6 +46,7 @@ import {
 import { AppHeader } from '@/components/layout/AppHeader';
 
 export default function AIReport() {
+  useTranslation();
   const navigate = useNavigate();
   const { currentProject } = useProject();
 
@@ -123,7 +125,7 @@ export default function AIReport() {
         (meta) => setMetadata(meta),
       );
     } catch (err: any) {
-      setError(err.message || '리포트 생성에 실패했습니다.');
+      setError(err.message || t("리포트 생성에 실패했습니다."));
     } finally {
       setIsGenerating(false);
     }
@@ -151,7 +153,7 @@ export default function AIReport() {
       setNewTemplateFile(null);
       await loadTemplates();
     } catch (err: any) {
-      setError(err.message || '템플릿 업로드에 실패했습니다.');
+      setError(err.message || t("템플릿 업로드에 실패했습니다."));
     } finally {
       setIsUploading(false);
     }
@@ -177,13 +179,11 @@ export default function AIReport() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader title="AI 리포트" subtitle={currentProject?.name} backTo="/" showProjectSelector={false} />
+      <AppHeader title={t("AI 리포트")} subtitle={currentProject?.name} backTo="/" showProjectSelector={false} />
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {!aiAvailable && (
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            AI 서비스가 설정되지 않았습니다. 서버 환경변수(AZURE_OPENAI_*)를 확인해주세요.
-          </div>
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-lg border border-yellow-200 dark:border-yellow-800">{t("AI 서비스가 설정되지 않았습니다. 서버 환경변수(AZURE_OPENAI_*)를 확인해주세요.")}</div>
         )}
 
         {/* Controls */}
@@ -191,44 +191,42 @@ export default function AIReport() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Period */}
             <div className="space-y-2">
-              <Label>기간 유형</Label>
+              <Label>{t("기간 유형")}</Label>
               <Select value={period} onValueChange={(v) => setPeriod(v as 'weekly' | 'monthly')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="weekly">주간</SelectItem>
-                  <SelectItem value="monthly">월간</SelectItem>
+                  <SelectItem value="weekly">{t("주간")}</SelectItem>
+                  <SelectItem value="monthly">{t("월간")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Start Date */}
             <div className="space-y-2">
-              <Label>시작일</Label>
+              <Label>{t("시작일")}</Label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
 
             {/* End Date */}
             <div className="space-y-2">
-              <Label>종료일</Label>
+              <Label>{t("종료일")}</Label>
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
 
             {/* Template */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>양식 템플릿</Label>
+                <Label>{t("양식 템플릿")}</Label>
                 <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                      <Settings2 className="h-3 w-3 mr-1" />
-                      관리
-                    </Button>
+                      <Settings2 className="h-3 w-3 mr-1" />{t("관리")}</Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
-                      <DialogTitle>리포트 양식 관리</DialogTitle>
+                      <DialogTitle>{t("리포트 양식 관리")}</DialogTitle>
                     </DialogHeader>
                     <TemplateManager
                       templates={templates}
@@ -247,13 +245,13 @@ export default function AIReport() {
               </div>
               <Select value={templateId} onValueChange={setTemplateId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="자유 형식" />
+                  <SelectValue placeholder={t("자유 형식")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">자유 형식</SelectItem>
-                  {templates.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      {t.name}
+                  <SelectItem value="none">{t("자유 형식")}</SelectItem>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -268,14 +266,10 @@ export default function AIReport() {
           >
             {isGenerating ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                리포트 생성 중...
-              </>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("리포트 생성 중...")}</>
             ) : (
               <>
-                <FileText className="h-4 w-4 mr-2" />
-                리포트 생성
-              </>
+                <FileText className="h-4 w-4 mr-2" />{t("리포트 생성")}</>
             )}
           </Button>
         </div>
@@ -293,22 +287,16 @@ export default function AIReport() {
               <div className="text-sm text-muted-foreground">
                 {metadata && (
                   <span>
-                    {metadata.period} 리포트 ({metadata.startDate} ~ {metadata.endDate}) | 활동{' '}
-                    {metadata.logCount}건, 목표 {metadata.goalCount}개
-                  </span>
+                    {t("{{period}} 리포트 ({{start}} ~ {{end}}) | 활동 {{logs}}건, 목표 {{goals}}개", { period: t(metadata.period), start: metadata.startDate, end: metadata.endDate, logs: metadata.logCount, goals: metadata.goalCount })}</span>
                 )}
               </div>
               <Button variant="outline" size="sm" onClick={handleCopy}>
                 {copied ? (
                   <>
-                    <Check className="h-4 w-4 mr-1" />
-                    복사됨
-                  </>
+                    <Check className="h-4 w-4 mr-1" />{t("복사됨")}</>
                 ) : (
                   <>
-                    <Copy className="h-4 w-4 mr-1" />
-                    복사
-                  </>
+                    <Copy className="h-4 w-4 mr-1" />{t("복사")}</>
                 )}
               </Button>
             </div>
@@ -326,6 +314,7 @@ export default function AIReport() {
 
 // Simple markdown renderer (handles headings, bold, lists, etc.)
 function MarkdownRenderer({ content }: { content: string }) {
+  useTranslation();
   const lines = content.split('\n');
   const elements: React.ReactNode[] = [];
   let inList = false;
@@ -422,23 +411,24 @@ function TemplateManager({
   file,
   onFileChange,
 }: TemplateManagerProps) {
+  useTranslation();
   return (
     <div className="space-y-4">
       {/* Existing templates */}
       {templates.length > 0 && (
         <div className="space-y-2">
-          <Label className="text-sm font-medium">등록된 양식</Label>
-          {templates.map((t) => (
-            <div key={t.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+          <Label className="text-sm font-medium">{t("등록된 양식")}</Label>
+          {templates.map((template) => (
+            <div key={template.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm truncate">{t.name}</p>
-                {t.description && (
-                  <p className="text-xs text-muted-foreground truncate">{t.description}</p>
+                <p className="font-medium text-sm truncate">{template.name}</p>
+                {template.description && (
+                  <p className="text-xs text-muted-foreground truncate">{template.description}</p>
                 )}
-                {t.originalFileName && (
+                {template.originalFileName && (
                   <p className="text-xs text-muted-foreground">
                     <FileText className="h-3 w-3 inline mr-1" />
-                    {t.originalFileName}
+                    {template.originalFileName}
                   </p>
                 )}
               </div>
@@ -450,14 +440,13 @@ function TemplateManager({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>양식 삭제</AlertDialogTitle>
+                    <AlertDialogTitle>{t("양식 삭제")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      '{t.name}' 양식을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-                    </AlertDialogDescription>
+                      {t("'{{name}}' 양식을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.", { name: template.name })}</AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>취소</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onDelete(t.id)}>삭제</AlertDialogAction>
+                    <AlertDialogCancel>{t("취소")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(template.id)}>{t("삭제")}</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -468,14 +457,14 @@ function TemplateManager({
 
       {/* Upload new template */}
       <div className="space-y-3 pt-2 border-t">
-        <Label className="text-sm font-medium">새 양식 추가</Label>
+        <Label className="text-sm font-medium">{t("새 양식 추가")}</Label>
         <Input
-          placeholder="양식 이름 *"
+          placeholder={t("양식 이름 *")}
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
         />
         <Textarea
-          placeholder="설명 (선택사항)"
+          placeholder={t("설명 (선택사항)")}
           value={desc}
           onChange={(e) => onDescChange(e.target.value)}
           rows={2}
@@ -496,14 +485,10 @@ function TemplateManager({
         >
           {isUploading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              업로드 중...
-            </>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("업로드 중...")}</>
           ) : (
             <>
-              <Upload className="h-4 w-4 mr-2" />
-              양식 업로드
-            </>
+              <Upload className="h-4 w-4 mr-2" />{t("양식 업로드")}</>
           )}
         </Button>
       </div>

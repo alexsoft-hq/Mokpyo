@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useState } from 'react';
@@ -38,6 +39,7 @@ export function BoardColumn({
   column, users, commentCounts, collapsed, onToggleCollapse, canManage, doneCap,
   onOpenGoal, onRename, onDelete, onAddGoal,
 }: BoardColumnProps) {
+  useTranslation();
   const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { columnId: column.id } });
   const [showAll, setShowAll] = useState(false);
   const isDone = column.kind === 'done';
@@ -64,13 +66,13 @@ export function BoardColumn({
         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: column.color ?? 'hsl(var(--muted-foreground))' }} />
         <span className="font-medium text-sm truncate flex-1" title={column.name}>{column.name}</span>
         <span className="text-xs text-muted-foreground">{column.goals.length}</span>
-        <button onClick={onToggleCollapse} className="text-muted-foreground hover:text-foreground" title="접기"><ChevronLeft className="h-4 w-4" /></button>
+        <button onClick={onToggleCollapse} className="text-muted-foreground hover:text-foreground" title={t("접기")}><ChevronLeft className="h-4 w-4" /></button>
         {canManage && column.id !== '__none__' && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild><button aria-label="컬럼 메뉴" className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"><MoreHorizontal className="h-4 w-4" /></button></DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild><button aria-label={t("컬럼 메뉴")} className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"><MoreHorizontal className="h-4 w-4" /></button></DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onRename}><Pencil className="h-4 w-4 mr-2" />이름·색상 변경</DropdownMenuItem>
-              {!column.isSystem && <DropdownMenuItem onClick={onDelete} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />삭제</DropdownMenuItem>}
+              <DropdownMenuItem onClick={onRename}><Pencil className="h-4 w-4 mr-2" />{t("이름·색상 변경")}</DropdownMenuItem>
+              {!column.isSystem && <DropdownMenuItem onClick={onDelete} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />{t("삭제")}</DropdownMenuItem>}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -82,15 +84,15 @@ export function BoardColumn({
           ))}
           {hiddenCount > 0 && (
             <button onClick={() => setShowAll(true)} className="w-full text-xs text-muted-foreground hover:text-foreground py-1">
-              + {hiddenCount}개 더 보기
+              {t("{{count}}개 더보기", { count: hiddenCount })}
             </button>
           )}
-          {column.goals.length === 0 && <div className="text-center text-xs text-muted-foreground py-6">비어 있음</div>}
+          {column.goals.length === 0 && <div className="text-center text-xs text-muted-foreground py-6">{t("비어 있음")}</div>}
         </div>
       </SortableContext>
       {onAddGoal && column.id !== '__none__' && (
         <button onClick={onAddGoal} className="flex items-center gap-1 px-3 py-2 text-xs text-muted-foreground hover:text-foreground border-t">
-          <Plus className="h-3.5 w-3.5" />목표 추가
+          <Plus className="h-3.5 w-3.5" />{t("목표 추가")}
         </button>
       )}
     </div>

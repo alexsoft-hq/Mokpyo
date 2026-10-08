@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon, ExternalLink } from 'lucide-react';
@@ -27,6 +28,7 @@ function commitKeys(onCommit: () => void, onCancel: () => void) {
 
 // ---- Status cell ----
 export function StatusCell({ goal, labels, onChange }: { goal: Goal; labels: StatusLabel[]; onChange: (statusId: string) => void }) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   const current = labels.find((l) => l.id === goal.statusId) ?? null;
   return (
@@ -53,6 +55,7 @@ export function StatusCell({ goal, labels, onChange }: { goal: Goal; labels: Sta
 
 // ---- Title cell (inline text + open panel) ----
 export function TitleCell({ goal, onCommit, onOpen }: { goal: Goal; onCommit: (title: string) => void; onOpen: () => void }) {
+  useTranslation();
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(goal.title);
   useEffect(() => setVal(goal.title), [goal.title]);
@@ -76,7 +79,7 @@ export function TitleCell({ goal, onCommit, onOpen }: { goal: Goal; onCommit: (t
       <span className="truncate flex-1 cursor-text hover:text-primary" onClick={() => setEditing(true)} title={goal.title}>
         {goal.title}
       </span>
-      <Button variant="ghost" size="icon" className="h-5 w-5 opacity-0 group-hover:opacity-100 shrink-0" onClick={onOpen} title="열기">
+      <Button variant="ghost" size="icon" className="h-5 w-5 opacity-0 group-hover:opacity-100 shrink-0" onClick={onOpen} title={t("열기")}>
         <ExternalLink className="h-3.5 w-3.5" />
       </Button>
     </div>
@@ -85,13 +88,14 @@ export function TitleCell({ goal, onCommit, onOpen }: { goal: Goal; onCommit: (t
 
 // ---- Person cell ----
 export function PersonCell({ owners, users, onChange }: { owners: string[]; users: RegisteredUser[]; onChange: (owners: string[]) => void }) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn('flex items-center gap-1 min-w-0 w-full text-left hover:bg-accent/50 rounded px-1 py-0.5', TRIGGER)}>
           {owners.length === 0 ? (
-            <span className="text-muted-foreground text-xs">담당자 없음</span>
+            <span className="text-muted-foreground text-xs">{t("담당자 없음")}</span>
           ) : (
             <div className="flex items-center gap-0.5 flex-wrap">
               {owners.slice(0, 4).map((o) => (
@@ -111,6 +115,7 @@ export function PersonCell({ owners, users, onChange }: { owners: string[]; user
 
 // ---- Progress cell (read-only when subGoals drive it) ----
 export function ProgressCell({ goal, onCommit }: { goal: Goal; onCommit: (progress: number) => void }) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   const [val, setVal] = useState(goal.progress);
   useEffect(() => setVal(goal.progress), [goal.progress]);
@@ -122,7 +127,7 @@ export function ProgressCell({ goal, onCommit }: { goal: Goal; onCommit: (progre
     </div>
   );
   if (readOnly) {
-    return <div title="하위 목표(KR)에서 자동 산출됩니다" className="w-full cursor-help">{bar}</div>;
+    return <div title={t("하위 목표(KR)에서 자동 산출됩니다")} className="w-full cursor-help">{bar}</div>;
   }
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -134,7 +139,7 @@ export function ProgressCell({ goal, onCommit }: { goal: Goal; onCommit: (progre
           onKeyDown={commitKeys(() => { onCommit(val); setOpen(false); }, () => { setVal(goal.progress); setOpen(false); })}
           className="h-8"
         />
-        <Button size="sm" className="w-full mt-2" onClick={() => { onCommit(val); setOpen(false); }}>적용</Button>
+        <Button size="sm" className="w-full mt-2" onClick={() => { onCommit(val); setOpen(false); }}>{t("적용")}</Button>
       </PopoverContent>
     </Popover>
   );
@@ -142,6 +147,7 @@ export function ProgressCell({ goal, onCommit }: { goal: Goal; onCommit: (progre
 
 // ---- Date cell ----
 export function DateCell({ value, onChange }: { value?: string | null; onChange: (v: string | null) => void }) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   const date = value ? new Date(value + 'T00:00:00') : undefined;
   return (
@@ -160,7 +166,7 @@ export function DateCell({ value, onChange }: { value?: string | null; onChange:
         />
         {value && (
           <div className="p-2 border-t">
-            <Button variant="ghost" size="sm" className="w-full" onClick={() => { onChange(null); setOpen(false); }}>지우기</Button>
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => { onChange(null); setOpen(false); }}>{t("지우기")}</Button>
           </div>
         )}
       </PopoverContent>
@@ -170,10 +176,11 @@ export function DateCell({ value, onChange }: { value?: string | null; onChange:
 
 // ---- Priority (size) cell ----
 const SIZES: { value: GoalSize; label: string }[] = [
-  { value: 'xl', label: '최고' }, { value: 'large', label: '높음' }, { value: 'medium', label: '중간' },
-  { value: 'small', label: '낮음' }, { value: 'xs', label: '최저' },
+  { value: 'xl', get label() { return t("최고"); } }, { value: 'large', get label() { return t("높음"); } }, { value: 'medium', get label() { return t("중간"); } },
+  { value: 'small', get label() { return t("낮음"); } }, { value: 'xs', get label() { return t("최저"); } },
 ];
 export function SizeCell({ size, onChange }: { size: GoalSize; onChange: (s: GoalSize) => void }) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -203,6 +210,7 @@ export function CustomFieldCell({
   users: RegisteredUser[];
   onChange: (v: unknown) => void;
 }) {
+  useTranslation();
   // 모든 훅은 조건 분기 위에서 호출(Rules of Hooks)
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState(false);

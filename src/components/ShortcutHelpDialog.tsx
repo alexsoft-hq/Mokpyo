@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Fragment } from 'react';
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
 import { getShortcutGroups } from '@/lib/shortcuts';
 
 function Key({ children }: { children: React.ReactNode }) {
+  useTranslation();
   return (
     <kbd className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded border border-border bg-muted px-1.5 font-sans text-xs font-medium text-foreground">
       {children}
@@ -23,15 +25,16 @@ export interface ShortcutHelpDialogProps {
 
 /** ? 키로 여는 단축키 도움말. 목록은 src/lib/shortcuts.ts 한 곳에서 온다. */
 export function ShortcutHelpDialog({ open, onOpenChange }: ShortcutHelpDialogProps) {
+  useTranslation();
   const groups = getShortcutGroups();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>단축키</DialogTitle>
+          <DialogTitle>{t("단축키")}</DialogTitle>
           <DialogDescription>
-            입력 중이거나 다이얼로그가 열려 있을 때는 동작하지 않습니다.
+            {t("입력 중이거나 다이얼로그가 열려 있을 때는 동작하지 않습니다.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -46,7 +49,7 @@ export function ShortcutHelpDialog({ open, onOpenChange }: ShortcutHelpDialogPro
                     <span className="flex shrink-0 items-center gap-1">
                       {item.keys.map((key, i) => (
                         <Fragment key={key}>
-                          {i > 0 && <span className="text-xs text-muted-foreground">다음</span>}
+                          {i > 0 && <span className="text-xs text-muted-foreground">{t("다음")}</span>}
                           <Key>{key}</Key>
                         </Fragment>
                       ))}

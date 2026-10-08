@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { API_BASE_URL, getAuthHeaders, throwApiError } from '@/lib/api/http';
 import { Goal } from '@/types/goal';
 
@@ -14,7 +15,7 @@ export const goalsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ ...patch, version }),
     });
-    if (!res.ok) await throwApiError(res, '목표 수정에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("목표 수정에 실패했습니다."));
     return res.json();
   },
 };

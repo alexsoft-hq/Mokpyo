@@ -1,3 +1,4 @@
+import { getLocale, useTranslation } from '@/i18n';
 import { useMemo, useCallback, useRef } from 'react';
 import { Goal } from '@/types/goal';
 
@@ -74,7 +75,7 @@ function endOfMonth(d: Date): Date {
 }
 
 function formatMonthLabel(d: Date): string {
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+  return d.toLocaleDateString(getLocale(), { year: 'numeric', month: 'long' });
 }
 
 function collectTimestamps(goals: Goal[]): number[] {
@@ -93,6 +94,7 @@ function collectTimestamps(goals: Goal[]): number[] {
 }
 
 export function useTimelineScale(goals: Goal[], zoomLevel: ZoomLevel): TimelineScale {
+  const { i18n } = useTranslation();
   // Keep stable dateToX reference across renders when startTime/dayWidth don't change
   const dateToXRef = useRef<{ startTime: number; dayWidth: number; fn: (date: Date) => number }>({
     startTime: 0, dayWidth: 0, fn: () => 0,
@@ -166,7 +168,7 @@ export function useTimelineScale(goals: Goal[], zoomLevel: ZoomLevel): TimelineS
         const mEnd = nextMonth <= endDate ? addDays(nextMonth, -1) : endDate;
         const days = diffDays(mEnd, mStart) + 1;
         columns.push({
-          label: `${mStart.getMonth() + 1}월`,
+          label: mStart.toLocaleDateString(getLocale(), { month: 'short' }),
           startX: dateToX(mStart),
           width: days * dayWidth,
           date: new Date(mStart),
@@ -201,7 +203,8 @@ export function useTimelineScale(goals: Goal[], zoomLevel: ZoomLevel): TimelineS
       totalWidth,
       _startTime: startTime,
     };
-  }, [goals, zoomLevel]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+  }, [goals, zoomLevel, i18n.language]);
 
   // Stabilize dateToX reference: only create a new function when startTime or dayWidth actually change
   if (result._startTime !== dateToXRef.current.startTime || result.dayWidth !== dateToXRef.current.dayWidth) {

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bookmark, Check, Trash2, Plus, Users, Lock } from 'lucide-react';
@@ -24,6 +25,7 @@ interface Props {
 
 /** 저장된 뷰 선택·저장·삭제 드롭다운. 공유 뷰는 ADMIN 만 생성/삭제, 개인 뷰는 누구나. */
 export function SavedViewsMenu({ projectId, viewType, currentConfig, activeViewId, onApply }: Props) {
+  useTranslation();
   const qc = useQueryClient();
   const { user } = useAuth();
   const { currentOrganization } = useWorkspace();
@@ -45,14 +47,14 @@ export function SavedViewsMenu({ projectId, viewType, currentConfig, activeViewI
     try {
       await viewsApi.create({ projectId, name: name.trim(), type: viewType, isShared: shared && isAdmin, config: currentConfig });
       invalidate(); setSaveOpen(false); setName(''); setShared(false);
-      toast.success('뷰를 저장했습니다.');
-    } catch (e) { toast.error(e instanceof Error ? e.message : '저장 실패'); }
+      toast.success(t("뷰를 저장했습니다."));
+    } catch (e) { toast.error(e instanceof Error ? e.message : t("저장 실패")); }
   };
 
   const remove = async (v: SavedView) => {
-    if (!confirm(`'${v.name}' 뷰를 삭제할까요?`)) return;
-    try { await viewsApi.remove(v.id); invalidate(); toast.success('삭제했습니다.'); }
-    catch (e) { toast.error(e instanceof Error ? e.message : '삭제 실패'); }
+    if (!confirm(t("'{{value0}}' 뷰를 삭제할까요?", { value0: v.name }))) return;
+    try { await viewsApi.remove(v.id); invalidate(); toast.success(t("삭제했습니다.")); }
+    catch (e) { toast.error(e instanceof Error ? e.message : t("삭제 실패")); }
   };
 
   const active = views.find((v) => v.id === activeViewId);
@@ -63,12 +65,12 @@ export function SavedViewsMenu({ projectId, viewType, currentConfig, activeViewI
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="h-9">
-            <Bookmark className="h-4 w-4 mr-1" />{active ? active.name : '뷰'}
+            <Bookmark className="h-4 w-4 mr-1" />{active ? active.name : t("뷰")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
-          <DropdownMenuLabel className="text-xs text-muted-foreground">저장된 뷰</DropdownMenuLabel>
-          {views.length === 0 && <div className="px-2 py-1.5 text-xs text-muted-foreground">저장된 뷰가 없습니다.</div>}
+          <DropdownMenuLabel className="text-xs text-muted-foreground">{t("저장된 뷰")}</DropdownMenuLabel>
+          {views.length === 0 && <div className="px-2 py-1.5 text-xs text-muted-foreground">{t("저장된 뷰가 없습니다.")}</div>}
           {views.map((v) => (
             <DropdownMenuItem key={v.id} onSelect={(e) => { e.preventDefault(); onApply(v); }} className="flex items-center gap-2">
               {v.id === activeViewId ? <Check className="h-3.5 w-3.5" /> : <span className="w-3.5" />}
@@ -81,7 +83,7 @@ export function SavedViewsMenu({ projectId, viewType, currentConfig, activeViewI
           ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setSaveOpen(true); }}>
-            <Plus className="h-4 w-4 mr-2" />현재 뷰 저장
+            <Plus className="h-4 w-4 mr-2" />{t("현재 뷰 저장")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -92,14 +94,14 @@ export function SavedViewsMenu({ projectId, viewType, currentConfig, activeViewI
           <Input
             autoFocus value={name} onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => { if (e.nativeEvent.isComposing || e.keyCode === 229) return; if (e.key === 'Enter') save(); }}
-            placeholder="뷰 이름" className="h-8"
+            placeholder={t("뷰 이름")} className="h-8"
           />
           {isAdmin && (
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={shared} onCheckedChange={(c) => setShared(!!c)} /> 팀과 공유
+              <Checkbox checked={shared} onCheckedChange={(c) => setShared(!!c)} /> {t("팀과 공유")}
             </label>
           )}
-          <Button size="sm" className="w-full" onClick={save} disabled={!name.trim()}>저장</Button>
+          <Button size="sm" className="w-full" onClick={save} disabled={!name.trim()}>{t("저장")}</Button>
         </PopoverContent>
       </Popover>
     </div>

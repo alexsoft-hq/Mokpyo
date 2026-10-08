@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +47,7 @@ export const TimelineBar = memo(function TimelineBar({
   onHold,
   onClick,
 }: TimelineBarProps) {
+  useTranslation();
   if (!startDate || !dueDate) return null;
 
   const start = parseDateStr(startDate);
@@ -57,7 +59,7 @@ export const TimelineBar = memo(function TimelineBar({
   const barHeight = isSubGoal ? 'h-5' : 'h-7';
 
   // Build tooltip text as title attribute (zero JS overhead, browser-native)
-  const tooltipText = `${title}\n${formatDate(startDate)} ~ ${formatDate(dueDate)}\n진행률: ${progress}%${completed ? ' (완료)' : ''}${onHold ? ' (보류)' : ''}`;
+  const tooltipText = t("{{value0}}\n{{value1}} ~ {{value2}}\n진행률: {{value3}}%{{value4}}{{value5}}", { value0: title, value1: formatDate(startDate), value2: formatDate(dueDate), value3: progress, value4: completed ? ` (${t('완료')})` : '', value5: onHold ? ` (${t('보류')})` : '' });
 
   return (
     <div

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { API_BASE_URL, getAuthHeaders, throwApiError } from '@/lib/api/http';
 
 export interface AutomationAction { type: string; config: Record<string, unknown>; }
@@ -39,31 +40,31 @@ export interface RuleInput {
 export const automationsApi = {
   async list(projectId: string): Promise<AutomationRule[]> {
     const res = await fetch(`${API_BASE_URL}/api/automations?projectId=${projectId}`, { headers: getAuthHeaders() });
-    if (!res.ok) await throwApiError(res, '자동화를 불러오지 못했습니다.');
+    if (!res.ok) await throwApiError(res, t("자동화를 불러오지 못했습니다."));
     return res.json();
   },
   async create(data: RuleInput): Promise<AutomationRule> {
     const res = await fetch(`${API_BASE_URL}/api/automations`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(data) });
-    if (!res.ok) await throwApiError(res, '자동화 생성에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("자동화 생성에 실패했습니다."));
     return res.json();
   },
   async update(id: string, data: Partial<RuleInput>): Promise<AutomationRule> {
     const res = await fetch(`${API_BASE_URL}/api/automations/${id}`, { method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(data) });
-    if (!res.ok) await throwApiError(res, '자동화 수정에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("자동화 수정에 실패했습니다."));
     return res.json();
   },
   async toggle(id: string, enabled: boolean): Promise<AutomationRule> {
     const res = await fetch(`${API_BASE_URL}/api/automations/${id}/toggle`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ enabled }) });
-    if (!res.ok) await throwApiError(res, '토글에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("토글에 실패했습니다."));
     return res.json();
   },
   async remove(id: string): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/api/automations/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-    if (!res.ok) await throwApiError(res, '삭제에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("삭제에 실패했습니다."));
   },
   async executions(id: string): Promise<AutomationExecution[]> {
     const res = await fetch(`${API_BASE_URL}/api/automations/${id}/executions`, { headers: getAuthHeaders() });
-    if (!res.ok) await throwApiError(res, '실행 이력을 불러오지 못했습니다.');
+    if (!res.ok) await throwApiError(res, t("실행 이력을 불러오지 못했습니다."));
     return res.json();
   },
 };

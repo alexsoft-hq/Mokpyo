@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useMemo, useRef } from 'react';
 import { User, Check, ChevronsUpDown, X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ interface OwnerAvatarProps {
 }
 
 export function OwnerAvatar({ ownerName, registeredUsers, size = 'sm' }: OwnerAvatarProps) {
+  useTranslation();
   const matchedUser = registeredUsers?.find(u => u.name === ownerName);
   const avatarInfo = matchedUser ? getAvatarInfo(matchedUser.picture) : null;
   const sizeClass = size === 'sm' ? 'w-4 h-4 text-[8px]' : 'w-5 h-5 text-[10px]';
@@ -58,7 +60,8 @@ interface OwnerInputProps {
   placeholder?: string;
 }
 
-export function OwnerInput({ value, onChange, registeredUsers = [], existingOwners = [], className, placeholder = '담당자 이름' }: OwnerInputProps) {
+export function OwnerInput({ value, onChange, registeredUsers = [], existingOwners = [], className, placeholder = t("담당자 이름") }: OwnerInputProps) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -115,7 +118,7 @@ export function OwnerInput({ value, onChange, registeredUsers = [], existingOwne
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="이름 검색 또는 입력..."
+            placeholder={t("이름 검색 또는 입력...")}
             value={inputValue}
             onValueChange={(v) => {
               // 복수 담당자 구분자(/, ,) 입력 차단
@@ -143,10 +146,10 @@ export function OwnerInput({ value, onChange, registeredUsers = [], existingOwne
                     setOpen(false);
                   }}
                 >
-                  "{inputValue}" 사용
+                  {t('"{{name}}" 사용', { name: inputValue })}
                 </button>
               ) : (
-                '검색 결과 없음'
+                t("검색 결과 없음")
               )}
             </CommandEmpty>
             {filteredSuggestions.length > 0 && (
@@ -165,7 +168,7 @@ export function OwnerInput({ value, onChange, registeredUsers = [], existingOwne
                     <OwnerAvatar ownerName={item.name} registeredUsers={registeredUsers} size="sm" />
                     <span className="ml-2">{item.name}</span>
                     {item.isRegistered && (
-                      <span className="ml-auto text-xs text-muted-foreground">등록 사용자</span>
+                      <span className="ml-auto text-xs text-muted-foreground">{t("등록 사용자")}</span>
                     )}
                   </CommandItem>
                 ))}
@@ -188,7 +191,8 @@ interface MultiOwnerInputProps {
   placeholder?: string;
 }
 
-export function MultiOwnerInput({ values, onChange, registeredUsers = [], existingOwners = [], className, placeholder = '담당자 추가' }: MultiOwnerInputProps) {
+export function MultiOwnerInput({ values, onChange, registeredUsers = [], existingOwners = [], className, placeholder = t("담당자 추가") }: MultiOwnerInputProps) {
+  useTranslation();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -273,7 +277,7 @@ export function MultiOwnerInput({ values, onChange, registeredUsers = [], existi
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="이름 검색 또는 입력..."
+              placeholder={t("이름 검색 또는 입력...")}
               value={inputValue}
               onValueChange={(v) => {
                 if (/[/,]/.test(v)) return;
@@ -296,10 +300,10 @@ export function MultiOwnerInput({ values, onChange, registeredUsers = [], existi
                       addOwner(inputValue);
                     }}
                   >
-                    "{inputValue}" 추가
+                    {t('"{{name}}" 추가', { name: inputValue })}
                   </button>
                 ) : (
-                  '검색 결과 없음'
+                  t("검색 결과 없음")
                 )}
               </CommandEmpty>
               {filteredSuggestions.length > 0 && (
@@ -320,7 +324,7 @@ export function MultiOwnerInput({ values, onChange, registeredUsers = [], existi
                       <OwnerAvatar ownerName={item.name} registeredUsers={registeredUsers} size="sm" />
                       <span className="ml-2">{item.name}</span>
                       {item.isRegistered && (
-                        <span className="ml-auto text-xs text-muted-foreground">등록 사용자</span>
+                        <span className="ml-auto text-xs text-muted-foreground">{t("등록 사용자")}</span>
                       )}
                     </CommandItem>
                   ))}

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useMemo, useCallback } from 'react';
 import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
 import { Progress } from '@/components/ui/progress';
@@ -44,6 +45,7 @@ function progressToBgClass(progress: number): string {
 
 // Custom treemap cell content
 function TreemapCell(props: any) {
+  useTranslation();
   const { x, y, width, height, name, avgProgress, totalCount } = props;
   if (!name || width < 30 || height < 20) return null;
 
@@ -82,7 +84,7 @@ function TreemapCell(props: any) {
               fill="rgba(255,255,255,0.85)"
               fontSize={11}
             >
-              {avgProgress}% · {totalCount}건
+              {t("진행률 {{progress}}% · 목표 {{count}}건", { progress: avgProgress, count: totalCount })}
             </text>
           )}
         </>
@@ -93,22 +95,24 @@ function TreemapCell(props: any) {
 
 // Custom tooltip for treemap
 function TreemapTooltipContent({ active, payload }: any) {
+  useTranslation();
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload;
   return (
     <div className="rounded-lg border bg-popover px-3 py-2 text-popover-foreground shadow-md text-sm">
       <p className="font-semibold">{data.name}</p>
       <p className="text-muted-foreground">
-        목표 {data.totalCount}건 · 진행률 {data.avgProgress}%
+        {t("목표 {{count}}건 · 진행률 {{progress}}%", { count: data.totalCount, progress: data.avgProgress })}
       </p>
       <p className="text-muted-foreground">
-        완료 {data.completedCount} · 보류 {data.onHoldCount}
+        {t("완료")} {data.completedCount} {t("· 보류")} {data.onHoldCount}
       </p>
     </div>
   );
 }
 
 export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps) {
+  useTranslation();
   const [tab, setTab] = useState<DashboardTab>('cards');
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
 
@@ -157,30 +161,30 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => setSelectedMember(null)}>
             <ArrowLeft className="h-4 w-4 mr-1" />
-            전체 현황
+            {t("전체 현황")}
           </Button>
           <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-muted-foreground" />
             <h2 className="text-lg font-bold">{drilldownMember.name}</h2>
             <Badge variant="outline" className="text-xs">
-              {drilldownMember.totalCount}건
+              {t("{{count}}건", { count: drilldownMember.totalCount })}
             </Badge>
           </div>
         </div>
 
         {/* Member stats */}
         <div className="grid grid-cols-4 gap-3">
-          <StatCard label="전체" value={drilldownMember.totalCount} icon={<Target className="h-4 w-4" />} />
-          <StatCard label="진행률" value={`${drilldownMember.avgProgress}%`} icon={<TrendingUp className="h-4 w-4" />} color={getProgressColor(drilldownMember.avgProgress)} />
-          <StatCard label="완료" value={drilldownMember.completedCount} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
-          <StatCard label="보류" value={drilldownMember.onHoldCount} icon={<PauseCircle className="h-4 w-4" />} color="text-amber-600" />
+          <StatCard label={t("전체")} value={drilldownMember.totalCount} icon={<Target className="h-4 w-4" />} />
+          <StatCard label={t("진행률")} value={`${drilldownMember.avgProgress}%`} icon={<TrendingUp className="h-4 w-4" />} color={getProgressColor(drilldownMember.avgProgress)} />
+          <StatCard label={t("완료")} value={drilldownMember.completedCount} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
+          <StatCard label={t("보류")} value={drilldownMember.onHoldCount} icon={<PauseCircle className="h-4 w-4" />} color="text-amber-600" />
         </div>
 
         <Progress value={drilldownMember.avgProgress} className="h-2" />
 
         {/* Goals list */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">담당 목표</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground">{t("담당 목표")}</h3>
           {drilldownMember.goals.map(goal => (
             <button
               key={goal.id}
@@ -193,15 +197,15 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
                   <span className="text-sm font-medium truncate">{goal.title}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {goal.completed && <Badge className="bg-green-100 text-green-700 text-[10px]">완료</Badge>}
-                  {goal.onHold && <Badge className="bg-amber-100 text-amber-700 text-[10px]">보류</Badge>}
+                  {goal.completed && <Badge className="bg-green-100 text-green-700 text-[10px]">{t("완료")}</Badge>}
+                  {goal.onHold && <Badge className="bg-amber-100 text-amber-700 text-[10px]">{t("보류")}</Badge>}
                   <span className={cn('text-sm font-semibold', getProgressColor(goal.progress))}>{goal.progress}%</span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
               {goal.subGoals && goal.subGoals.length > 0 && (
                 <p className="text-xs text-muted-foreground mt-1 ml-6">
-                  하위목표 {goal.subGoals.length}개
+                  {t("하위 목표 {{count}}개", { count: goal.subGoals.length })}
                 </p>
               )}
             </button>
@@ -209,7 +213,7 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
 
           {drilldownMember.subGoals.length > 0 && (
             <>
-              <h3 className="text-sm font-semibold text-muted-foreground mt-4">담당 하위목표</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mt-4">{t("담당 하위목표")}</h3>
               {drilldownMember.subGoals.map(sub => (
                 <button
                   key={sub.id}
@@ -240,11 +244,11 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
     <div className="space-y-6">
       {/* Global summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <StatCard label="담당자" value={summary.totalMembers} icon={<Users className="h-4 w-4" />} />
-        <StatCard label="전체 목표" value={summary.totalGoals} icon={<Target className="h-4 w-4" />} />
-        <StatCard label="평균 진행률" value={`${summary.avgProgress}%`} icon={<TrendingUp className="h-4 w-4" />} color={getProgressColor(summary.avgProgress)} />
-        <StatCard label="완료" value={summary.totalCompleted} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
-        <StatCard label="보류" value={summary.totalOnHold} icon={<PauseCircle className="h-4 w-4" />} color="text-amber-600" />
+        <StatCard label={t("담당자")} value={summary.totalMembers} icon={<Users className="h-4 w-4" />} />
+        <StatCard label={t("전체 목표")} value={summary.totalGoals} icon={<Target className="h-4 w-4" />} />
+        <StatCard label={t("평균 진행률")} value={`${summary.avgProgress}%`} icon={<TrendingUp className="h-4 w-4" />} color={getProgressColor(summary.avgProgress)} />
+        <StatCard label={t("완료")} value={summary.totalCompleted} icon={<CheckCircle2 className="h-4 w-4" />} color="text-green-600" />
+        <StatCard label={t("보류")} value={summary.totalOnHold} icon={<PauseCircle className="h-4 w-4" />} color="text-amber-600" />
       </div>
 
       {/* Tab toggle */}
@@ -256,7 +260,7 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
           className="text-xs h-7 px-3"
         >
           <LayoutGrid className="h-3.5 w-3.5 mr-1" />
-          카드
+          {t("카드")}
         </Button>
         <Button
           variant={tab === 'treemap' ? 'secondary' : 'ghost'}
@@ -265,7 +269,7 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
           className="text-xs h-7 px-3"
         >
           <TreePine className="h-3.5 w-3.5 mr-1" />
-          트리맵
+          {t("트리맵")}
         </Button>
       </div>
 
@@ -284,12 +288,12 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate">{member.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{member.totalCount}건</p>
+                  <p className="text-[10px] text-muted-foreground">{t("목표 {{count}}건", { count: member.totalCount })}</p>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">진행률</span>
+                  <span className="text-muted-foreground">{t("진행률")}</span>
                   <span className={cn('font-semibold', getProgressColor(member.avgProgress))}>
                     {member.avgProgress}%
                   </span>
@@ -322,12 +326,12 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
       {tab === 'treemap' && (
         <div className="border rounded-xl p-4 bg-card">
           <div className="flex items-center gap-4 mb-3 text-xs text-muted-foreground">
-            <span>크기 = 목표 수</span>
+            <span>{t("크기 = 목표 수")}</span>
             <span className="flex items-center gap-1">
-              색상:
-              <span className="inline-block w-3 h-3 rounded bg-red-500" />낮음
-              <span className="inline-block w-3 h-3 rounded bg-yellow-500" />중간
-              <span className="inline-block w-3 h-3 rounded bg-green-500" />높음
+              {t("색상:")}
+              <span className="inline-block w-3 h-3 rounded bg-red-500" />{t("낮음")}
+              <span className="inline-block w-3 h-3 rounded bg-yellow-500" />{t("중간")}
+              <span className="inline-block w-3 h-3 rounded bg-green-500" />{t("높음")}
             </span>
           </div>
           <ResponsiveContainer width="100%" height={Math.max(300, members.length * 30)}>
@@ -351,6 +355,7 @@ export function MemberDashboard({ members, onOpenDetail }: MemberDashboardProps)
 
 // Small stat card
 function StatCard({ label, value, icon, color }: { label: string; value: string | number; icon: React.ReactNode; color?: string }) {
+  useTranslation();
   return (
     <div className="rounded-lg border bg-card p-3">
       <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1">

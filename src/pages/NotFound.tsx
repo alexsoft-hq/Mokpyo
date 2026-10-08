@@ -1,3 +1,4 @@
+import { useTranslation, t, getLocale } from '@/i18n';
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Home } from 'lucide-react';
@@ -5,6 +6,8 @@ import { LogoMark } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/button';
 
 const NotFound = () => {
+  useTranslation();
+  const locale = getLocale();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -14,11 +17,11 @@ const NotFound = () => {
 
   useEffect(() => {
     const previous = document.title;
-    document.title = '페이지를 찾을 수 없습니다 · Mokpyo';
+    document.title = t("페이지를 찾을 수 없습니다 · Mokpyo");
     return () => {
       document.title = previous;
     };
-  }, []);
+  }, [locale]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 md:px-6">
@@ -28,22 +31,16 @@ const NotFound = () => {
         </div>
 
         <p className="mt-6 text-sm font-medium text-muted-foreground">404</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">페이지를 찾을 수 없습니다</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          주소가 바뀌었거나 삭제된 페이지입니다. 주소를 다시 확인하거나 홈에서 다시 찾아 주세요.
-        </p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{t("페이지를 찾을 수 없습니다")}</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("주소가 바뀌었거나 삭제된 페이지입니다. 주소를 다시 확인하거나 홈에서 다시 찾아 주세요.")}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
           <Button asChild>
             <Link to="/">
-              <Home aria-hidden="true" />
-              홈으로
-            </Link>
+              <Home aria-hidden="true" />{t("홈으로")}</Link>
           </Button>
           <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft aria-hidden="true" />
-            이전으로
-          </Button>
+            <ArrowLeft aria-hidden="true" />{t("이전으로")}</Button>
         </div>
       </div>
     </div>

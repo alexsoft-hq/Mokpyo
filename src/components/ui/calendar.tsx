@@ -1,3 +1,4 @@
+import { getDateLocale, t, useTranslation } from '@/i18n';
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
@@ -8,8 +9,11 @@ import { buttonVariants } from "@/components/ui/button";
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+  useTranslation();
   return (
     <DayPicker
+      locale={getDateLocale()}
+      labels={{ labelPrevious: () => t("이전 달"), labelNext: () => t("다음 달") }}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{

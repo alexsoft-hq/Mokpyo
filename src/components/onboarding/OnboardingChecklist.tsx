@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Circle, X } from 'lucide-react';
@@ -31,6 +32,7 @@ export interface OnboardingChecklistProps {
 }
 
 export function OnboardingChecklist({ goalCount, onAddGoal, className }: OnboardingChecklistProps) {
+  const { i18n } = useTranslation();
   const { currentOrganization } = useWorkspace();
   const { projects } = useProject();
   const usersQuery = useOrgUsers();
@@ -52,30 +54,31 @@ export function OnboardingChecklist({ goalCount, onAddGoal, className }: Onboard
 
   const items = useMemo<ChecklistItem[]>(
     () => [
-      { id: 'project', label: '프로젝트 만들기', done: projects.length > 0 },
+      { id: 'project', label: t("프로젝트 만들기"), done: projects.length > 0 },
       {
         id: 'goal',
-        label: '첫 목표 추가하기',
+        label: t("첫 목표 추가하기"),
         done: goalCount > 0,
         onClick: onAddGoal,
-        actionLabel: '추가',
+        actionLabel: t("추가"),
       },
       {
         id: 'invite',
-        label: '팀원 초대하기',
+        label: t("팀원 초대하기"),
         done: memberCount >= 2,
         to: '/workspace/settings',
-        actionLabel: '초대',
+        actionLabel: t("초대"),
       },
       {
         id: 'board',
-        label: '보드에서 상태 바꿔보기',
+        label: t("보드에서 상태 바꿔보기"),
         done: boardVisited,
         to: '/board',
-        actionLabel: '열기',
+        actionLabel: t("열기"),
       },
     ],
-    [projects.length, goalCount, memberCount, boardVisited, onAddGoal]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Translation helpers read the current language globally.
+    [projects.length, goalCount, memberCount, boardVisited, onAddGoal, i18n.language]
   );
 
   const doneCount = items.filter((i) => i.done).length;
@@ -100,9 +103,9 @@ export function OnboardingChecklist({ goalCount, onAddGoal, className }: Onboard
     <Card className={cn('rounded-xl p-4 md:p-5 mb-6', className)}>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold text-foreground">시작하기</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("시작하기")}</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            네 단계만 마치면 팀과 함께 쓸 준비가 끝납니다.
+            {t("네 단계만 마치면 팀과 함께 쓸 준비가 끝납니다.")}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -114,7 +117,7 @@ export function OnboardingChecklist({ goalCount, onAddGoal, className }: Onboard
             size="icon"
             className="h-7 w-7"
             onClick={handleDismiss}
-            aria-label="시작하기 안내 닫기"
+            aria-label={t("시작하기 안내 닫기")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -141,7 +144,7 @@ export function OnboardingChecklist({ goalCount, onAddGoal, className }: Onboard
             </span>
             {!item.done && item.to && (
               <Button asChild variant="link" size="sm" className="ml-auto h-auto p-0 text-xs">
-                <Link to={item.to}>{item.actionLabel ?? '이동'}</Link>
+                <Link to={item.to}>{item.actionLabel ?? t("이동")}</Link>
               </Button>
             )}
             {!item.done && !item.to && item.onClick && (
@@ -151,7 +154,7 @@ export function OnboardingChecklist({ goalCount, onAddGoal, className }: Onboard
                 className="ml-auto h-auto p-0 text-xs"
                 onClick={item.onClick}
               >
-                {item.actionLabel ?? '이동'}
+                {item.actionLabel ?? t("이동")}
               </Button>
             )}
           </li>

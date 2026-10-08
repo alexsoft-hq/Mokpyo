@@ -1,3 +1,5 @@
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { t, useTranslation } from '@/i18n';
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo, LogoMark } from '@/components/brand/Logo';
@@ -16,33 +18,35 @@ interface MarketingLayoutProps {
  * 색은 전부 토큰이라 다크 모드에서도 그대로 동작한다.
  */
 export function MarketingLayout({ children, className }: MarketingLayoutProps) {
+  useTranslation();
   useHashScroll();
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto w-full max-w-6xl px-4 md:px-6 h-14 flex items-center gap-4">
-          <Link to="/welcome" aria-label="Mokpyo 홈" className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background">
+          <Link to="/welcome" aria-label={t("Mokpyo 홈")} className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background">
             <Logo size={24} />
           </Link>
 
-          <nav aria-label="주요 메뉴" className="hidden md:flex items-center gap-6 ml-4 text-sm">
+          <nav aria-label={t("주요 메뉴")} className="hidden md:flex items-center gap-6 ml-4 text-sm">
             <Link to="/welcome#features" className="text-muted-foreground hover:text-foreground transition-colors">
-              기능
+              {t("기능")}
             </Link>
             <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-              도입과 지원
+              {t("도입과 지원")}
             </Link>
           </nav>
 
           <div className="flex-1" />
 
           <div className="flex items-center gap-2 shrink-0">
+            <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm">
-              <Link to="/login">로그인</Link>
+              <Link to="/login">{t("로그인")}</Link>
             </Button>
             <Button asChild size="sm">
-              <Link to="/register">이 서버에 가입</Link>
+              <Link to="/register">{t("이 서버에 가입")}</Link>
             </Button>
           </div>
         </div>
@@ -56,18 +60,18 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
             <div>
               <Logo size={24} />
               <p className="mt-3 text-sm text-muted-foreground max-w-xs leading-relaxed">
-                ALEXSOFT가 만든 MIT 오픈소스 목표·OKR 도구입니다. 조직의 환경에 맞게 설치하고 수정할 수 있습니다.
+                {t("ALEXSOFT가 만든 MIT 오픈소스 목표·OKR 도구입니다. 조직의 환경에 맞게 설치하고 수정할 수 있습니다.")}
               </p>
             </div>
 
-            <FooterColumn title="제품">
-              <FooterLink to="/welcome#features">기능</FooterLink>
-              <FooterLink to="/pricing">도입과 지원</FooterLink>
+            <FooterColumn title={t("제품")}>
+              <FooterLink to="/welcome#features">{t("기능")}</FooterLink>
+              <FooterLink to="/pricing">{t("도입과 지원")}</FooterLink>
             </FooterColumn>
 
-            <FooterColumn title="소스와 지원">
+            <FooterColumn title={t("소스와 지원")}>
               <li><a href={REPOSITORY_URL} className="text-muted-foreground hover:text-foreground">GitHub</a></li>
-              <li><a href={CONSULTING_URL} className="text-muted-foreground hover:text-foreground">ALEXSOFT 상담</a></li>
+              <li><a href={CONSULTING_URL} className="text-muted-foreground hover:text-foreground">{t("ALEXSOFT 상담")}</a></li>
               <li>
                 <a
                   href={`mailto:${CONTACT_EMAIL}`}
@@ -78,9 +82,9 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
               </li>
             </FooterColumn>
 
-            <FooterColumn title="법적 고지">
-              <FooterLink to="/terms">라이선스·이용 안내</FooterLink>
-              <FooterLink to="/privacy">개인정보 처리 안내</FooterLink>
+            <FooterColumn title={t("법적 고지")}>
+              <FooterLink to="/terms">{t("라이선스·이용 안내")}</FooterLink>
+              <FooterLink to="/privacy">{t("개인정보 처리 안내")}</FooterLink>
             </FooterColumn>
           </div>
 
@@ -99,6 +103,7 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
  * /pricing 에서 "기능"을 눌러 /welcome#features 로 올 때도 해당 섹션으로 가도록 직접 맞춘다.
  */
 function useHashScroll() {
+  useTranslation();
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
@@ -112,6 +117,7 @@ function useHashScroll() {
 }
 
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
+  useTranslation();
   return (
     <div>
       <h2 className="text-sm font-semibold text-foreground">{title}</h2>
@@ -121,6 +127,7 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
 }
 
 function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
+  useTranslation();
   return (
     <li>
       <Link to={to} className="text-muted-foreground hover:text-foreground transition-colors">

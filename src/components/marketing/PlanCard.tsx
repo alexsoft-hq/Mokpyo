@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -10,6 +11,7 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, maxFeatures }: PlanCardProps) {
+  useTranslation();
   const features = maxFeatures ? plan.features.slice(0, maxFeatures) : plan.features;
   const hidden = plan.features.length - features.length;
 
@@ -33,12 +35,12 @@ export function PlanCard({ plan, maxFeatures }: PlanCardProps) {
 
       <ul className="mt-6 flex-1 space-y-2.5 text-sm">
         {features.map((feature) => (
-          <li key={feature} className="flex items-start gap-2">
+          <li key={t(feature)} className="flex items-start gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-            <span className="text-foreground">{feature}</span>
+            <span className="text-foreground">{t(feature)}</span>
           </li>
         ))}
-        {hidden > 0 && <li className="text-muted-foreground">외 {hidden}가지</li>}
+        {hidden > 0 && <li className="text-muted-foreground">{t("외 {{count}}가지", { count: hidden })}</li>}
       </ul>
 
       <Button

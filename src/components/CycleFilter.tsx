@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { Cycle, CycleOverlapPreview, api } from '@/lib/api';
 import {
@@ -25,10 +26,10 @@ const ALL_VALUE = '__all__';
 const MANAGE_VALUE = '__manage__';
 
 const CYCLE_TYPES: { value: string; label: string }[] = [
-  { value: 'quarter', label: '분기' },
-  { value: 'half', label: '반기' },
-  { value: 'annual', label: '연간' },
-  { value: 'custom', label: '사용자 지정' },
+  { value: 'quarter', get label() { return t("분기"); } },
+  { value: 'half', get label() { return t("반기"); } },
+  { value: 'annual', get label() { return t("연간"); } },
+  { value: 'custom', get label() { return t("사용자 지정"); } },
 ];
 
 const toDateInput = (value?: string) => (value ? value.slice(0, 10) : '');
@@ -55,6 +56,7 @@ export const CycleFilter = ({
   onGoalsChange,
   className,
 }: CycleFilterProps) => {
+  useTranslation();
   const [manageOpen, setManageOpen] = useState(false);
 
   return (
@@ -71,13 +73,13 @@ export const CycleFilter = ({
       >
         <SelectTrigger
           className={cn('h-9 w-auto min-w-[130px] max-w-[200px] gap-1.5 text-sm', className)}
-          aria-label="사이클 필터"
+          aria-label={t("사이클 필터")}
         >
           <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" />
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_VALUE}>전체 사이클</SelectItem>
+          <SelectItem value={ALL_VALUE}>{t("전체 사이클")}</SelectItem>
           {cycles.map((cycle) => (
             <SelectItem key={cycle.id} value={cycle.id}>
               {cycle.name}
@@ -89,7 +91,7 @@ export const CycleFilter = ({
               <SelectItem value={MANAGE_VALUE}>
                 <span className="flex items-center gap-2">
                   <Settings2 className="w-3.5 h-3.5" />
-                  사이클 관리…
+                  {t("사이클 관리…")}
                 </span>
               </SelectItem>
             </>
@@ -119,18 +121,19 @@ interface CycleManageDialogProps {
 }
 
 const CycleManageDialog = ({ open, onClose, cycles, onChanged, onGoalsChanged }: CycleManageDialogProps) => {
+  useTranslation();
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">사이클 관리</DialogTitle>
+          <DialogTitle className="text-xl">{t("사이클 관리")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-3">
             {cycles.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
-                등록된 사이클이 없습니다. 아래에서 새 사이클을 추가하세요.
+                {t("등록된 사이클이 없습니다. 아래에서 새 사이클을 추가하세요.")}
               </p>
             ) : (
               cycles.map((cycle) => (
@@ -140,14 +143,14 @@ const CycleManageDialog = ({ open, onClose, cycles, onChanged, onGoalsChanged }:
           </div>
 
           <div className="pt-4 border-t">
-            <h4 className="text-sm font-semibold mb-2">새 사이클 추가</h4>
+            <h4 className="text-sm font-semibold mb-2">{t("새 사이클 추가")}</h4>
             <CycleAddForm onChanged={onChanged} />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            닫기
+            {t("닫기")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -161,10 +164,10 @@ const CycleTypeSelect = ({
 }: {
   value: string;
   onValueChange: (value: string) => void;
-}) => (
+}) => { useTranslation(); return ((
   <Select value={value} onValueChange={onValueChange}>
     <SelectTrigger className="h-9">
-      <SelectValue placeholder="유형" />
+      <SelectValue placeholder={t("유형")} />
     </SelectTrigger>
     <SelectContent>
       {CYCLE_TYPES.map((t) => (
@@ -174,7 +177,7 @@ const CycleTypeSelect = ({
       ))}
     </SelectContent>
   </Select>
-);
+)); };
 
 const CycleRow = ({
   cycle,
@@ -185,6 +188,7 @@ const CycleRow = ({
   onChanged?: () => void;
   onGoalsChanged?: () => void;
 }) => {
+  useTranslation();
   const [name, setName] = useState(cycle.name);
   const [type, setType] = useState(cycle.type || 'quarter');
   const [startDate, setStartDate] = useState(toDateInput(cycle.startDate));
@@ -197,14 +201,14 @@ const CycleRow = ({
       setBusy(true);
       const result = await api.getCycleUnassignedOverlaps(cycle.id);
       if (result.count === 0) {
-        alert('이 사이클 기간과 겹치는 미배정 목표가 없습니다.');
+        alert(t("이 사이클 기간과 겹치는 미배정 목표가 없습니다."));
         setPreview(null);
         return;
       }
       setPreview(result);
     } catch (error) {
       console.error('Failed to preview overlapping goals:', error);
-      alert(error instanceof Error ? error.message : '배정 대상 목표 조회에 실패했습니다.');
+      alert(error instanceof Error ? error.message : t("배정 대상 목표 조회에 실패했습니다."));
     } finally {
       setBusy(false);
     }
@@ -218,10 +222,10 @@ const CycleRow = ({
       const { assigned } = await api.assignCycleOverlaps(cycle.id, preview.goals.map((g) => g.id));
       setPreview(null);
       onGoalsChanged?.();
-      alert(`${assigned}건의 목표를 '${cycle.name}' 사이클에 배정했습니다.`);
+      alert(t("{{value0}}건의 목표를 '{{value1}}' 사이클에 배정했습니다.", { value0: assigned, value1: cycle.name }));
     } catch (error) {
       console.error('Failed to assign overlapping goals:', error);
-      alert(error instanceof Error ? error.message : '목표 일괄 배정에 실패했습니다.');
+      alert(error instanceof Error ? error.message : t("목표 일괄 배정에 실패했습니다."));
     } finally {
       setBusy(false);
     }
@@ -229,7 +233,7 @@ const CycleRow = ({
 
   const handleSave = async () => {
     if (!name.trim() || !startDate || !endDate) {
-      alert('이름, 시작일, 종료일을 모두 입력하세요.');
+      alert(t("이름, 시작일, 종료일을 모두 입력하세요."));
       return;
     }
     try {
@@ -240,14 +244,14 @@ const CycleRow = ({
       onChanged?.();
     } catch (error) {
       console.error('Failed to update cycle:', error);
-      alert(error instanceof Error ? error.message : '사이클 수정에 실패했습니다.');
+      alert(error instanceof Error ? error.message : t("사이클 수정에 실패했습니다."));
     } finally {
       setBusy(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm(`'${cycle.name}' 사이클을 삭제하시겠습니까?`)) return;
+    if (!confirm(t("'{{value0}}' 사이클을 삭제하시겠습니까?", { value0: cycle.name }))) return;
     try {
       setBusy(true);
       await api.deleteCycle(cycle.id);
@@ -255,7 +259,7 @@ const CycleRow = ({
       onChanged?.();
     } catch (error) {
       console.error('Failed to delete cycle:', error);
-      alert(error instanceof Error ? error.message : '사이클 삭제에 실패했습니다.');
+      alert(error instanceof Error ? error.message : t("사이클 삭제에 실패했습니다."));
     } finally {
       setBusy(false);
     }
@@ -265,17 +269,17 @@ const CycleRow = ({
     <div className="p-3 bg-muted/50 rounded-lg border space-y-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div>
-          <Label className="text-xs">이름</Label>
+          <Label className="text-xs">{t("이름")}</Label>
           <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 h-9" />
         </div>
         <div>
-          <Label className="text-xs">유형</Label>
+          <Label className="text-xs">{t("유형")}</Label>
           <div className="mt-1">
             <CycleTypeSelect value={type} onValueChange={setType} />
           </div>
         </div>
         <div>
-          <Label className="text-xs">시작일</Label>
+          <Label className="text-xs">{t("시작일")}</Label>
           <Input
             type="date"
             value={startDate}
@@ -284,7 +288,7 @@ const CycleRow = ({
           />
         </div>
         <div>
-          <Label className="text-xs">종료일</Label>
+          <Label className="text-xs">{t("종료일")}</Label>
           <Input
             type="date"
             value={endDate}
@@ -299,18 +303,18 @@ const CycleRow = ({
           size="sm"
           onClick={handlePreviewOverlaps}
           disabled={busy}
-          title="시작일·마감일이 이 사이클 기간과 겹치는 '사이클 미지정' 목표를 찾아 일괄 배정합니다"
+          title={t("시작일·마감일이 이 사이클 기간과 겹치는 '사이클 미지정' 목표를 찾아 일괄 배정합니다")}
         >
           <ListPlus className="w-4 h-4 mr-1" />
-          목표 일괄 배정
+          {t("목표 일괄 배정")}
         </Button>
         <div className="flex gap-2">
           <Button variant="ghost" size="sm" onClick={handleDelete} disabled={busy} className="text-destructive hover:text-destructive">
             <Trash2 className="w-4 h-4 mr-1" />
-            삭제
+            {t("삭제")}
           </Button>
           <Button variant="outline" size="sm" onClick={handleSave} disabled={busy}>
-            저장
+            {t("저장")}
           </Button>
         </div>
       </div>
@@ -318,8 +322,7 @@ const CycleRow = ({
       {preview && (
         <div className="rounded-md border bg-background p-3 space-y-2">
           <p className="text-sm font-medium" role="status">
-            기간이 겹치는 미배정 목표 <span className="text-primary">{preview.count}건</span> — 아래 목표가
-            이 사이클에 배정됩니다.
+            {t("기간이 겹치는 미배정 목표")} <span className="text-primary">{t("{{count}}건", { count: preview.count })}</span> {t("— 아래 목표가 이 사이클에 배정됩니다.")}
           </p>
           <ul className="max-h-40 overflow-y-auto space-y-1 pr-1">
             {preview.goals.map((g) => (
@@ -333,10 +336,10 @@ const CycleRow = ({
           </ul>
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="ghost" size="sm" onClick={() => setPreview(null)} disabled={busy}>
-              취소
+              {t("취소")}
             </Button>
             <Button size="sm" onClick={handleAssignOverlaps} disabled={busy}>
-              {preview.count}건 배정
+              {t("{{count}}건 배정", { count: preview.count })}
             </Button>
           </div>
         </div>
@@ -346,6 +349,7 @@ const CycleRow = ({
 };
 
 const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
+  useTranslation();
   const [name, setName] = useState('');
   const [type, setType] = useState('quarter');
   const [startDate, setStartDate] = useState('');
@@ -361,7 +365,7 @@ const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
 
   const handleAdd = async () => {
     if (!name.trim() || !startDate || !endDate) {
-      alert('이름, 시작일, 종료일을 모두 입력하세요.');
+      alert(t("이름, 시작일, 종료일을 모두 입력하세요."));
       return;
     }
     try {
@@ -371,7 +375,7 @@ const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
       onChanged?.();
     } catch (error) {
       console.error('Failed to create cycle:', error);
-      alert(error instanceof Error ? error.message : '사이클 생성에 실패했습니다.');
+      alert(error instanceof Error ? error.message : t("사이클 생성에 실패했습니다."));
     } finally {
       setBusy(false);
     }
@@ -381,22 +385,22 @@ const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
     <div className="p-3 bg-background rounded-lg border space-y-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div>
-          <Label className="text-xs">이름</Label>
+          <Label className="text-xs">{t("이름")}</Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="예: 2026 1분기"
+            placeholder={t("예: 2026 1분기")}
             className="mt-1 h-9"
           />
         </div>
         <div>
-          <Label className="text-xs">유형</Label>
+          <Label className="text-xs">{t("유형")}</Label>
           <div className="mt-1">
             <CycleTypeSelect value={type} onValueChange={setType} />
           </div>
         </div>
         <div>
-          <Label className="text-xs">시작일</Label>
+          <Label className="text-xs">{t("시작일")}</Label>
           <Input
             type="date"
             value={startDate}
@@ -405,7 +409,7 @@ const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
           />
         </div>
         <div>
-          <Label className="text-xs">종료일</Label>
+          <Label className="text-xs">{t("종료일")}</Label>
           <Input
             type="date"
             value={endDate}
@@ -417,7 +421,7 @@ const CycleAddForm = ({ onChanged }: { onChanged?: () => void }) => {
       <div className="flex justify-end">
         <Button size="sm" onClick={handleAdd} disabled={busy}>
           <Plus className="w-4 h-4 mr-1" />
-          추가
+          {t("추가")}
         </Button>
       </div>
     </div>

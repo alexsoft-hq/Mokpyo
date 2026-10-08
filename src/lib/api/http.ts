@@ -1,3 +1,4 @@
+import { t, getLocale, englishMessages } from '@/i18n';
 // Shared HTTP helpers for all API modules.
 // Extracted from src/lib/api.ts so new feature API modules (fields, comments,
 // automations, views, dashboards) can reuse the exact same auth/parse/error logic.
@@ -46,7 +47,7 @@ export async function safeJson<T>(response: Response, fallbackMessage: string): 
     return JSON.parse(text);
   } catch {
     console.error('Non-JSON response:', text.slice(0, 200));
-    throw new Error(fallbackMessage);
+    throw new Error(t(fallbackMessage));
   }
 }
 
@@ -63,6 +64,13 @@ export class ApiError extends Error {
   }
 }
 
+// Localize system errors without changing user-authored content.
+export function localizeApiError(message: unknown, fallbackMessage: string): string {
+  if (typeof message !== 'string' || !message) return t(fallbackMessage);
+  if (getLocale() === 'en-US' && /[가-힣]/.test(message) && !(message in englishMessages)) return t(fallbackMessage);
+  return t(message);
+}
+
 // Helper to throw API error with safe JSON parsing
 export async function throwApiError(response: Response, fallbackMessage: string): Promise<never> {
   const text = await response.text();
@@ -70,13 +78,13 @@ export async function throwApiError(response: Response, fallbackMessage: string)
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new ApiError(`${fallbackMessage} (서버 응답: ${response.status})`, response.status, null);
+    throw new ApiError(t('{{message}} (서버 응답: {{status}})', { message: t(fallbackMessage), status: response.status }), response.status, null);
   }
   const message =
     parsed && typeof parsed === 'object' && 'error' in parsed && typeof (parsed as { error: unknown }).error === 'string'
       ? (parsed as { error: string }).error
       : fallbackMessage;
-  throw new ApiError(message, response.status, parsed);
+  throw new ApiError(localizeApiError(message, fallbackMessage), response.status, parsed);
 }
 
 // --- 세션 만료 처리 -----------------------------------------------------------

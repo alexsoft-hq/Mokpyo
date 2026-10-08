@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { GoalCategory } from '@/types/goal';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ export function CategoryStatStrip({
   density = 'comfortable',
   className,
 }: CategoryStatStripProps) {
+  useTranslation();
   const entries = Object.entries(stats);
   if (entries.length === 0) return null;
 
@@ -41,7 +43,7 @@ export function CategoryStatStrip({
             type="button"
             onClick={() => onToggle(category as GoalCategory)}
             aria-pressed={isSel}
-            title={`${category} · ${s.count}개 · 평균 ${avg}%`}
+            title={t("{{value0}} · {{value1}}개 · 평균 {{value2}}%", { value0: category, value1: s.count, value2: avg })}
             className={cn(
               'group flex items-center rounded-lg border transition-all',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
@@ -60,7 +62,7 @@ export function CategoryStatStrip({
             >
               {category}
             </span>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">{s.count}개</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{t("{{count}}개", { count: s.count })}</span>
             <div
               className="h-1.5 w-10 shrink-0 overflow-hidden rounded-full"
               style={{ backgroundColor: `${color}26` }}

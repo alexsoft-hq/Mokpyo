@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -34,6 +35,7 @@ interface GoalDetailContainerProps {
  * (Index.tsx 는 명령형 로컬 상태 기반이라 별도 인라인 다이얼로그를 유지 — 이 컨테이너 미사용.)
  */
 export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContainerProps) {
+  useTranslation();
   const qc = useQueryClient();
   const { currentProject, projects, projectTree, setCurrentProject } = useProject();
   const { currentOrganization } = useWorkspace();
@@ -85,7 +87,7 @@ export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContain
   // 상세 조회 실패(예: 삭제된 목표·권한 없음) → 안내 후 패널 닫기
   useEffect(() => {
     if (open && !!goalId && goalQuery.isError) {
-      toast.error('목표를 불러오지 못했습니다.');
+      toast.error(t("목표를 불러오지 못했습니다."));
       onClose();
     }
     // onClose 는 부모 인라인 콜백이라 매 렌더 변경 → 의존성 제외
@@ -104,7 +106,7 @@ export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContain
         await api.toggleGoalCompletion(id, completed);
         invalidateGoal();
       } catch {
-        toast.error('목표 완료 상태 변경에 실패했습니다.');
+        toast.error(t("목표 완료 상태 변경에 실패했습니다."));
       }
     },
     [invalidateGoal]
@@ -116,7 +118,7 @@ export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContain
         await api.toggleGoalOnHold(id, onHold);
         invalidateGoal();
       } catch {
-        toast.error('목표 보류 상태 변경에 실패했습니다.');
+        toast.error(t("목표 보류 상태 변경에 실패했습니다."));
       }
     },
     [invalidateGoal]
@@ -130,7 +132,7 @@ export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContain
       } catch (err) {
         const status = (err as { response?: { status?: number }; status?: number })?.response?.status
           ?? (err as { status?: number })?.status;
-        toast.error(status === 409 ? '다른 사용자가 먼저 수정했습니다. 최신 데이터로 갱신합니다.' : '목표 저장에 실패했습니다.');
+        toast.error(status === 409 ? t("다른 사용자가 먼저 수정했습니다. 최신 데이터로 갱신합니다.") : t("목표 저장에 실패했습니다."));
         invalidateGoal();
         throw err; // 실패 시 편집 모달을 열어둔 채 편집내용 보존(모달이 성공 시에만 닫힘)
       }
@@ -143,10 +145,10 @@ export function GoalDetailContainer({ goalId, open, onClose }: GoalDetailContain
       try {
         await api.deleteGoal(id);
         justDeleted.current = true; // 성공 시에만 설정 → 모달 onClose(handleEditClose)가 패널 전체를 닫음
-        toast.success('목표를 삭제했습니다.');
+        toast.success(t("목표를 삭제했습니다."));
         qc.invalidateQueries({ queryKey: ['goals'] });
       } catch (err) {
-        toast.error('목표 삭제에 실패했습니다.');
+        toast.error(t("목표 삭제에 실패했습니다."));
         qc.invalidateQueries({ queryKey: ['goals'] }); // 실패 시에도 목록 정합성 보정
         throw err; // 실패 시 모달 유지(성공 시에만 닫힘)
       }

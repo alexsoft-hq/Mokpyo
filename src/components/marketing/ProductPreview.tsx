@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 const TABS = ['카드', '테이블', '보드', '타임라인', '대시보드'] as const;
 
 interface PreviewCard {
@@ -8,10 +9,10 @@ interface PreviewCard {
 }
 
 const CARDS: PreviewCard[] = [
-  { title: '온보딩 이탈률 절반으로 줄이기', owners: 3, progress: 72, due: '3월 31일' },
-  { title: '분기 매출 12억 달성', owners: 2, progress: 45, due: '3월 31일' },
-  { title: '고객 응대 평균 4시간 이내', owners: 4, progress: 88, due: '2월 28일' },
-  { title: '신규 요금제 정식 출시', owners: 2, progress: 30, due: '4월 15일' },
+  { get title() { return t("온보딩 이탈률 절반으로 줄이기"); }, owners: 3, progress: 72, get due() { return t("3월 31일"); } },
+  { get title() { return t("분기 매출 12억 달성"); }, owners: 2, progress: 45, get due() { return t("3월 31일"); } },
+  { get title() { return t("고객 응대 평균 4시간 이내"); }, owners: 4, progress: 88, get due() { return t("2월 28일"); } },
+  { get title() { return t("신규 요금제 정식 출시"); }, owners: 2, progress: 30, get due() { return t("4월 15일"); } },
 ];
 
 /**
@@ -19,6 +20,7 @@ const CARDS: PreviewCard[] = [
  * 장식이므로 스크린 리더에는 노출하지 않는다.
  */
 export function ProductPreview() {
+  useTranslation();
   return (
     <div
       aria-hidden="true"
@@ -43,7 +45,7 @@ export function ProductPreview() {
                 : 'shrink-0 rounded-md px-2.5 py-1 text-xs text-muted-foreground'
             }
           >
-            {tab}
+            {t(tab)}
           </span>
         ))}
       </div>

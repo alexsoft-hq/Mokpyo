@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { memo, useState, useEffect } from 'react';
 import { Target, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ export const GoalTimelineRow = memo(function GoalTimelineRow({
   isEven,
   showSubGoals,
 }: GoalTimelineRowProps) {
+  useTranslation();
   const hasGoalDates = goal.startDate && goal.dueDate;
   const allSubGoals = goal.subGoals || [];
   const subGoalsWithDates = allSubGoals.filter((s) => s.startDate && s.dueDate);
@@ -78,7 +80,7 @@ export const GoalTimelineRow = memo(function GoalTimelineRow({
           <p className="text-sm font-medium truncate">{goal.title}</p>
           <p className="text-[10px] text-muted-foreground">
             {(goal.owners && goal.owners.length > 0 ? goal.owners : [goal.owner]).join(', ')} · {goal.progress}%
-            {hasSubGoals && ` · 하위 ${allSubGoals.length}개`}
+            {hasSubGoals && t(" · 하위 {{value0}}개", { value0: allSubGoals.length })}
           </p>
         </div>
       </div>

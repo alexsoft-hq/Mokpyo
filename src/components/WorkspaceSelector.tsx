@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Building2, ChevronDown, Plus, Settings } from 'lucide-react';
 
 export default function WorkspaceSelector() {
+  useTranslation();
   const { organizations, currentOrganization, setCurrentOrganization } = useWorkspace();
   const navigate = useNavigate();
 
@@ -41,18 +43,18 @@ export default function WorkspaceSelector() {
             <Building2 className="mr-2 h-4 w-4" />
             <span className="truncate">{org.name}</span>
             <span className="ml-auto text-xs text-muted-foreground">
-              {org.memberCount}명
+              {t("멤버 {{count}}명", { count: org.memberCount })}
             </span>
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/workspace/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          워크스페이스 설정
+          {t("워크스페이스 설정")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/workspace/new')}>
           <Plus className="mr-2 h-4 w-4" />
-          새 워크스페이스 만들기
+          {t("새 워크스페이스 만들기")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MarketingLayout } from '@/components/marketing/MarketingLayout';
@@ -16,38 +17,39 @@ const FAQS: FaqItem[] = [
 ];
 
 export default function Pricing() {
-  usePageTitle('도입과 지원');
+  useTranslation();
+  usePageTitle(t("도입과 지원"));
   return (
     <MarketingLayout>
       <Section className="pb-8 md:pb-10">
-        <SectionHeading eyebrow="도입과 지원" title="소프트웨어는 자유롭게. 필요한 도움은 함께." description="직접 설치하고 수정해 쓰세요. 조직에 맞춘 설계와 개발이 필요할 때 ALEXSOFT가 함께합니다." />
+        <SectionHeading eyebrow={t("도입과 지원")} title={t("소프트웨어는 자유롭게. 필요한 도움은 함께.")} description={t("직접 설치하고 수정해 쓰세요. 조직에 맞춘 설계와 개발이 필요할 때 ALEXSOFT가 함께합니다.")} />
         <div className="mt-6 flex items-start gap-2.5 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-          <p>{OPEN_SOURCE_NOTICE}</p>
+          <p>{t(OPEN_SOURCE_NOTICE)}</p>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {PLANS.map((plan) => <PlanCard key={plan.id} plan={plan} />)}
         </div>
       </Section>
       <Section muted>
-        <SectionHeading title="설치 전에 확인하세요" />
+        <SectionHeading title={t("설치 전에 확인하세요")} />
         <div className="mt-8 max-w-3xl space-y-4 text-sm leading-relaxed text-muted-foreground">
-          <p>설치 가이드에서 실행 환경과 설정을 확인하세요. 운영 서버의 HTTPS, 접근 권한, 백업·복구와 업데이트는 운영자가 관리합니다.</p>
-          <p>멤버 수에 따른 소프트웨어 사용료는 없습니다. 실제 사용 가능한 용량과 외부 연동은 서버 자원과 운영자 설정에 따라 달라집니다.</p>
-          <p>프로젝트는 MIT 라이선스 조건에 따라 보증 없이 제공됩니다. 지속적인 지원이나 응답 시간이 필요하면 별도의 지원 범위를 협의하세요.</p>
+          <p>{t("설치 가이드에서 실행 환경과 설정을 확인하세요. 운영 서버의 HTTPS, 접근 권한, 백업·복구와 업데이트는 운영자가 관리합니다.")}</p>
+          <p>{t("멤버 수에 따른 소프트웨어 사용료는 없습니다. 실제 사용 가능한 용량과 외부 연동은 서버 자원과 운영자 설정에 따라 달라집니다.")}</p>
+          <p>{t("프로젝트는 MIT 라이선스 조건에 따라 보증 없이 제공됩니다. 지속적인 지원이나 응답 시간이 필요하면 별도의 지원 범위를 협의하세요.")}</p>
         </div>
       </Section>
       <Section>
-        <SectionHeading title="자주 묻는 질문" />
-        <div className="mt-8 max-w-3xl"><FaqList items={FAQS} /></div>
+        <SectionHeading title={t("자주 묻는 질문")} />
+        <div className="mt-8 max-w-3xl"><FaqList items={FAQS.map(item => ({ question: t(item.question), answer: t(item.answer) }))} /></div>
       </Section>
       <Section muted>
         <div className="rounded-xl border border-border bg-background p-8 md:p-12 shadow-sm">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">우리 조직의 도구로 만들어 보세요.</h2>
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">Mokpyo의 소스를 바탕으로 시작하거나, ALEXSOFT와 업무에 맞는 제품을 설계하세요.</p>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">{t("우리 조직의 도구로 만들어 보세요.")}</h2>
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">{t("Mokpyo의 소스를 바탕으로 시작하거나, ALEXSOFT와 업무에 맞는 제품을 설계하세요.")}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Button asChild size="lg"><a href={INSTALL_GUIDE_URL}>설치 가이드</a></Button>
-            <Button asChild size="lg" variant="outline"><a href={CONSULTING_URL}>ALEXSOFT 상담</a></Button>
+            <Button asChild size="lg"><a href={INSTALL_GUIDE_URL}>{t("설치 가이드")}</a></Button>
+            <Button asChild size="lg" variant="outline"><a href={CONSULTING_URL}>{t("ALEXSOFT 상담")}</a></Button>
           </div>
         </div>
       </Section>

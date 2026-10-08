@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { Goal, GoalCategory } from '@/types/goal';
 import { Plus, Check, Pencil, Trash2, X, Palette } from 'lucide-react';
@@ -41,6 +42,7 @@ export const CategoryQuickEditor = ({
   categoryUsageCount = {},
   size = 'md',
 }: CategoryQuickEditorProps) => {
+  useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<GoalCategory[]>(goal.categories || []);
@@ -85,7 +87,7 @@ export const CategoryQuickEditor = ({
   const handleAddNewCategory = async () => {
     if (!newCategoryName.trim() || !onAddCategory) return;
     if (categories.includes(newCategoryName.trim())) {
-      alert('이미 존재하는 카테고리입니다.');
+      alert(t("이미 존재하는 카테고리입니다."));
       return;
     }
 
@@ -120,7 +122,7 @@ export const CategoryQuickEditor = ({
       return;
     }
     if (categories.includes(editingName.trim()) && editingName.trim() !== oldName) {
-      alert('이미 존재하는 카테고리입니다.');
+      alert(t("이미 존재하는 카테고리입니다."));
       return;
     }
 
@@ -140,11 +142,11 @@ export const CategoryQuickEditor = ({
 
     const usageCount = categoryUsageCount[category] || 0;
     if (usageCount > 0) {
-      alert(`이 카테고리를 사용하는 목표가 ${usageCount}개 있어 삭제할 수 없습니다.`);
+      alert(t("이 카테고리를 사용하는 목표가 {{value0}}개 있어 삭제할 수 없습니다.", { value0: usageCount }));
       return;
     }
 
-    if (!confirm(`'${category}' 카테고리를 삭제하시겠습니까?`)) return;
+    if (!confirm(t("'{{value0}}' 카테고리를 삭제하시겠습니까?", { value0: category }))) return;
 
     try {
       await onDeleteCategory(category);
@@ -187,7 +189,7 @@ export const CategoryQuickEditor = ({
             'transition-all duration-200',
             'border border-transparent hover:border-border'
           )}
-          title="카테고리 편집"
+          title={t("카테고리 편집")}
         >
           <Plus className={iconSize} />
         </button>
@@ -199,9 +201,9 @@ export const CategoryQuickEditor = ({
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold">카테고리 관리</span>
+            <span className="text-sm font-semibold">{t("카테고리 관리")}</span>
             <span className="text-xs text-muted-foreground">
-              선택: {selectedCategories.length}/5
+              {t("선택:")} {selectedCategories.length}/5
             </span>
           </div>
 
@@ -272,7 +274,7 @@ export const CategoryQuickEditor = ({
                           <button
                             onClick={() => startEditing(category)}
                             className="p-1 rounded hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors"
-                            title="이름 변경"
+                            title={t("이름 변경")}
                           >
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
@@ -284,7 +286,7 @@ export const CategoryQuickEditor = ({
                               "p-1 rounded hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors",
                               isColorPicking && "bg-accent/50 text-foreground"
                             )}
-                            title="색상 변경"
+                            title={t("색상 변경")}
                           >
                             <Palette className="w-3.5 h-3.5" />
                           </button>
@@ -298,7 +300,7 @@ export const CategoryQuickEditor = ({
                                 ? 'text-muted-foreground/40 cursor-not-allowed'
                                 : 'hover:bg-destructive/20 text-muted-foreground hover:text-destructive'
                             )}
-                            title={usageCount > 0 ? `${usageCount}개 목표에서 사용 중` : '삭제'}
+                            title={usageCount > 0 ? t("{{value0}}개 목표에서 사용 중", { value0: usageCount }) : t("삭제")}
                             disabled={usageCount > 0}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -319,7 +321,7 @@ export const CategoryQuickEditor = ({
                           onChange={(e) => handleColorChange(category, e.target.value)}
                           className="w-8 h-6 rounded cursor-pointer border-0"
                         />
-                        <span className="text-xs text-muted-foreground">직접 선택</span>
+                        <span className="text-xs text-muted-foreground">{t("직접 선택")}</span>
                       </div>
                       {/* 프리셋 색상 */}
                       <div className="flex flex-wrap gap-1">
@@ -350,7 +352,7 @@ export const CategoryQuickEditor = ({
                   <Input
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="새 카테고리명"
+                    placeholder={t("새 카테고리명")}
                     className="h-8 text-sm"
                     onKeyDown={(e) => {
                       if (e.nativeEvent.isComposing || e.keyCode === 229) return;
@@ -369,7 +371,7 @@ export const CategoryQuickEditor = ({
                     onClick={handleAddNewCategory}
                     disabled={!newCategoryName.trim()}
                   >
-                    추가
+                    {t("추가")}
                   </Button>
                   <Button
                     size="sm"
@@ -389,7 +391,7 @@ export const CategoryQuickEditor = ({
                   className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>새 카테고리 추가</span>
+                  <span>{t("새 카테고리 추가")}</span>
                 </button>
               )}
             </div>
@@ -403,7 +405,7 @@ export const CategoryQuickEditor = ({
               className="w-full h-8"
               size="sm"
             >
-              {isLoading ? '저장 중...' : '저장'}
+              {isLoading ? t("저장 중...") : t("저장")}
             </Button>
           )}
         </div>

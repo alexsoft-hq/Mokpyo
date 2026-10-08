@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useRef, useCallback } from 'react';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { OwnerAvatar, RegisteredUser } from '@/components/OwnerInput';
@@ -17,7 +18,8 @@ interface Props {
  * @멘션 자동완성 textarea. OwnerInput 의 cmdk 패턴을 이식 — '@' 입력 시 팝업으로 멤버 검색,
  * 선택하면 본문에 @[이름](userId) 마커 삽입. IME 조합 Enter 는 커밋 무시.
  */
-export function MentionTextarea({ value, onChange, users, placeholder = '댓글 입력…  @로 멤버 멘션', onSubmit, className }: Props) {
+export function MentionTextarea({ value, onChange, users, placeholder = t("댓글 입력… @로 멤버 멘션"), onSubmit, className }: Props) {
+  useTranslation();
   const ref = useRef<HTMLTextAreaElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -84,7 +86,7 @@ export function MentionTextarea({ value, onChange, users, placeholder = '댓글 
         <div className="absolute z-50 left-0 bottom-full mb-1 w-56 rounded-md border bg-popover shadow-md">
           <Command>
             <CommandList>
-              <CommandGroup heading="멤버 멘션">
+              <CommandGroup heading={t("멤버 멘션")}>
                 {filtered.map((u) => (
                   <CommandItem key={u.id} value={u.name} onSelect={() => insertMention(u)} className="flex items-center gap-2 cursor-pointer">
                     <OwnerAvatar ownerName={u.name} registeredUsers={users} size="sm" />

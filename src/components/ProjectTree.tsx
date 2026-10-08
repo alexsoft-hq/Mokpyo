@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Project } from '@/types/goal';
@@ -87,6 +88,7 @@ function TreeNodeContent({
   onToggle: () => void;
   onSelect: () => void;
 }) {
+  useTranslation();
   return (
     <div
       className={cn(
@@ -146,6 +148,7 @@ function DraggableTreeNode({
   onSelect,
   allProjects,
 }: TreeNodeProps) {
+  useTranslation();
   const hasChildren = project.children && project.children.length > 0;
   const isExpanded = expandedIds.has(project.id);
   const isSelected = selectedId === project.id;
@@ -224,6 +227,7 @@ export function ProjectTree({
   onMove,
   onCreateNew,
 }: ProjectTreeProps) {
+  useTranslation();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
     // 기본적으로 모든 프로젝트를 펼침
     const ids = new Set<string>();
@@ -350,8 +354,8 @@ export function ProjectTree({
             draggedId ? 'text-sm' : 'text-xs'
           )}>
             {draggedId
-              ? (isOverRootManual ? '✓ 여기에 놓으면 최상위로 이동' : '⬆️ 최상위로 이동')
-              : '최상위'
+              ? (isOverRootManual ? t("✓ 여기에 놓으면 최상위로 이동") : t("⬆️ 최상위로 이동"))
+              : t("최상위")
             }
           </div>
         </div>
@@ -375,7 +379,7 @@ export function ProjectTree({
 
           {projectTree.length === 0 && (
             <div className="text-center text-sm text-muted-foreground py-8">
-              프로젝트가 없습니다.
+              {t("프로젝트가 없습니다.")}
             </div>
           )}
         </div>
@@ -412,7 +416,7 @@ export function ProjectTree({
           onClick={onCreateNew}
         >
           <Plus className="h-4 w-4 mr-2" />
-          새 프로젝트
+          {t("새 프로젝트")}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ export const ProjectManageDialog = ({
   onDeleteProject,
   onSelectProject,
 }: ProjectManageDialogProps) => {
+  useTranslation();
   const { currentOrganization } = useWorkspace();
   const isAdminOrOwner = currentOrganization?.role === 'OWNER' || currentOrganization?.role === 'ADMIN';
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -74,9 +76,9 @@ export const ProjectManageDialog = ({
     } catch (error: any) {
       console.error('Failed to move project:', error);
       if (error.message?.includes('circular reference')) {
-        alert('순환 참조가 발생합니다. 다른 위치로 이동해주세요.');
+        alert(t("순환 참조가 발생합니다. 다른 위치로 이동해주세요."));
       } else {
-        alert('프로젝트 이동에 실패했습니다.');
+        alert(t("프로젝트 이동에 실패했습니다."));
       }
     }
   };
@@ -107,7 +109,7 @@ export const ProjectManageDialog = ({
 
   const handleCreateSubmit = async () => {
     if (!newName.trim()) {
-      alert('프로젝트 이름을 입력해주세요.');
+      alert(t("프로젝트 이름을 입력해주세요."));
       return;
     }
 
@@ -124,7 +126,7 @@ export const ProjectManageDialog = ({
       setNewParentId(null);
     } catch (error) {
       console.error('Failed to create project:', error);
-      alert('프로젝트 생성에 실패했습니다.');
+      alert(t("프로젝트 생성에 실패했습니다."));
     } finally {
       setIsCreating(false);
     }
@@ -148,7 +150,7 @@ export const ProjectManageDialog = ({
         <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle>
-              {mode === 'tree' ? '프로젝트 관리' : '새 프로젝트 추가'}
+              {mode === 'tree' ? t("프로젝트 관리") : t("새 프로젝트 추가")}
             </DialogTitle>
           </div>
         </DialogHeader>
@@ -159,7 +161,7 @@ export const ProjectManageDialog = ({
             <div className="w-1/2 border-r flex flex-col">
               <div className="px-4 py-2 border-b bg-muted/30">
                 <p className="text-xs text-muted-foreground">
-                  드래그 앤 드롭으로 구조 변경 / 클릭으로 선택
+                  {t("드래그 앤 드롭으로 구조 변경 / 클릭으로 선택")}
                 </p>
               </div>
               <div className="flex-1 overflow-hidden">
@@ -195,7 +197,7 @@ export const ProjectManageDialog = ({
                     className="w-full"
                     onClick={() => handleProjectDoubleClick(selectedProject)}
                   >
-                    이 프로젝트 대시보드로 이동
+                    {t("이 프로젝트 대시보드로 이동")}
                   </Button>
                 </div>
               )}
@@ -212,41 +214,41 @@ export const ProjectManageDialog = ({
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                뒤로
+                {t("뒤로")}
               </Button>
 
               <div className="space-y-2">
-                <Label htmlFor="newProjectName">프로젝트 이름 *</Label>
+                <Label htmlFor="newProjectName">{t("프로젝트 이름 *")}</Label>
                 <Input
                   id="newProjectName"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="예: Mokpyo"
+                  placeholder={t("예: Mokpyo")}
                   autoFocus
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newProjectDescription">설명</Label>
+                <Label htmlFor="newProjectDescription">{t("설명")}</Label>
                 <Textarea
                   id="newProjectDescription"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  placeholder="예: 제품 개발 > 플랫폼 팀"
+                  placeholder={t("예: 제품 개발 > 플랫폼 팀")}
                   rows={3}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>부모 프로젝트</Label>
+                <Label>{t("부모 프로젝트")}</Label>
                 <ProjectTreeSelect
                   projects={projectTree}
                   value={newParentId}
                   onChange={setNewParentId}
-                  placeholder="부모 프로젝트 선택 (선택사항)"
+                  placeholder={t("부모 프로젝트 선택 (선택사항)")}
                 />
                 <p className="text-xs text-muted-foreground">
-                  선택하지 않으면 최상위 프로젝트로 생성됩니다.
+                  {t("선택하지 않으면 최상위 프로젝트로 생성됩니다.")}
                 </p>
               </div>
 
@@ -256,10 +258,10 @@ export const ProjectManageDialog = ({
                   onClick={handleCreateCancel}
                   disabled={isCreating}
                 >
-                  취소
+                  {t("취소")}
                 </Button>
                 <Button onClick={handleCreateSubmit} disabled={isCreating}>
-                  {isCreating ? '생성 중...' : '생성'}
+                  {isCreating ? t("생성 중...") : t("생성")}
                 </Button>
               </div>
             </div>

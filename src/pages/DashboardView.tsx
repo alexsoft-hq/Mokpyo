@@ -1,3 +1,4 @@
+import { useTranslation, t, getLocale } from '@/i18n';
 import { useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils';
 const CHART_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'];
 
 function Widget({ title, subtitle, action, children, className }: { title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+  useTranslation();
   return (
     <div className={cn('rounded-lg border bg-card p-4 flex flex-col', className)}>
       <div className="flex items-start justify-between gap-2 mb-3 min-h-[1.25rem]">
@@ -31,6 +33,7 @@ function Widget({ title, subtitle, action, children, className }: { title: strin
 }
 
 function StatCard({ icon: Icon, label, value, tone }: { icon: any; label: string; value: string | number; tone?: string }) {
+  useTranslation();
   return (
     <div className="rounded-lg border bg-card p-4 flex items-center gap-3">
       <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', tone ?? 'bg-primary/10 text-primary')}>
@@ -45,6 +48,8 @@ function StatCard({ icon: Icon, label, value, tone }: { icon: any; label: string
 }
 
 export default function DashboardView() {
+  useTranslation();
+  const locale = getLocale();
   const navigate = useNavigate();
   const { currentProject, includeDescendants, setIncludeDescendants } = useProject() as any;
   const projectId = currentProject?.id ?? null;
@@ -55,9 +60,15 @@ export default function DashboardView() {
   const labels = schemaQuery.data?.statusLabels ?? [];
 
   const stats = useMemo(() => summarize(goals), [goals]);
-  const statusData = useMemo(() => byStatus(goals, labels), [goals, labels]);
-  const ownerData = useMemo(() => byOwner(goals, 8), [goals]);
-  const categoryData = useMemo(() => byCategory(goals), [goals]);
+  // These aggregation helpers translate fallback labels using the current global locale.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const statusData = useMemo(() => byStatus(goals, labels), [goals, labels, locale]);
+  // These aggregation helpers translate fallback labels using the current global locale.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ownerData = useMemo(() => byOwner(goals, 8), [goals, locale]);
+  // These aggregation helpers translate fallback labels using the current global locale.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const categoryData = useMemo(() => byCategory(goals), [goals, locale]);
   // 로컬 기준 오늘(YYYY-MM-DD) — toISOString(UTC)은 KST 저녁에 하루 밀릴 수 있음
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -74,20 +85,20 @@ export default function DashboardView() {
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
         ) : !projectId ? (
-          <div className="text-center text-muted-foreground py-20">프로젝트를 선택하세요.</div>
+          <div className="text-center text-muted-foreground py-20">{t("프로젝트를 선택하세요.")}</div>
         ) : (
           <div className="space-y-4">
             {/* 요약 숫자 카드 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard icon={Target} label="총 목표" value={stats.total} />
-              <StatCard icon={TrendingUp} label="평균 진행률" value={`${stats.avgProgress}%`} tone="bg-blue-500/10 text-blue-600 dark:text-blue-400" />
-              <StatCard icon={CheckCircle2} label="완료" value={stats.completed} tone="bg-green-500/10 text-green-600 dark:text-green-400" />
-              <StatCard icon={PauseCircle} label="보류" value={stats.onHold} tone="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
+              <StatCard icon={Target} label={t("총 목표")} value={stats.total} />
+              <StatCard icon={TrendingUp} label={t("평균 진행률")} value={`${stats.avgProgress}%`} tone="bg-blue-500/10 text-blue-600 dark:text-blue-400" />
+              <StatCard icon={CheckCircle2} label={t("완료")} value={stats.completed} tone="bg-green-500/10 text-green-600 dark:text-green-400" />
+              <StatCard icon={PauseCircle} label={t("보류")} value={stats.onHold} tone="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* 상태 분포 도넛 */}
-              <Widget title="상태 분포">
+              <Widget title={t("상태 분포")}>
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie data={statusData} dataKey="count" nameKey="label" cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={2}>
@@ -101,14 +112,13 @@ export default function DashboardView() {
 
               {/* 담당자 워크로드 — 요약. 상세 인물별 목표는 담당자별 현황으로 드릴다운. */}
               <Widget
-                title="담당자별 목표 수"
-                subtitle="막대를 클릭하면 담당자별 현황으로 이동합니다"
+                title={t("담당자별 목표 수")}
+                subtitle={t("막대를 클릭하면 담당자별 현황으로 이동합니다")}
                 action={
                   <Link
                     to="/members"
                     className="text-xs text-primary dark:text-blue-400 hover:underline inline-flex items-center gap-0.5 shrink-0 rounded px-1 py-1 -my-1 -mr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    담당자별 현황 <ArrowRight className="h-3 w-3" />
+                  >{t("담당자별 현황")}<ArrowRight className="h-3 w-3" />
                   </Link>
                 }
               >
@@ -133,7 +143,7 @@ export default function DashboardView() {
               </Widget>
 
               {/* 카테고리 분포 */}
-              <Widget title="분류별 목표 수">
+              <Widget title={t("분류별 목표 수")}>
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={categoryData} margin={{ left: 0, right: 10 }}>
                     <XAxis dataKey="label" stroke="hsl(var(--muted-foreground))" fontSize={11} />
@@ -147,9 +157,9 @@ export default function DashboardView() {
               </Widget>
 
               {/* 마감 임박 */}
-              <Widget title="마감 임박 (14일 이내)">
+              <Widget title={t("마감 임박 (14일 이내)")}>
                 {upcoming.length === 0 ? (
-                  <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">임박한 마감이 없습니다.</div>
+                  <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">{t("임박한 마감이 없습니다.")}</div>
                 ) : (
                   <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
                     {upcoming.map((g) => (

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Goal, GoalCategory } from '@/types/goal';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Minimize2, Maximize2, ChevronDown } from 'lucide-react';
@@ -85,6 +86,7 @@ export const OverallSummary = ({
   onCyclesChange,
   onGoalsChange,
 }: OverallSummaryProps) => {
+  useTranslation();
   // Filter goals based on showCompleted toggle
   const displayGoals = goals.filter(g => (showCompleted || !g.completed) && (showOnHold || !g.onHold));
 
@@ -142,26 +144,26 @@ export const OverallSummary = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="default" variant="outline" className="whitespace-nowrap">
-                  {viewMode === 'normal' && <><Maximize2 className="w-4 h-4 mr-2" />상세보기</>}
-                  {viewMode === 'compact' && <><Minimize2 className="w-4 h-4 mr-2" />요약보기</>}
+                  {viewMode === 'normal' && <><Maximize2 className="w-4 h-4 mr-2" />{t("상세보기")}</>}
+                  {viewMode === 'compact' && <><Minimize2 className="w-4 h-4 mr-2" />{t("요약보기")}</>}
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => onViewModeChange('compact')}>
                   <Minimize2 className="w-4 h-4 mr-2" />
-                  요약보기
+                  {t("요약보기")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onViewModeChange('normal')}>
                   <Maximize2 className="w-4 h-4 mr-2" />
-                  상세보기
+                  {t("상세보기")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
           <Button onClick={onAddGoal} size="default" className="shadow-lg whitespace-nowrap">
             <Plus className="w-4 h-4 mr-2" />
-            새 목표 추가
+            {t("새 목표 추가")}
           </Button>
       </div>
 
@@ -169,12 +171,12 @@ export const OverallSummary = ({
         <div className="space-y-2">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">전체 평균 진행률</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("전체 평균 진행률")}</p>
               <p className="text-3xl font-bold text-primary">{overallAverage}%</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">총 목표</p>
-              <p className="text-xl font-semibold">{goals.length}개</p>
+              <p className="text-xs text-muted-foreground">{t("총 목표")}</p>
+              <p className="text-xl font-semibold">{t("{{count}}개", { count: goals.length })}</p>
             </div>
           </div>
           <Progress value={overallAverage} className="h-2" />
@@ -183,12 +185,12 @@ export const OverallSummary = ({
         <div className="space-y-2">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">필터된 목표 평균</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("필터된 목표 평균")}</p>
               <p className="text-3xl font-bold text-accent">{filteredAverage}%</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">필터된 목표</p>
-              <p className="text-xl font-semibold">{filteredGoals.length}개</p>
+              <p className="text-xs text-muted-foreground">{t("필터된 목표")}</p>
+              <p className="text-xl font-semibold">{t("{{count}}개", { count: filteredGoals.length })}</p>
             </div>
           </div>
           <Progress value={filteredAverage} className="h-2" />

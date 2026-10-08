@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -19,17 +20,18 @@ export const FilterBar = ({
   onOwnerToggle,
   owners,
 }: FilterBarProps) => {
+  useTranslation();
   return (
     <div>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Filter className="w-5 h-5 text-muted-foreground" />
-          <h3 className="font-semibold text-lg">필터</h3>
+          <h3 className="font-semibold text-lg">{t("필터")}</h3>
         </div>
         <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="목표 검색..."
+            placeholder={t("목표 검색...")}
             value={searchText}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9 h-9"
@@ -45,8 +47,8 @@ export const FilterBar = ({
             >
               <span className="text-sm truncate">
                 {selectedOwners.length === 0
-                  ? "담당자 선택"
-                  : `${selectedOwners.length}명 선택`}
+                  ? t("담당자 선택")
+                  : t("{{value0}}명 선택", { value0: selectedOwners.length })}
               </span>
               <ChevronDown className="w-4 h-4 ml-2 opacity-50 shrink-0" />
             </Button>
@@ -54,7 +56,7 @@ export const FilterBar = ({
           <PopoverContent className="w-64 p-3">
             {owners.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-2">
-                담당자가 없습니다
+                {t("담당자가 없습니다")}
               </p>
             ) : (
               <div className="space-y-3">
@@ -69,7 +71,7 @@ export const FilterBar = ({
                       }
                     })}
                   >
-                    전체 선택
+                    {t("전체 선택")}
                   </Button>
                   <Button
                     variant="outline"
@@ -79,7 +81,7 @@ export const FilterBar = ({
                       selectedOwners.forEach(owner => onOwnerToggle(owner));
                     }}
                   >
-                    전체 해제
+                    {t("전체 해제")}
                   </Button>
                 </div>
                 <div className="space-y-1 max-h-64 overflow-y-auto">

@@ -1,3 +1,4 @@
+import { getLocale, t, useTranslation } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Goal, SubGoal, GoalCategory, Note, Attachment, Project } from '@/types/goal';
 import { ActivityLog, formatRelativeTime, formatActivitySummary } from '@/types/activity';
@@ -77,6 +78,7 @@ export const GoalViewDialog = ({
   currentProjectId = '',
   onCopySuccess,
 }: GoalViewDialogProps) => {
+  useTranslation();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
   const [isActivityOpen, setIsActivityOpen] = useState(false);
@@ -162,7 +164,7 @@ export const GoalViewDialog = ({
 
   const formatCheckInDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    return date.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -170,17 +172,17 @@ export const GoalViewDialog = ({
   };
 
   const sizeLabels: Record<string, string> = {
-    xs: '최저',
-    small: '낮음',
-    medium: '중간',
-    large: '높음',
-    xl: '최고',
+    xs: t("최저"),
+    small: t("낮음"),
+    medium: t("중간"),
+    large: t("높음"),
+    xl: t("최고"),
   };
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return null;
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    return date.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'short',
     });
@@ -188,7 +190,7 @@ export const GoalViewDialog = ({
 
   const formatFullDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    return date.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -226,7 +228,7 @@ export const GoalViewDialog = ({
         {/* Header */}
         <SheetHeader className="px-6 py-4 border-b bg-background sticky top-0 z-10">
           <div className="flex items-center justify-between">
-            <SheetTitle className="sr-only">목표 상세 보기</SheetTitle>
+            <SheetTitle className="sr-only">{t("목표 상세 보기")}</SheetTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -245,7 +247,7 @@ export const GoalViewDialog = ({
                 )}
               >
                 <Check className="h-4 w-4 mr-1" />
-                {goal.completed ? '완료됨' : '완료'}
+                {goal.completed ? t("완료됨") : t("완료")}
               </Button>
               {onToggleOnHold && (
                 <Button
@@ -257,12 +259,12 @@ export const GoalViewDialog = ({
                   )}
                 >
                   <PauseCircle className="h-4 w-4 mr-1" />
-                  {goal.onHold ? '보류됨' : '보류'}
+                  {goal.onHold ? t("보류됨") : t("보류")}
                 </Button>
               )}
               <Button size="sm" onClick={onEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
-                편집
+                {t("편집")}
               </Button>
             </div>
           </div>
@@ -286,7 +288,7 @@ export const GoalViewDialog = ({
                 </Badge>
               ))}
               <Badge variant="outline" className="text-muted-foreground">
-                중요도: {sizeLabels[goal.size] || goal.size}
+                {t("중요도:")} {sizeLabels[goal.size] || goal.size}
               </Badge>
             </div>
 
@@ -326,7 +328,7 @@ export const GoalViewDialog = ({
           {/* Progress Section */}
           <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">진행률</span>
+              <span className="text-sm font-medium">{t("진행률")}</span>
               <span className="text-lg font-bold text-primary">{goal.progress}%</span>
             </div>
             <Progress value={goal.progress} className="h-2" />
@@ -343,7 +345,7 @@ export const GoalViewDialog = ({
               <button className="w-full flex items-center justify-between p-3 bg-muted/30 rounded-lg border hover:bg-muted/50 transition-colors group">
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  진행 체크인
+                  {t("진행 체크인")}
                 </h3>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
               </button>
@@ -355,7 +357,7 @@ export const GoalViewDialog = ({
                 </div>
               ) : checkIns.length === 0 ? (
                 <div className="text-center py-4 text-sm text-muted-foreground">
-                  진행 체크인 기록이 없습니다.
+                  {t("진행 체크인 기록이 없습니다.")}
                 </div>
               ) : (
                 checkIns.map((checkIn) => (
@@ -387,7 +389,7 @@ export const GoalViewDialog = ({
           {goal.description && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                설명
+                {t("설명")}
               </h3>
               <div className="text-sm leading-relaxed">
                 <LinkifiedText text={goal.description} />
@@ -403,7 +405,7 @@ export const GoalViewDialog = ({
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                하위 목표 ({goal.subGoals!.length})
+                {t("하위 목표 (")}{goal.subGoals!.length})
               </h3>
               <div className="space-y-2">
                 {goal.subGoals!.map((subGoal, index) => (
@@ -418,7 +420,7 @@ export const GoalViewDialog = ({
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                 <StickyNote className="h-4 w-4" />
-                메모 ({goal.notes!.length})
+                {t("메모 (")}{goal.notes!.length})
               </h3>
               <div className="space-y-2">
                 {sortedNotes.map((note) => (
@@ -433,7 +435,7 @@ export const GoalViewDialog = ({
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                 <Paperclip className="h-4 w-4" />
-                첨부파일 ({goal.attachments!.length})
+                {t("첨부파일 (")}{goal.attachments!.length})
               </h3>
               <div className="space-y-2">
                 {goal.attachments!.map((attachment) => (
@@ -457,7 +459,7 @@ export const GoalViewDialog = ({
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 flex-shrink-0"
-                      title="다운로드"
+                      title={t("다운로드")}
                     >
                       <Download className="h-4 w-4" />
                     </Button>
@@ -478,7 +480,7 @@ export const GoalViewDialog = ({
               <button className="w-full flex items-center justify-between p-3 bg-muted/30 rounded-lg border hover:bg-muted/50 transition-colors group">
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                   <History className="h-4 w-4" />
-                  변경 이력 보기
+                  {t("변경 이력 보기")}
                 </h3>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
               </button>
@@ -490,7 +492,7 @@ export const GoalViewDialog = ({
                 </div>
               ) : activities.length === 0 ? (
                 <div className="text-center py-4 text-sm text-muted-foreground">
-                  변경 이력이 없습니다.
+                  {t("변경 이력이 없습니다.")}
                 </div>
               ) : (
                 <>
@@ -532,7 +534,7 @@ export const GoalViewDialog = ({
                       {isLoadingActivities ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       ) : null}
-                      더 보기
+                      {t("더 보기")}
                     </Button>
                   )}
                 </>
@@ -551,17 +553,17 @@ export const GoalViewDialog = ({
                   onClick={() => setIsCopyDialogOpen(true)}
                 >
                   <Copy className="h-4 w-4 mr-1" />
-                  복사
+                  {t("복사")}
                 </Button>
               )}
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={onClose}>
-                닫기
+                {t("닫기")}
               </Button>
               <Button onClick={onEdit}>
                 <Pencil className="h-4 w-4 mr-1" />
-                편집
+                {t("편집")}
               </Button>
             </div>
           </div>
@@ -586,6 +588,7 @@ export const GoalViewDialog = ({
 
 // SubGoal Card Component
 const SubGoalCard = ({ subGoal, index, registeredUsers }: { subGoal: SubGoal; index: number; registeredUsers?: RegisteredUser[] }) => {
+  useTranslation();
   const isKr = isKeyResult(subGoal);
   const displayProgress = isKr ? computeKrProgress(subGoal) : subGoal.progress;
   return (
@@ -646,6 +649,7 @@ const NoteCard = ({
   note: Note;
   formatFullDate: (date: string) => string;
 }) => {
+  useTranslation();
   return (
     <div
       className={cn(
@@ -665,7 +669,7 @@ const NoteCard = ({
           </p>
           <p className="text-xs text-muted-foreground mt-1.5">
             {note.updatedAt
-              ? `수정됨: ${formatFullDate(note.updatedAt)}`
+              ? t("수정됨: {{value0}}", { value0: formatFullDate(note.updatedAt) })
               : formatFullDate(note.createdAt)}
           </p>
         </div>

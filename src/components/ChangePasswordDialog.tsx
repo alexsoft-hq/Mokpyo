@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import {
   Dialog,
@@ -19,6 +20,7 @@ interface ChangePasswordDialogProps {
 }
 
 export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProps) {
+  useTranslation();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -44,7 +46,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
     setError('');
 
     if (newPassword !== confirmPassword) {
-      setError('새 비밀번호가 일치하지 않습니다.');
+      setError(t("새 비밀번호가 일치하지 않습니다."));
       return;
     }
 
@@ -70,13 +72,13 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>비밀번호 변경</DialogTitle>
-          <DialogDescription>현재 비밀번호를 확인한 후 새 비밀번호를 설정합니다.</DialogDescription>
+          <DialogTitle>{t("비밀번호 변경")}</DialogTitle>
+          <DialogDescription>{t("현재 비밀번호를 확인한 후 새 비밀번호를 설정합니다.")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="current-password">현재 비밀번호</Label>
+            <Label htmlFor="current-password">{t("현재 비밀번호")}</Label>
             <Input
               id="current-password"
               type="password"
@@ -88,7 +90,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="new-password">새 비밀번호</Label>
+            <Label htmlFor="new-password">{t("새 비밀번호")}</Label>
             <Input
               id="new-password"
               type="password"
@@ -101,7 +103,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">새 비밀번호 확인</Label>
+            <Label htmlFor="confirm-password">{t("새 비밀번호 확인")}</Label>
             <Input
               id="confirm-password"
               type="password"
@@ -113,14 +115,14 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-green-600">비밀번호가 변경되었습니다.</p>}
+          {success && <p className="text-sm text-green-600">{t("비밀번호가 변경되었습니다.")}</p>}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
-              취소
+              {t("취소")}
             </Button>
             <Button type="submit" disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}>
-              {isLoading ? '변경 중...' : '변경'}
+              {isLoading ? t("변경 중...") : t("변경")}
             </Button>
           </DialogFooter>
         </form>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { GoalSize } from '@/types/goal';
 
 /**
@@ -26,17 +27,17 @@ export const getPriorityColor = (size: GoalSize): string => {
 export const getPriorityLabel = (size: GoalSize): string => {
   switch (size) {
     case 'xl':
-      return '최고';
+      return t("최고");
     case 'large':
-      return '높음';
+      return t("높음");
     case 'medium':
-      return '중간';
+      return t("중간");
     case 'small':
-      return '낮음';
+      return t("낮음");
     case 'xs':
-      return '최저';
+      return t("최저");
     default:
-      return '중간';
+      return t("중간");
   }
 };
 

@@ -1,3 +1,4 @@
+import { useTranslation, t, getLocale } from '@/i18n';
 import { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -48,6 +49,7 @@ const DEFAULT_COL_WIDTH = 220;
 const COL_WIDTH_STORAGE_KEY = 'timeline-name-col-width';
 
 export default function Timeline() {
+  useTranslation();
   const navigate = useNavigate();
   const { currentProject } = useProject();
   const { loadSample, loading: sampleLoading } = useSampleData();
@@ -272,18 +274,16 @@ export default function Timeline() {
               size="sm"
               onClick={() => setShowAllPeriod(!showAllPeriod)}
               className="h-7 px-2 text-xs"
-              title={showAllPeriod ? '최근 6개월 완료 목표만 표시' : '전체 기간 완료 목표 표시'}
+              title={showAllPeriod ? t("최근 6개월 완료 목표만 표시") : t("전체 기간 완료 목표 표시")}
             >
-              <History className="h-3.5 w-3.5 mr-1" />
-              전체 기간
-            </Button>
+              <History className="h-3.5 w-3.5 mr-1" />{t("전체 기간")}</Button>
           )}
 
           {/* Search */}
           <div className="relative w-48 lg:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="검색..."
+              placeholder={t("검색...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-8 h-9"
@@ -306,18 +306,14 @@ export default function Timeline() {
               onClick={() => setViewMode('goal')}
               className="text-xs h-7 px-3"
             >
-              <Target className="h-3.5 w-3.5 mr-1" />
-              목표별
-            </Button>
+              <Target className="h-3.5 w-3.5 mr-1" />{t("목표별")}</Button>
             <Button
               variant={viewMode === 'member' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('member')}
               className="text-xs h-7 px-3"
             >
-              <Users className="h-3.5 w-3.5 mr-1" />
-              담당자별
-            </Button>
+              <Users className="h-3.5 w-3.5 mr-1" />{t("담당자별")}</Button>
           </div>
 
           {/* SubGoal expand/collapse */}
@@ -327,7 +323,7 @@ export default function Timeline() {
               size="sm"
               onClick={() => setShowSubGoals(true)}
               className="h-7 px-2"
-              title="하위목표 전체 펼치기"
+              title={t("하위목표 전체 펼치기")}
             >
               <ChevronsUpDown className="h-3.5 w-3.5" />
             </Button>
@@ -336,7 +332,7 @@ export default function Timeline() {
               size="sm"
               onClick={() => setShowSubGoals(false)}
               className="h-7 px-2"
-              title="하위목표 전체 접기"
+              title={t("하위목표 전체 접기")}
             >
               <ChevronsDownUp className="h-3.5 w-3.5" />
             </Button>
@@ -348,11 +344,9 @@ export default function Timeline() {
             size="sm"
             onClick={() => timelineChartRef.current?.scrollToToday()}
             className="h-7 px-2 text-xs"
-            title="오늘 날짜로 이동"
+            title={t("오늘 날짜로 이동")}
           >
-            <Calendar className="h-3.5 w-3.5 mr-1" />
-            오늘
-          </Button>
+            <Calendar className="h-3.5 w-3.5 mr-1" />{t("오늘")}</Button>
 
           {/* Zoom level toggle */}
           <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
@@ -361,25 +355,19 @@ export default function Timeline() {
               size="sm"
               onClick={() => setZoomLevel('week')}
               className="text-xs h-7 px-2"
-            >
-              주
-            </Button>
+            >{t("주")}</Button>
             <Button
               variant={zoomLevel === 'month' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setZoomLevel('month')}
               className="text-xs h-7 px-2"
-            >
-              월
-            </Button>
+            >{t("월")}</Button>
             <Button
               variant={zoomLevel === 'quarter' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setZoomLevel('quarter')}
               className="text-xs h-7 px-2"
-            >
-              분기
-            </Button>
+            >{t("분기")}</Button>
           </div>
         </div>
       </div>
@@ -395,10 +383,10 @@ export default function Timeline() {
         {!isLoading && goals.length === 0 && (
           <EmptyState
             icon={Target}
-            title="타임라인에 그릴 목표가 없습니다"
-            description="시작일과 마감일이 있는 목표를 추가하면 기간이 막대로 나타납니다."
-            primaryAction={{ label: '새 목표', onClick: () => navigate('/?new=1') }}
-            secondaryAction={{ label: '샘플 데이터로 둘러보기', onClick: loadSample, loading: sampleLoading }}
+            title={t("타임라인에 그릴 목표가 없습니다")}
+            description={t("시작일과 마감일이 있는 목표를 추가하면 기간이 막대로 나타납니다.")}
+            primaryAction={{ label: t("새 목표"), onClick: () => navigate('/?new=1') }}
+            secondaryAction={{ label: t("샘플 데이터로 둘러보기"), onClick: loadSample, loading: sampleLoading }}
           />
         )}
 
@@ -444,10 +432,8 @@ export default function Timeline() {
                   className="w-full p-3 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>
-                    날짜가 설정되지 않은 항목 <strong>{noDateItems.length}개</strong>는 타임라인에 표시되지 않습니다.
-                  </span>
-                  <span className="ml-auto text-xs">{showNoDateList ? '접기' : '펼치기'}</span>
+                  <span>{t("날짜가 설정되지 않은 항목 {{count}}개는 타임라인에 표시되지 않습니다.", { count: noDateItems.length })}</span>
+                  <span className="ml-auto text-xs">{showNoDateList ? t("접기") : t("펼치기")}</span>
                 </button>
                 {showNoDateList && (
                   <div className="border-t border-border px-3 py-2 space-y-1 max-h-60 overflow-y-auto">
@@ -488,12 +474,10 @@ export default function Timeline() {
         )}
       >
         <div className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center justify-between">
-          <h2 className="font-semibold text-lg">목표 상세</h2>
+          <h2 className="font-semibold text-lg">{t("목표 상세")}</h2>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={handleEditGoal} disabled={isLoadingDetail || !selectedGoal}>
-              <FileText className="h-4 w-4 mr-1" />
-              편집
-            </Button>
+              <FileText className="h-4 w-4 mr-1" />{t("편집")}</Button>
             <Button variant="ghost" size="icon" onClick={() => handleSheetClose(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -546,6 +530,7 @@ function GoalSheetContent({
   highlightSubGoalId?: string | null;
   onEdit: () => void;
 }) {
+  useTranslation();
   useEffect(() => {
     if (!highlightSubGoalId) return;
     const timer = setTimeout(() => {
@@ -568,13 +553,11 @@ function GoalSheetContent({
         </Badge>
         {goal.completed && (
           <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-            <CheckCircle2 className="h-3 w-3 mr-1" /> 완료
-          </Badge>
+            <CheckCircle2 className="h-3 w-3 mr-1" />{t("완료")}</Badge>
         )}
         {goal.onHold && (
           <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-            <PauseCircle className="h-3 w-3 mr-1" /> 보류
-          </Badge>
+            <PauseCircle className="h-3 w-3 mr-1" />{t("보류")}</Badge>
         )}
         {goal.categories?.map((cat) => (
           <Badge key={cat} variant="secondary" className="text-xs">
@@ -585,7 +568,7 @@ function GoalSheetContent({
 
       <div className="space-y-1">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">진행률</span>
+          <span className="text-muted-foreground">{t("진행률")}</span>
           <span className={`font-semibold ${getProgressColor(goal.progress)}`}>{goal.progress}%</span>
         </div>
         <Progress value={goal.progress} className="h-2" />
@@ -603,8 +586,7 @@ function GoalSheetContent({
       {goal.description && (
         <div className="space-y-1">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <FileText className="h-4 w-4" /> 설명
-          </h4>
+            <FileText className="h-4 w-4" />{t("설명")}</h4>
           <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words bg-muted/30 rounded-md p-3">
             {goal.description}
           </p>
@@ -613,7 +595,7 @@ function GoalSheetContent({
 
       {goal.statusNote && (
         <div className="space-y-1">
-          <h4 className="text-sm font-medium">상태 메모</h4>
+          <h4 className="text-sm font-medium">{t("상태 메모")}</h4>
           <div className="text-sm text-muted-foreground italic whitespace-pre-wrap break-words bg-muted/30 rounded-md p-3 border-l-2 border-primary/30">
             {goal.statusNote}
           </div>
@@ -623,7 +605,7 @@ function GoalSheetContent({
       {goal.subGoals && goal.subGoals.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <Target className="h-4 w-4" /> 하위목표 ({goal.subGoals.length})
+            <Target className="h-4 w-4" />{t("하위목표 (")}{goal.subGoals.length})
           </h4>
           <div className="space-y-2">
             {goal.subGoals.map((sub) => {
@@ -673,14 +655,14 @@ function GoalSheetContent({
       {goal.notes && goal.notes.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <StickyNote className="h-4 w-4" /> 메모 ({goal.notes.length})
+            <StickyNote className="h-4 w-4" />{t("메모 (")}{goal.notes.length})
           </h4>
           <div className="space-y-2">
             {goal.notes.map((note) => (
               <div key={note.id} className="bg-muted/30 rounded-md p-3 text-sm">
                 <p className="whitespace-pre-wrap break-words">{note.content}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(note.createdAt).toLocaleDateString('ko-KR')}
+                  {new Date(note.createdAt).toLocaleDateString(getLocale())}
                 </p>
               </div>
             ))}
@@ -691,7 +673,7 @@ function GoalSheetContent({
       {goal.attachments && goal.attachments.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium flex items-center gap-1">
-            <Paperclip className="h-4 w-4" /> 첨부파일 ({goal.attachments.length})
+            <Paperclip className="h-4 w-4" />{t("첨부파일 (")}{goal.attachments.length})
           </h4>
           <div className="space-y-1">
             {goal.attachments.map((att) => (
@@ -707,9 +689,7 @@ function GoalSheetContent({
 
       <div className="pt-2 border-t">
         <Button variant="default" size="sm" className="w-full" onClick={onEdit}>
-          <FileText className="h-4 w-4 mr-2" />
-          편집
-        </Button>
+          <FileText className="h-4 w-4 mr-2" />{t("편집")}</Button>
       </div>
     </div>
   );

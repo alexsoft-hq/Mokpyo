@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { cn } from '@/lib/utils';
 import { readableTextColor } from '@/lib/colorUtils';
 import { StatusLabel } from '@/types/fields';
@@ -15,7 +16,8 @@ interface StatusPillProps {
  * 글자색은 배경 명도로 자동 결정(흰색 고정 금지 — 밝은 라벨 판독성).
  * label 이 없으면 '상태 없음' 중립 표시(NULL statusId 방어).
  */
-export function StatusPill({ label, size = 'md', className, onClick, emptyText = '상태 없음' }: StatusPillProps) {
+export function StatusPill({ label, size = 'md', className, onClick, emptyText = t("상태 없음") }: StatusPillProps) {
+  useTranslation();
   const isEmpty = !label;
   const bg = label?.color ?? '#e5e7eb';
   const style = isEmpty ? undefined : { backgroundColor: bg, color: readableTextColor(bg) };
@@ -45,6 +47,7 @@ export function StatusPill({ label, size = 'md', className, onClick, emptyText =
  * 긴 라벨은 truncate + title. StatusPill 과 같은 대비 규칙을 공유.
  */
 export function OptionChip({ label, color, className }: { label: string; color?: string; className?: string }) {
+  useTranslation();
   const hasColor = !!color;
   return (
     <span

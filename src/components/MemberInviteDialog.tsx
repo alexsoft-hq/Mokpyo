@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -21,6 +22,7 @@ export default function MemberInviteDialog({
   organizationId,
   onInvited,
 }: MemberInviteDialogProps) {
+  useTranslation();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('MEMBER');
@@ -33,13 +35,13 @@ export default function MemberInviteDialog({
     setIsSubmitting(true);
     try {
       await api.createInvitation(organizationId, email.trim(), role);
-      toast({ title: '초대가 발송되었습니다.', description: `${email}으로 초대 이메일을 보냈습니다.` });
+      toast({ title: t("초대가 발송되었습니다."), description: t("{{value0}}으로 초대 이메일을 보냈습니다.", { value0: email }) });
       setEmail('');
       setRole('MEMBER');
       onInvited();
       onOpenChange(false);
     } catch (error: any) {
-      toast({ title: '초대 실패', description: error.message, variant: 'destructive' });
+      toast({ title: t("초대 실패"), description: error.message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -51,15 +53,15 @@ export default function MemberInviteDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            멤버 초대
+            {t("멤버 초대")}
           </DialogTitle>
           <DialogDescription>
-            이메일 주소를 입력하여 워크스페이스에 멤버를 초대하세요.
+            {t("이메일 주소를 입력하여 워크스페이스에 멤버를 초대하세요.")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="invite-email">이메일 주소</Label>
+            <Label htmlFor="invite-email">{t("이메일 주소")}</Label>
             <Input
               id="invite-email"
               type="email"
@@ -71,26 +73,26 @@ export default function MemberInviteDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="invite-role">역할</Label>
+            <Label htmlFor="invite-role">{t("역할")}</Label>
             <Select value={role} onValueChange={setRole}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="MEMBER">멤버 - 목표 생성/편집 가능</SelectItem>
-                <SelectItem value="ADMIN">관리자 - 멤버 관리 가능</SelectItem>
+                <SelectItem value="MEMBER">{t("멤버 - 목표 생성/편집 가능")}</SelectItem>
+                <SelectItem value="ADMIN">{t("관리자 - 멤버 관리 가능")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              취소
+              {t("취소")}
             </Button>
             <Button type="submit" disabled={isSubmitting || !email.trim()}>
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              초대 보내기
+              {t("초대 보내기")}
             </Button>
           </div>
         </form>

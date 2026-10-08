@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { API_BASE_URL, getAuthHeaders, throwApiError } from '@/lib/api/http';
 import { FieldSchema, StatusLabel, CustomFieldDefinition } from '@/types/fields';
 
@@ -6,7 +7,7 @@ export const fieldsApi = {
     const res = await fetch(`${API_BASE_URL}/api/field-schema?projectId=${projectId}`, {
       headers: getAuthHeaders(),
     });
-    if (!res.ok) await throwApiError(res, '필드 스키마를 불러오지 못했습니다.');
+    if (!res.ok) await throwApiError(res, t("필드 스키마를 불러오지 못했습니다."));
     return res.json();
   },
 
@@ -17,7 +18,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ name, color }),
     });
-    if (!res.ok) await throwApiError(res, '상태 라벨 생성에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("상태 라벨 생성에 실패했습니다."));
     return res.json();
   },
 
@@ -27,7 +28,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!res.ok) await throwApiError(res, '상태 라벨 수정에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("상태 라벨 수정에 실패했습니다."));
     return res.json();
   },
 
@@ -36,7 +37,7 @@ export const fieldsApi = {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
-    if (!res.ok) await throwApiError(res, '상태 라벨 삭제에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("상태 라벨 삭제에 실패했습니다."));
   },
 
   // --- Custom field definitions (project-scoped, OWNER/ADMIN) ---
@@ -46,7 +47,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!res.ok) await throwApiError(res, '필드 생성에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("필드 생성에 실패했습니다."));
     return res.json();
   },
 
@@ -56,7 +57,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!res.ok) await throwApiError(res, '필드 수정에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("필드 수정에 실패했습니다."));
     return res.json();
   },
 
@@ -65,7 +66,7 @@ export const fieldsApi = {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
-    if (!res.ok) await throwApiError(res, '필드 삭제에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("필드 삭제에 실패했습니다."));
   },
 
   // --- Goal writes ---
@@ -77,7 +78,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ statusId, version }),
     });
-    if (!res.ok) await throwApiError(res, '상태 변경에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("상태 변경에 실패했습니다."));
     return res.json();
   },
 
@@ -88,7 +89,7 @@ export const fieldsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ fieldId, value }),
     });
-    if (!res.ok) await throwApiError(res, '필드 값 저장에 실패했습니다.');
+    if (!res.ok) await throwApiError(res, t("필드 값 저장에 실패했습니다."));
     return res.json();
   },
 };

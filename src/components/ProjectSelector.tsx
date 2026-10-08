@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useProject } from '@/contexts/ProjectContext';
 import {
   Select,
@@ -24,6 +25,7 @@ interface TreeNodeProps {
 }
 
 function TreeNode({ project, depth, expandedIds, onToggle, onSelect, selectedId }: TreeNodeProps) {
+  useTranslation();
   const hasChildren = project.children && project.children.length > 0;
   const isExpanded = expandedIds.has(project.id);
   const isSelected = selectedId === project.id;
@@ -108,6 +110,7 @@ const saveExpandedIds = (ids: Set<string>) => {
 };
 
 export const ProjectSelector = () => {
+  useTranslation();
   const {
     projects,
     projectTree,
@@ -126,7 +129,7 @@ export const ProjectSelector = () => {
   if (isLoading || !currentProject) {
     return (
       <div className="text-lg">
-        <span className="font-bold text-muted-foreground">로딩 중...</span>
+        <span className="font-bold text-muted-foreground">{t("로딩 중...")}</span>
       </div>
     );
   }
@@ -157,15 +160,15 @@ export const ProjectSelector = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <Select
             value={currentProject.id}
             onValueChange={handleSelect}
           >
-            <SelectTrigger className="border-none shadow-none hover:bg-muted/50 transition-colors p-0 h-auto gap-2 w-auto [&>svg]:hidden">
-              <div className="flex flex-col items-start">
-                <div className="flex items-center gap-2 min-w-0">
+            <SelectTrigger className="border-none shadow-none hover:bg-muted/50 transition-colors p-0 h-auto gap-2 w-auto min-w-0 max-w-full [&>svg]:hidden">
+              <div className="flex min-w-0 max-w-full flex-col items-start">
+                <div className="flex items-center gap-2 min-w-0 max-w-full">
                   <h2 className="text-lg font-bold truncate max-w-[120px] sm:max-w-[160px] md:max-w-[260px]" title={currentProject.name}>{currentProject.name}</h2>
                   <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
                 </div>
@@ -197,7 +200,7 @@ export const ProjectSelector = () => {
             size="sm"
             onClick={() => setManageDialogOpen(true)}
             className="h-8 w-8 p-0"
-            title="프로젝트 관리"
+            title={t("프로젝트 관리")}
           >
             <Settings className="w-4 h-4" />
           </Button>
@@ -214,7 +217,7 @@ export const ProjectSelector = () => {
               htmlFor="include-descendants"
               className="text-sm text-muted-foreground cursor-pointer select-none"
             >
-              하위 프로젝트 목표 포함
+              {t("하위 프로젝트 목표 포함")}
             </label>
           </div>
         )}

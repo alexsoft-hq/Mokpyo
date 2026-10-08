@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -40,6 +41,7 @@ const COLUMN_LABELS: Record<string, string> = {
 };
 
 export default function TableView() {
+  useTranslation();
   const qc = useQueryClient();
   const { currentProject } = useProject();
   const projectId = currentProject?.id ?? null;
@@ -137,9 +139,9 @@ export default function TableView() {
       await api.createGoal({ ...goal, projectId: projectId ?? undefined } as Goal);
       qc.invalidateQueries({ queryKey: ['goals'] });
       setAddOpen(false);
-      toast.success('목표가 추가되었습니다.');
+      toast.success(t("목표가 추가되었습니다."));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '목표 추가에 실패했습니다.');
+      toast.error(e instanceof Error ? e.message : t("목표 추가에 실패했습니다."));
     }
   };
 
@@ -152,9 +154,9 @@ export default function TableView() {
         cycles: (cyclesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name })),
       });
       downloadCsv(csvFileName(currentProject?.name), csv);
-      toast.success(`${filtered.length}개 목표를 내보냈습니다.`);
+      toast.success(t("{{value0}}개 목표를 내보냈습니다.", { value0: filtered.length }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '내보내기에 실패했습니다.');
+      toast.error(e instanceof Error ? e.message : t("내보내기에 실패했습니다."));
     }
   };
 
@@ -168,12 +170,12 @@ export default function TableView() {
       <div className="px-4 md:px-6 py-3 flex items-center gap-2 flex-wrap">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="제목·담당자·분류 검색" className="pl-8 h-9 w-56" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("제목·담당자·분류 검색")} className="pl-8 h-9 w-56" />
         </div>
         <Select value={groupBy} onValueChange={(v) => setGroupBy(v as GroupByKey)}>
           <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
           <SelectContent>
-            {GROUP_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+            {GROUP_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{t(o.label)}</SelectItem>)}
           </SelectContent>
         </Select>
         {projectId && (
@@ -186,12 +188,10 @@ export default function TableView() {
           />
         )}
         <label className="flex items-center gap-1.5 text-sm cursor-pointer">
-          <Checkbox checked={showCompleted} onCheckedChange={(c) => setShowCompleted(!!c)} />
-          완료 포함
-        </label>
+          <Checkbox checked={showCompleted} onCheckedChange={(c) => setShowCompleted(!!c)} />{t("완료 포함")}</label>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9"><Settings2 className="h-4 w-4 mr-1" />컬럼</Button>
+            <Button variant="outline" size="sm" className="h-9"><Settings2 className="h-4 w-4 mr-1" />{t("컬럼")}</Button>
           </PopoverTrigger>
           <PopoverContent className="w-48 p-2" align="start">
             <div className="flex flex-col gap-1">
@@ -202,7 +202,7 @@ export default function TableView() {
                     onCheckedChange={(c) => setColumnVisibility((v) => ({ ...v, [id]: !!c }))}
                     disabled={id === 'title'}
                   />
-                  {label}
+                  {t(label)}
                 </label>
               ))}
               {(schemaQuery.data?.customFields ?? []).map((f) => (
@@ -224,18 +224,17 @@ export default function TableView() {
           className="h-9"
           onClick={handleExport}
           disabled={filtered.length === 0}
-          aria-label="현재 목록을 CSV 파일로 내보내기"
+          aria-label={t("현재 목록을 CSV 파일로 내보내기")}
         >
-          <Download className="h-4 w-4 mr-1" />내보내기
-        </Button>
-        <Button size="sm" className="h-9" onClick={() => setAddOpen(true)}><Plus className="h-4 w-4 mr-1" />새 목표</Button>
+          <Download className="h-4 w-4 mr-1" />{t("내보내기")}</Button>
+        <Button size="sm" className="h-9" onClick={() => setAddOpen(true)}><Plus className="h-4 w-4 mr-1" />{t("새 목표")}</Button>
       </div>
 
       <div className="px-4 md:px-6 pb-10">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !projectId ? (
-          <div className="text-center text-muted-foreground py-20">프로젝트를 선택하세요.</div>
+          <div className="text-center text-muted-foreground py-20">{t("프로젝트를 선택하세요.")}</div>
         ) : schemaQuery.data ? (
           <GoalTable
             goals={filtered}

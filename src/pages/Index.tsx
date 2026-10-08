@@ -1,3 +1,4 @@
+import { useTranslation, t } from '@/i18n';
 import { useState, useEffect, useMemo } from 'react';
 import { Goal, GoalCategory } from '@/types/goal';
 import { OverallSummary } from '@/components/OverallSummary';
@@ -39,6 +40,7 @@ import { useSampleData } from '@/components/onboarding/useSampleData';
 import { useSearchParams } from 'react-router-dom';
 
 const Index = () => {
+  useTranslation();
   const { user, logout, updateUser } = useAuth();
   const { currentOrganization } = useWorkspace();
   const isAdminOrOwner = currentOrganization?.role === 'OWNER' || currentOrganization?.role === 'ADMIN';
@@ -355,9 +357,9 @@ const Index = () => {
       // Handle conflict (409)
       if (error.response?.status === 409) {
         const shouldReload = confirm(
-          '다른 사용자가 이 목표를 수정했습니다.\n' +
-          '현재 화면을 새로고침하여 최신 데이터를 불러오시겠습니까?\n\n' +
-          '"확인"을 누르면 새로고침되며, 작성 중인 내용은 손실됩니다.'
+          t("다른 사용자가 이 목표를 수정했습니다.\n") +
+          t("현재 화면을 새로고침하여 최신 데이터를 불러오시겠습니까?\n\n") +
+          t("\"확인\"을 누르면 새로고침되며, 작성 중인 내용은 손실됩니다.")
         );
 
         if (shouldReload) {
@@ -373,10 +375,10 @@ const Index = () => {
           setGoals(allGoalsData);
         }
 
-        throw new Error('목표가 다른 사용자에 의해 수정되었습니다.');
+        throw new Error(t("목표가 다른 사용자에 의해 수정되었습니다."));
       }
 
-      alert('목표 저장에 실패했습니다.');
+      alert(t("목표 저장에 실패했습니다."));
       throw error;
     }
   };
@@ -390,7 +392,7 @@ const Index = () => {
       setSelectedGoal(null);
     } catch (error) {
       console.error('Failed to delete goal:', error);
-      alert('목표 삭제에 실패했습니다.');
+      alert(t("목표 삭제에 실패했습니다."));
       throw error; // 모달이 닫히지 않고 유지되도록 재전파(성공 시에만 닫힘)
     }
   };
@@ -417,7 +419,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to toggle goal completion:', error);
-      alert('목표 완료 상태 변경에 실패했습니다.');
+      alert(t("목표 완료 상태 변경에 실패했습니다."));
     }
   };
 
@@ -442,7 +444,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to toggle goal on-hold:', error);
-      alert('목표 보류 상태 변경에 실패했습니다.');
+      alert(t("목표 보류 상태 변경에 실패했습니다."));
     }
   };
 
@@ -471,7 +473,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to update goal categories:', error);
-      alert('카테고리 변경에 실패했습니다.');
+      alert(t("카테고리 변경에 실패했습니다."));
       throw error;
     }
   };
@@ -486,7 +488,7 @@ const Index = () => {
       setGoals((prev) => [...prev, createdGoal]);
     } catch (error) {
       console.error('Failed to add goal:', error);
-      alert('목표 추가에 실패했습니다.');
+      alert(t("목표 추가에 실패했습니다."));
     }
   };
 
@@ -502,7 +504,7 @@ const Index = () => {
       setCategoryIds((prev) => ({ ...prev, [trimmedCategory]: category.id }));
     } catch (error) {
       console.error('Failed to add category:', error);
-      alert('카테고리 추가에 실패했습니다.');
+      alert(t("카테고리 추가에 실패했습니다."));
     }
   };
 
@@ -515,7 +517,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to update category color:', error);
-      alert('카테고리 색상 변경에 실패했습니다.');
+      alert(t("카테고리 색상 변경에 실패했습니다."));
     }
   };
 
@@ -559,7 +561,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to update category name:', error);
-      alert('카테고리 이름 변경에 실패했습니다.');
+      alert(t("카테고리 이름 변경에 실패했습니다."));
     }
   };
 
@@ -567,7 +569,7 @@ const Index = () => {
     // Don't allow deletion if goals exist with this category
     const hasGoalsWithCategory = goals.some((g) => g.categories && g.categories.includes(categoryToDelete));
     if (hasGoalsWithCategory) {
-      alert('이 카테고리를 사용하는 목표가 있어 삭제할 수 없습니다.');
+      alert(t("이 카테고리를 사용하는 목표가 있어 삭제할 수 없습니다."));
       return;
     }
 
@@ -580,7 +582,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to delete category:', error);
-      alert('카테고리 삭제에 실패했습니다.');
+      alert(t("카테고리 삭제에 실패했습니다."));
     }
   };
 
@@ -701,7 +703,7 @@ const Index = () => {
           updatedGoals.map((g) => ({ id: g.id, order: g.order ?? 0 }))
         ).catch((error) => {
           console.error('Failed to save order:', error);
-          alert('순서 저장에 실패했습니다.');
+          alert(t("순서 저장에 실패했습니다."));
         });
 
         return updatedGoals;
@@ -715,7 +717,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-muted-foreground">데이터 로딩 중...</p>
+          <p className="text-xl text-muted-foreground">{t("데이터 로딩 중...")}</p>
         </div>
       </div>
     );
@@ -728,27 +730,23 @@ const Index = () => {
         <AppHeader showProjectSelector={false} />
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <h1 className="text-3xl font-bold mb-4">프로젝트가 없습니다</h1>
-            <p className="text-muted-foreground mb-6">
-              시작하려면 첫 번째 프로젝트를 생성하세요.
-            </p>
+            <h1 className="text-3xl font-bold mb-4">{t("프로젝트가 없습니다")}</h1>
+            <p className="text-muted-foreground mb-6">{t("시작하려면 첫 번째 프로젝트를 생성하세요.")}</p>
             <Button
               onClick={async () => {
-                const name = prompt('프로젝트 이름을 입력하세요:', 'My First Project');
+                const name = prompt(t("프로젝트 이름을 입력하세요:"), 'My First Project');
                 if (name) {
                   try {
                     await createProject({ name, description: '' });
                   } catch (error) {
                     console.error('Failed to create project:', error);
-                    alert('프로젝트 생성에 실패했습니다.');
+                    alert(t("프로젝트 생성에 실패했습니다."));
                   }
                 }
               }}
               size="lg"
             >
-              <Plus className="mr-2 h-5 w-5" />
-              첫 프로젝트 만들기
-            </Button>
+              <Plus className="mr-2 h-5 w-5" />{t("첫 프로젝트 만들기")}</Button>
           </div>
         </div>
       </>
@@ -899,17 +897,17 @@ const Index = () => {
               goals.length === 0 ? (
                 <EmptyState
                   icon={Target}
-                  title="첫 목표를 만들어 보세요"
-                  description="목표를 하나 추가하면 카드·테이블·보드·타임라인에서 같은 목표를 다르게 볼 수 있습니다."
-                  primaryAction={{ label: '새 목표', onClick: () => setIsAddModalOpen(true) }}
-                  secondaryAction={{ label: '샘플 데이터로 둘러보기', onClick: loadSample, loading: sampleLoading }}
+                  title={t("첫 목표를 만들어 보세요")}
+                  description={t("목표를 하나 추가하면 카드·테이블·보드·타임라인에서 같은 목표를 다르게 볼 수 있습니다.")}
+                  primaryAction={{ label: t("새 목표"), onClick: () => setIsAddModalOpen(true) }}
+                  secondaryAction={{ label: t("샘플 데이터로 둘러보기"), onClick: loadSample, loading: sampleLoading }}
                 />
               ) : (
                 <EmptyState
                   icon={SearchX}
-                  title="조건에 맞는 목표가 없습니다"
-                  description="검색어나 필터를 바꾸면 다른 목표를 볼 수 있습니다."
-                  primaryAction={{ label: '필터 초기화', onClick: resetFilters }}
+                  title={t("조건에 맞는 목표가 없습니다")}
+                  description={t("검색어나 필터를 바꾸면 다른 목표를 볼 수 있습니다.")}
+                  primaryAction={{ label: t("필터 초기화"), onClick: resetFilters }}
                 />
               )
             )}

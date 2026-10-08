@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { GoalSize } from '@/types/goal';
 import { ChevronsUp, ChevronUp, Minus, ChevronDown, ChevronsDown } from 'lucide-react';
 import { getPriorityColor, getPriorityLabel, getPriorityIconType } from '@/lib/priorityColors';
@@ -13,6 +14,7 @@ interface PriorityIconProps {
  * JIRA 스타일 중요도 아이콘
  */
 export const PriorityIcon = ({ size, className, showLabel = false }: PriorityIconProps) => {
+  useTranslation();
   const color = getPriorityColor(size);
   const label = getPriorityLabel(size);
   const iconType = getPriorityIconType(size);
@@ -42,7 +44,7 @@ export const PriorityIcon = ({ size, className, showLabel = false }: PriorityIco
 
   if (showLabel) {
     return (
-      <span className="inline-flex items-center gap-1" title={`중요도: ${label}`}>
+      <span className="inline-flex items-center gap-1" title={t("중요도: {{value0}}", { value0: label })}>
         {renderIcon()}
         <span className="text-xs" style={{ color }}>{label}</span>
       </span>
@@ -50,7 +52,7 @@ export const PriorityIcon = ({ size, className, showLabel = false }: PriorityIco
   }
 
   return (
-    <span title={`중요도: ${label}`} className="inline-flex">
+    <span title={t("중요도: {{value0}}", { value0: label })} className="inline-flex">
       {renderIcon()}
     </span>
   );

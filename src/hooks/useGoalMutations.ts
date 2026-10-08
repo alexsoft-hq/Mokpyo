@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
@@ -47,7 +48,7 @@ export function useGoalMutations() {
   const handleConflict = useCallback(
     (err: unknown, goalId: string) => {
       if (err instanceof ApiError && err.status === 409) {
-        toast.error('다른 사용자가 먼저 수정했습니다. 최신 데이터로 갱신합니다.');
+        toast.error(t("다른 사용자가 먼저 수정했습니다. 최신 데이터로 갱신합니다."));
         const currentData = (err.data as { currentData?: Goal })?.currentData;
         if (currentData) patchGoalInCaches(qc, goalId, currentData);
         invalidate(goalId);
@@ -69,7 +70,7 @@ export function useGoalMutations() {
       } catch (err) {
         restore(qc, snapshots);
         if (!handleConflict(err, goalId)) {
-          toast.error(err instanceof Error ? err.message : '수정에 실패했습니다.');
+          toast.error(err instanceof Error ? err.message : t("수정에 실패했습니다."));
         }
         throw err;
       }
@@ -89,7 +90,7 @@ export function useGoalMutations() {
       } catch (err) {
         restore(qc, snapshots);
         if (!handleConflict(err, goalId)) {
-          toast.error(err instanceof Error ? err.message : '상태 변경에 실패했습니다.');
+          toast.error(err instanceof Error ? err.message : t("상태 변경에 실패했습니다."));
         }
         throw err;
       }
@@ -108,7 +109,7 @@ export function useGoalMutations() {
         return res;
       } catch (err) {
         restore(qc, snapshots);
-        toast.error(err instanceof Error ? err.message : '필드 저장에 실패했습니다.');
+        toast.error(err instanceof Error ? err.message : t("필드 저장에 실패했습니다."));
         throw err;
       }
     },

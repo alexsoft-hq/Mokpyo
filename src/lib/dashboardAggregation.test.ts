@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { summarize, byStatus, byOwner, byCategory, upcomingDeadlines, addDaysStr } from './dashboardAggregation';
 import { Goal } from '@/types/goal';
+import { setLanguage } from '@/i18n';
 import { StatusLabel } from '@/types/fields';
 
 const labels: StatusLabel[] = [
@@ -10,6 +11,16 @@ const labels: StatusLabel[] = [
 const g = (o: Partial<Goal>): Goal => ({ id: Math.random().toString(), title: 't', owner: '', owners: [], categories: ['A'], progress: 0, size: 'medium', ...o } as Goal);
 
 describe('dashboardAggregation', () => {
+  it('keeps missing-value buckets distinct from user labels in either language', async () => {
+    const goals = [g({ categories: [], owner: undefined }), g({ categories: ['Uncategorized'], owner: 'Unassigned' })];
+    const koreanCategories = byCategory(goals);
+    const koreanOwners = byOwner(goals);
+    await setLanguage('en');
+    expect(byCategory(goals).map(b => [b.key, b.count])).toEqual(koreanCategories.map(b => [b.key, b.count]));
+    expect(byOwner(goals).map(b => [b.key, b.count])).toEqual(koreanOwners.map(b => [b.key, b.count]));
+    expect(byCategory(goals)).toHaveLength(2);
+    expect(byOwner(goals)).toHaveLength(2);
+  });
   it('summarize: 총계·평균·완료·보류', () => {
     const s = summarize([g({ progress: 100, completed: true }), g({ progress: 50 }), g({ progress: 0, onHold: true })]);
     expect(s).toEqual({ total: 3, completed: 1, onHold: 1, avgProgress: 50 });

@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { Goal, Project } from '@/types/goal';
 import {
@@ -31,6 +32,7 @@ export const GoalCopyDialog = ({
   currentProjectId,
   onSuccess,
 }: GoalCopyDialogProps) => {
+  useTranslation();
   const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
   const [isCopying, setIsCopying] = useState(false);
   const [result, setResult] = useState<{
@@ -60,7 +62,7 @@ export const GoalCopyDialog = ({
       });
     } catch (error: any) {
       console.error('Failed to copy goal:', error);
-      alert(error.message || '목표 복사에 실패했습니다.');
+      alert(error.message || t("목표 복사에 실패했습니다."));
     } finally {
       setIsCopying(false);
     }
@@ -94,7 +96,7 @@ export const GoalCopyDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Copy className="h-5 w-5" />
-            목표 복사
+            {t("목표 복사")}
           </DialogTitle>
         </DialogHeader>
 
@@ -103,61 +105,61 @@ export const GoalCopyDialog = ({
           <div className="space-y-6 py-4">
             {/* Source info */}
             <div className="p-3 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">복사할 목표</p>
+              <p className="text-sm text-muted-foreground mb-1">{t("복사할 목표")}</p>
               <p className="font-medium">{goal.title}</p>
             </div>
 
             {/* Target project selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">대상 프로젝트 *</label>
+              <label className="text-sm font-medium">{t("대상 프로젝트 *")}</label>
               <ProjectTreeSelect
                 projects={projectTree}
                 value={targetProjectId}
                 onChange={setTargetProjectId}
                 excludeIds={[currentProjectId]}
-                placeholder="프로젝트 선택..."
+                placeholder={t("프로젝트 선택...")}
               />
               <p className="text-xs text-muted-foreground">
-                현재 프로젝트({projects.find(p => p.id === currentProjectId)?.name})는 선택할 수 없습니다.
+                {t("현재 프로젝트(")}{projects.find(p => p.id === currentProjectId)?.name}{t(")는 선택할 수 없습니다.")}
               </p>
             </div>
 
             {/* Preview */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">복사 내용</p>
+              <p className="text-sm font-medium">{t("복사 내용")}</p>
               <div className="p-3 bg-muted/30 rounded-lg text-sm space-y-1.5">
                 <div className="flex items-center gap-2 text-green-600">
                   <Check className="h-4 w-4" />
-                  <span>기본 정보 (제목, 설명, 진행률, 담당자 등)</span>
+                  <span>{t("기본 정보 (제목, 설명, 진행률, 담당자 등)")}</span>
                 </div>
                 {subGoalsCount > 0 && (
                   <div className="flex items-center gap-2 text-green-600">
                     <Check className="h-4 w-4" />
-                    <span>하위 목표 {subGoalsCount}개</span>
+                    <span>{t("하위 목표 {{count}}개", { count: subGoalsCount })}</span>
                   </div>
                 )}
                 {notesCount > 0 && (
                   <div className="flex items-center gap-2 text-green-600">
                     <Check className="h-4 w-4" />
-                    <span>메모 {notesCount}개</span>
+                    <span>{t("메모 {{count}}개", { count: notesCount })}</span>
                   </div>
                 )}
                 {categoriesNames.length > 0 && (
                   <div className="flex items-center gap-2 text-green-600">
                     <Check className="h-4 w-4" />
-                    <span>카테고리: {categoriesNames.join(', ')}</span>
+                    <span>{t("카테고리:")} {categoriesNames.join(', ')}</span>
                   </div>
                 )}
                 <div className="border-t my-2" />
                 {attachmentsCount > 0 && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <X className="h-4 w-4" />
-                    <span>첨부 파일 {attachmentsCount}개 (복사 안 됨)</span>
+                    <span>{t("첨부 파일 {{count}}개 (복사 안 됨)", { count: attachmentsCount })}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <X className="h-4 w-4" />
-                  <span>변경 이력 (복사 안 됨)</span>
+                  <span>{t("변경 이력 (복사 안 됨)")}</span>
                 </div>
               </div>
             </div>
@@ -165,7 +167,7 @@ export const GoalCopyDialog = ({
             {/* Category note */}
             <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
               <p>
-                <strong>카테고리 처리:</strong> 대상 프로젝트에 동일한 이름의 카테고리가 있으면 기존 카테고리를 사용하고, 없으면 새로 생성합니다.
+                <strong>{t("카테고리 처리:")}</strong> {t("대상 프로젝트에 동일한 이름의 카테고리가 있으면 기존 카테고리를 사용하고, 없으면 새로 생성합니다.")}
               </p>
             </div>
           </div>
@@ -177,10 +179,9 @@ export const GoalCopyDialog = ({
                 <Check className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-lg">복사 완료!</p>
+                <p className="font-semibold text-lg">{t("복사 완료!")}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  "{goal.title}"이(가)<br />
-                  "{result.targetProjectName}" 프로젝트에 복사되었습니다.
+                  {t('"{{title}}"이(가) "{{project}}" 프로젝트에 복사되었습니다.', { title: goal.title, project: result.targetProjectName })}
                 </p>
               </div>
             </div>
@@ -189,7 +190,7 @@ export const GoalCopyDialog = ({
             {newCategoriesCount > 0 && (
               <div className="text-sm text-center text-muted-foreground">
                 <FolderTree className="h-4 w-4 inline mr-1" />
-                새 카테고리 {newCategoriesCount}개가 생성되었습니다.
+                {t("새 카테고리 {{count}}개가 생성되었습니다.", { count: newCategoriesCount })}
               </div>
             )}
           </div>
@@ -199,7 +200,7 @@ export const GoalCopyDialog = ({
           {!result ? (
             <>
               <Button variant="outline" onClick={handleClose} disabled={isCopying}>
-                취소
+                {t("취소")}
               </Button>
               <Button
                 onClick={handleCopy}
@@ -208,12 +209,12 @@ export const GoalCopyDialog = ({
                 {isCopying ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    복사 중...
+                    {t("복사 중...")}
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4 mr-2" />
-                    복사하기
+                    {t("복사하기")}
                   </>
                 )}
               </Button>
@@ -221,10 +222,10 @@ export const GoalCopyDialog = ({
           ) : (
             <>
               <Button variant="outline" onClick={handleClose}>
-                여기서 계속
+                {t("여기서 계속")}
               </Button>
               <Button onClick={handleViewCopied}>
-                복사된 목표 보기
+                {t("복사된 목표 보기")}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </>

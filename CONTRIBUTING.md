@@ -5,7 +5,7 @@ MIT-licensed team goals and OKR tool. See [README.md](README.md) for setup.
 
 ## Questions, bugs and changes
 
-Use [GitHub Issues](https://github.com/alexsoft-hq/mokpyo-oss/issues) for reproducible
+Use [GitHub Issues](https://github.com/alexsoft-hq/Mokpyo/issues) for reproducible
 bugs and focused feature proposals. Include the version/commit, deployment method,
 steps to reproduce, expected result and relevant **redacted** logs. Remove personal
 data, customer names, tokens and internal network details from screenshots and logs.

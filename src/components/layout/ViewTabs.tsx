@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { NavLink } from 'react-router-dom';
 import { LayoutGrid, Table2, KanbanSquare, GanttChart, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,14 +12,15 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { to: '/', label: '카드', icon: LayoutGrid, enabled: true },
-  { to: '/table', label: '테이블', icon: Table2, enabled: true },
-  { to: '/board', label: '보드', icon: KanbanSquare, enabled: true },
-  { to: '/timeline', label: '타임라인', icon: GanttChart, enabled: true },
-  { to: '/dashboard', label: '대시보드', icon: BarChart3, enabled: true },
+  { to: '/', get label() { return t("카드"); }, icon: LayoutGrid, enabled: true },
+  { to: '/table', get label() { return t("테이블"); }, icon: Table2, enabled: true },
+  { to: '/board', get label() { return t("보드"); }, icon: KanbanSquare, enabled: true },
+  { to: '/timeline', get label() { return t("타임라인"); }, icon: GanttChart, enabled: true },
+  { to: '/dashboard', get label() { return t("대시보드"); }, icon: BarChart3, enabled: true },
 ];
 
 export function ViewTabs({ className }: { className?: string }) {
+  useTranslation();
   return (
     <div className={cn('flex items-center gap-1 border-b overflow-x-auto overflow-y-hidden', className)}>
       {TABS.filter((t) => t.enabled).map((t) => (

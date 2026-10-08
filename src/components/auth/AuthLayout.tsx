@@ -1,3 +1,5 @@
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { t, useTranslation } from '@/i18n';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
@@ -17,15 +19,15 @@ interface AuthLayoutProps {
 const FEATURES = [
   {
     icon: LayoutGrid,
-    text: '카드·테이블·보드·타임라인으로 같은 목표를 다르게 봅니다.',
+    get text() { return t("카드·테이블·보드·타임라인으로 같은 목표를 다르게 봅니다."); },
   },
   {
     icon: Target,
-    text: 'Key Result 체크인만 하면 진행률과 마감이 따라옵니다.',
+    get text() { return t("Key Result 체크인만 하면 진행률과 마감이 따라옵니다."); },
   },
   {
     icon: MessagesSquare,
-    text: '댓글과 멘션으로 논의가 목표 안에 남습니다.',
+    get text() { return t("댓글과 멘션으로 논의가 목표 안에 남습니다."); },
   },
 ];
 
@@ -34,6 +36,7 @@ const FEATURES = [
  * 좌측 브랜드 패널은 lg 이상에서만 보이고, 모바일에서는 폼 위에 로고만 남는다.
  */
 export function AuthLayout({ title, description, children, footer }: AuthLayoutProps) {
+  useTranslation();
   return (
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-2">
       {/* 좌: 브랜드 패널 */}
@@ -44,12 +47,12 @@ export function AuthLayout({ title, description, children, footer }: AuthLayoutP
 
         <div className="max-w-md">
           <h2 className="text-3xl font-semibold leading-snug tracking-tight text-foreground">
-            팀의 목표를 한 화면에서.
+            {t("팀의 목표를 한 화면에서.")}
             <br />
-            계획부터 달성까지.
+            {t("계획부터 달성까지.")}
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            카드·테이블·보드·타임라인으로 같은 목표를 다르게 보고, 진행률과 마감은 자동으로 따라갑니다.
+            {t("카드·테이블·보드·타임라인으로 같은 목표를 다르게 보고, 진행률과 마감은 자동으로 따라갑니다.")}
           </p>
 
           <ul className="mt-10 space-y-4">
@@ -70,6 +73,7 @@ export function AuthLayout({ title, description, children, footer }: AuthLayoutP
       {/* 우: 폼 */}
       <main className="flex flex-col items-center justify-center px-4 py-12 md:px-6">
         <div className="w-full max-w-md">
+          <div className="mb-4 flex justify-end"><LanguageSwitcher /></div>
           <div className="mb-8 flex justify-center lg:hidden">
             <Link to="/welcome" className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <Logo size={26} />
@@ -88,13 +92,13 @@ export function AuthLayout({ title, description, children, footer }: AuthLayoutP
 
           <div className="mt-8 text-center text-xs text-muted-foreground">
             <Link to="/terms" className="hover:text-foreground hover:underline">
-              이용약관
+              {t("이용약관")}
             </Link>
             <span className="mx-2" aria-hidden="true">
               ·
             </span>
             <Link to="/privacy" className="hover:text-foreground hover:underline">
-              개인정보처리방침
+              {t("개인정보처리방침")}
             </Link>
           </div>
         </div>
@@ -105,6 +109,7 @@ export function AuthLayout({ title, description, children, footer }: AuthLayoutP
 
 /** 인증 화면 공통 오류 박스. 토큰 색만 쓴다. */
 export function AuthAlert({ children }: { children: ReactNode }) {
+  useTranslation();
   return (
     <div
       role="alert"
@@ -117,6 +122,7 @@ export function AuthAlert({ children }: { children: ReactNode }) {
 
 /** 인증 화면 공통 안내 박스(재발송 완료 등). */
 export function AuthNotice({ children }: { children: ReactNode }) {
+  useTranslation();
   return (
     <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
       {children}

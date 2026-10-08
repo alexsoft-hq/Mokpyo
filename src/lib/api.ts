@@ -1,7 +1,8 @@
+import { t } from '@/i18n';
 import { Goal, GoalCategory, Attachment, Project } from '@/types/goal';
 import { ActivityLog } from '@/types/activity';
 import { ReportTemplate, AIReportRequest, AIReportResponse, AISummarizeResponse } from '@/types/ai';
-import { API_BASE_URL, getAuthHeaders, safeJson, throwApiError } from '@/lib/api/http';
+import { API_BASE_URL, getAuthHeaders, safeJson, throwApiError, localizeApiError } from '@/lib/api/http';
 
 export { API_BASE_URL, getAuthHeaders, safeJson, throwApiError, ApiError } from '@/lib/api/http';
 
@@ -21,7 +22,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '회원가입에 실패했습니다.');
+      throw new Error(localizeApiError(data.error, t("회원가입에 실패했습니다.")));
     }
     return response.json();
   },
@@ -34,7 +35,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '이메일 인증에 실패했습니다.');
+      throw new Error(localizeApiError(data.error, t("이메일 인증에 실패했습니다.")));
     }
     return response.json();
   },
@@ -47,7 +48,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '인증 코드 재발송에 실패했습니다.');
+      throw new Error(localizeApiError(data.error, t("인증 코드 재발송에 실패했습니다.")));
     }
     return response.json();
   },
@@ -60,7 +61,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      const error: any = new Error(data.error || '로그인에 실패했습니다.');
+      const error: any = new Error(localizeApiError(data.error, t("로그인에 실패했습니다.")));
       if (data.needsVerification) {
         error.needsVerification = true;
         error.email = data.email;
@@ -79,7 +80,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '비밀번호 재설정 요청에 실패했습니다.');
+      throw new Error(localizeApiError(data.error, t("비밀번호 재설정 요청에 실패했습니다.")));
     }
     return response.json();
   },
@@ -90,7 +91,7 @@ export const api = {
     );
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '링크를 확인할 수 없습니다.');
+      throw new Error(localizeApiError(data.error, t("링크를 확인할 수 없습니다.")));
     }
     return response.json();
   },
@@ -103,7 +104,7 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || '비밀번호 재설정에 실패했습니다.');
+      throw new Error(localizeApiError(data.error, t("비밀번호 재설정에 실패했습니다.")));
     }
     return response.json();
   },
@@ -116,9 +117,9 @@ export const api = {
       body: JSON.stringify({ name }),
     });
     if (!response.ok) {
-      await throwApiError(response, '프로필 수정에 실패했습니다.');
+      await throwApiError(response, t("프로필 수정에 실패했습니다."));
     }
-    return safeJson(response, '프로필 수정 응답을 처리할 수 없습니다.');
+    return safeJson(response, t("프로필 수정 응답을 처리할 수 없습니다."));
   },
 
   async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
@@ -128,9 +129,9 @@ export const api = {
       body: JSON.stringify({ currentPassword, newPassword }),
     });
     if (!response.ok) {
-      await throwApiError(response, '비밀번호 변경에 실패했습니다.');
+      await throwApiError(response, t("비밀번호 변경에 실패했습니다."));
     }
-    return safeJson(response, '비밀번호 변경 응답을 처리할 수 없습니다.');
+    return safeJson(response, t("비밀번호 변경 응답을 처리할 수 없습니다."));
   },
 
   async selectDefaultAvatar(avatarId: string): Promise<{ user: { userId: string; email: string; name: string; picture?: string } }> {
@@ -140,9 +141,9 @@ export const api = {
       body: JSON.stringify({ avatarId }),
     });
     if (!response.ok) {
-      await throwApiError(response, '아바타 설정에 실패했습니다.');
+      await throwApiError(response, t("아바타 설정에 실패했습니다."));
     }
-    return safeJson(response, '아바타 설정 응답을 처리할 수 없습니다.');
+    return safeJson(response, t("아바타 설정 응답을 처리할 수 없습니다."));
   },
 
   async uploadProfilePicture(file: File): Promise<{ user: { userId: string; email: string; name: string; picture?: string } }> {
@@ -165,9 +166,9 @@ export const api = {
       body: formData,
     });
     if (!response.ok) {
-      await throwApiError(response, '프로필 사진 업로드에 실패했습니다.');
+      await throwApiError(response, t("프로필 사진 업로드에 실패했습니다."));
     }
-    return safeJson(response, '프로필 사진 업로드 응답을 처리할 수 없습니다.');
+    return safeJson(response, t("프로필 사진 업로드 응답을 처리할 수 없습니다."));
   },
 
   getProfilePictureUrl(fileName: string): string {
@@ -215,7 +216,7 @@ export const api = {
       body: JSON.stringify({ confirmName }),
     });
     if (!response.ok) {
-      await throwApiError(response, '프로젝트 삭제에 실패했습니다.');
+      await throwApiError(response, t("프로젝트 삭제에 실패했습니다."));
     }
   },
 
@@ -479,11 +480,11 @@ export const api = {
       body: JSON.stringify(request),
     });
     if (!response.ok) {
-      await throwApiError(response, '리포트 생성에 실패했습니다.');
+      await throwApiError(response, t("리포트 생성에 실패했습니다."));
     }
 
     const reader = response.body?.getReader();
-    if (!reader) throw new Error('스트리밍을 지원하지 않습니다.');
+    if (!reader) throw new Error(t("스트리밍을 지원하지 않습니다."));
 
     const decoder = new TextDecoder();
     let buffer = '';
@@ -521,11 +522,11 @@ export const api = {
       body: JSON.stringify({ activityIds }),
     });
     if (!response.ok) {
-      await throwApiError(response, 'AI 요약에 실패했습니다.');
+      await throwApiError(response, t("AI 요약에 실패했습니다."));
     }
 
     const reader = response.body?.getReader();
-    if (!reader) throw new Error('스트리밍을 지원하지 않습니다.');
+    if (!reader) throw new Error(t("스트리밍을 지원하지 않습니다."));
 
     const decoder = new TextDecoder();
     let buffer = '';
@@ -573,9 +574,9 @@ export const api = {
       body: formData,
     });
     if (!response.ok) {
-      await throwApiError(response, '템플릿 업로드에 실패했습니다.');
+      await throwApiError(response, t("템플릿 업로드에 실패했습니다."));
     }
-    return safeJson(response, '템플릿 업로드 응답을 처리할 수 없습니다.');
+    return safeJson(response, t("템플릿 업로드 응답을 처리할 수 없습니다."));
   },
 
   async deleteReportTemplate(id: string): Promise<void> {
@@ -604,7 +605,7 @@ export const api = {
       body: JSON.stringify({ name }),
     });
     if (!response.ok) {
-      await throwApiError(response, '워크스페이스 생성에 실패했습니다.');
+      await throwApiError(response, t("워크스페이스 생성에 실패했습니다."));
     }
     return response.json();
   },
@@ -656,7 +657,7 @@ export const api = {
       body: JSON.stringify({ role }),
     });
     if (!response.ok) {
-      await throwApiError(response, '역할 변경에 실패했습니다.');
+      await throwApiError(response, t("역할 변경에 실패했습니다."));
     }
     return response.json();
   },
@@ -668,7 +669,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
     if (!response.ok) {
-      await throwApiError(response, '멤버 제거에 실패했습니다.');
+      await throwApiError(response, t("멤버 제거에 실패했습니다."));
     }
   },
 
@@ -681,7 +682,7 @@ export const api = {
       body: JSON.stringify({ organizationId, email, role }),
     });
     if (!response.ok) {
-      await throwApiError(response, '초대 생성에 실패했습니다.');
+      await throwApiError(response, t("초대 생성에 실패했습니다."));
     }
     return response.json();
   },
@@ -689,7 +690,7 @@ export const api = {
   async getInvitation(token: string): Promise<InvitationInfo> {
     const response = await fetch(`${API_BASE_URL}/api/invitations/${token}`);
     if (!response.ok) {
-      await throwApiError(response, '초대 정보를 불러올 수 없습니다.');
+      await throwApiError(response, t("초대 정보를 불러올 수 없습니다."));
     }
     return response.json();
   },
@@ -701,7 +702,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
     if (!response.ok) {
-      await throwApiError(response, '초대 수락에 실패했습니다.');
+      await throwApiError(response, t("초대 수락에 실패했습니다."));
     }
     return response.json();
   },
@@ -731,7 +732,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
     if (!response.ok) {
-      await throwApiError(response, '워크스페이스 나가기에 실패했습니다.');
+      await throwApiError(response, t("워크스페이스 나가기에 실패했습니다."));
     }
   },
 
@@ -759,7 +760,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!response.ok) await throwApiError(response, '사이클 생성에 실패했습니다.');
+    if (!response.ok) await throwApiError(response, t("사이클 생성에 실패했습니다."));
     return response.json();
   },
 
@@ -769,7 +770,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!response.ok) await throwApiError(response, '사이클 수정에 실패했습니다.');
+    if (!response.ok) await throwApiError(response, t("사이클 수정에 실패했습니다."));
     return response.json();
   },
 
@@ -778,7 +779,7 @@ export const api = {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
-    if (!response.ok) await throwApiError(response, '사이클 삭제에 실패했습니다.');
+    if (!response.ok) await throwApiError(response, t("사이클 삭제에 실패했습니다."));
   },
 
   /** 사이클 기간과 겹치는 미배정 목표 미리보기 (OWNER/ADMIN) */
@@ -786,7 +787,7 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/api/cycles/${cycleId}/unassigned-overlaps`, {
       headers: getAuthHeaders(),
     });
-    if (!response.ok) await throwApiError(response, '배정 대상 목표 조회에 실패했습니다.');
+    if (!response.ok) await throwApiError(response, t("배정 대상 목표 조회에 실패했습니다."));
     return response.json();
   },
 
@@ -797,7 +798,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ goalIds }),
     });
-    if (!response.ok) await throwApiError(response, '목표 일괄 배정에 실패했습니다.');
+    if (!response.ok) await throwApiError(response, t("목표 일괄 배정에 실패했습니다."));
     return response.json();
   },
 

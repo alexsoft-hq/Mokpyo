@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Goal, GoalCategory, GoalSize } from '@/types/goal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ export const AddGoalModal = ({
   cycles = [],
   goals = [],
 }: AddGoalModalProps) => {
+  useTranslation();
   const [newGoal, setNewGoal] = useState<Partial<Goal> & { owners?: string[] }>({
     title: '',
     description: '',
@@ -102,7 +104,7 @@ export const AddGoalModal = ({
   const handleAddCategory = async () => {
     if (!newCategoryName.trim() || !onAddCategory) return;
     if (categories.includes(newCategoryName.trim())) {
-      alert('이미 존재하는 카테고리입니다.');
+      alert(t("이미 존재하는 카테고리입니다."));
       return;
     }
 
@@ -138,7 +140,7 @@ export const AddGoalModal = ({
       return;
     }
     if (categories.includes(editingName.trim()) && editingName.trim() !== oldName) {
-      alert('이미 존재하는 카테고리입니다.');
+      alert(t("이미 존재하는 카테고리입니다."));
       return;
     }
 
@@ -161,7 +163,7 @@ export const AddGoalModal = ({
   const handleDeleteCategory = async (category: string) => {
     if (!onDeleteCategory) return;
 
-    if (!confirm(`'${category}' 카테고리를 삭제하시겠습니까?`)) return;
+    if (!confirm(t("'{{value0}}' 카테고리를 삭제하시겠습니까?", { value0: category }))) return;
 
     try {
       await onDeleteCategory(category);
@@ -186,12 +188,12 @@ export const AddGoalModal = ({
   const handleAdd = () => {
     const owners = newGoal.owners || [];
     if (!newGoal.title || owners.length === 0) {
-      alert('제목과 담당자는 필수 입력 항목입니다.');
+      alert(t("제목과 담당자는 필수 입력 항목입니다."));
       return;
     }
 
     if (!newGoal.categories || newGoal.categories.length === 0) {
-      alert('최소 1개의 카테고리를 선택해야 합니다.');
+      alert(t("최소 1개의 카테고리를 선택해야 합니다."));
       return;
     }
 
@@ -235,11 +237,11 @@ export const AddGoalModal = ({
   };
 
   const sizeOptions: { value: GoalSize; label: string; description: string }[] = [
-    { value: 'xs', label: '최저 중요도', description: '1x1 카드' },
-    { value: 'small', label: '낮은 중요도', description: '1x1 카드' },
-    { value: 'medium', label: '중간 중요도', description: '1x2 카드 (높이 2배)' },
-    { value: 'large', label: '높은 중요도', description: '2x2 카드 (가로/세로 2배)' },
-    { value: 'xl', label: '최고 중요도', description: '2x3 카드 (매우 큰 크기)' },
+    { value: 'xs', label: t("최저 중요도"), description: t("1x1 카드") },
+    { value: 'small', label: t("낮은 중요도"), description: t("1x1 카드") },
+    { value: 'medium', label: t("중간 중요도"), description: t("1x2 카드 (높이 2배)") },
+    { value: 'large', label: t("높은 중요도"), description: t("2x2 카드 (가로/세로 2배)") },
+    { value: 'xl', label: t("최고 중요도"), description: t("2x3 카드 (매우 큰 크기)") },
   ];
 
   const hasManagementFeatures = onAddCategory || onUpdateCategoryColor || onUpdateCategoryName || onDeleteCategory;
@@ -248,42 +250,42 @@ export const AddGoalModal = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">새 목표 추가</DialogTitle>
+          <DialogTitle className="text-2xl">{t("새 목표 추가")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label>제목 *</Label>
+            <Label>{t("제목 *")}</Label>
             <Input
               value={newGoal.title}
               onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
-              placeholder="목표 제목을 입력하세요"
+              placeholder={t("목표 제목을 입력하세요")}
             />
           </div>
 
           <div>
-            <Label>설명</Label>
+            <Label>{t("설명")}</Label>
             <Textarea
               value={newGoal.description}
               onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
-              placeholder="목표에 대한 간단한 설명"
+              placeholder={t("목표에 대한 간단한 설명")}
               rows={3}
             />
           </div>
 
           <div>
-            <Label>담당자 * (복수 선택 가능)</Label>
+            <Label>{t("담당자 * (복수 선택 가능)")}</Label>
             <MultiOwnerInput
               values={newGoal.owners || []}
               onChange={(values) => setNewGoal({ ...newGoal, owners: values, owner: values[0] || '' })}
               registeredUsers={registeredUsers}
               existingOwners={existingOwners}
-              placeholder="담당자 추가"
+              placeholder={t("담당자 추가")}
             />
           </div>
 
           <div>
-            <Label>카테고리 * (최소 1개, 최대 5개) - 선택됨: {newGoal.categories?.length || 0} / 5</Label>
+            <Label>{t("카테고리 * (최소 1개, 최대 5개) - 선택됨:")} {newGoal.categories?.length || 0} / 5</Label>
             <div className="mt-2 space-y-2 p-3 border rounded-md bg-background">
               {categories.map((category) => {
                 const isSelected = newGoal.categories?.includes(category);
@@ -358,7 +360,7 @@ export const AddGoalModal = ({
                               type="button"
                               onClick={() => startEditing(category)}
                               className="p-1 rounded hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors"
-                              title="이름 변경"
+                              title={t("이름 변경")}
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
@@ -371,7 +373,7 @@ export const AddGoalModal = ({
                                 "p-1 rounded hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors",
                                 isColorPicking && "bg-accent/50 text-foreground"
                               )}
-                              title="색상 변경"
+                              title={t("색상 변경")}
                             >
                               <Palette className="w-3.5 h-3.5" />
                             </button>
@@ -381,7 +383,7 @@ export const AddGoalModal = ({
                               type="button"
                               onClick={() => handleDeleteCategory(category)}
                               className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
-                              title="삭제"
+                              title={t("삭제")}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -400,7 +402,7 @@ export const AddGoalModal = ({
                             onChange={(e) => handleColorChange(category, e.target.value)}
                             className="w-8 h-6 rounded cursor-pointer border-0"
                           />
-                          <span className="text-xs text-muted-foreground">직접 선택</span>
+                          <span className="text-xs text-muted-foreground">{t("직접 선택")}</span>
                         </div>
                         <div className="flex flex-wrap gap-1">
                           {PRESET_COLORS.map((presetColor) => (
@@ -429,7 +431,7 @@ export const AddGoalModal = ({
                     <Input
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="새 카테고리명"
+                      placeholder={t("새 카테고리명")}
                       className="h-8 text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -451,7 +453,7 @@ export const AddGoalModal = ({
                       onClick={handleAddCategory}
                       disabled={!newCategoryName.trim()}
                     >
-                      추가
+                      {t("추가")}
                     </Button>
                     <Button
                       type="button"
@@ -473,7 +475,7 @@ export const AddGoalModal = ({
                     className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border-t pt-2"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>새 카테고리 추가</span>
+                    <span>{t("새 카테고리 추가")}</span>
                   </button>
                 )
               )}
@@ -481,7 +483,7 @@ export const AddGoalModal = ({
               {/* 카테고리가 없을 때 안내 메시지 */}
               {categories.length === 0 && !showAddCategory && (
                 <p className="text-sm text-muted-foreground">
-                  카테고리가 없습니다. 아래 버튼을 눌러 새 카테고리를 만들어주세요.
+                  {t("카테고리가 없습니다. 아래 버튼을 눌러 새 카테고리를 만들어주세요.")}
                 </p>
               )}
             </div>
@@ -490,7 +492,7 @@ export const AddGoalModal = ({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Maximize2 className="w-4 h-4 text-primary" />
-              <Label>카드 크기 (중요도)</Label>
+              <Label>{t("카드 크기 (중요도)")}</Label>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {sizeOptions.map((option) => (
@@ -514,7 +516,7 @@ export const AddGoalModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>시작일</Label>
+              <Label>{t("시작일")}</Label>
               <Input
                 type="date"
                 value={newGoal.startDate}
@@ -523,7 +525,7 @@ export const AddGoalModal = ({
             </div>
 
             <div>
-              <Label>종료일</Label>
+              <Label>{t("종료일")}</Label>
               <Input
                 type="date"
                 value={newGoal.dueDate}
@@ -532,7 +534,7 @@ export const AddGoalModal = ({
             </div>
 
             <div>
-              <Label>사이클</Label>
+              <Label>{t("사이클")}</Label>
               <Select
                 value={newGoal.cycleId || '__none__'}
                 onValueChange={(value) => {
@@ -541,10 +543,10 @@ export const AddGoalModal = ({
                 }}
               >
                 <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="사이클 선택" />
+                  <SelectValue placeholder={t("사이클 선택")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">없음</SelectItem>
+                  <SelectItem value="__none__">{t("없음")}</SelectItem>
                   {cycles.map((cycle) => (
                     <SelectItem key={cycle.id} value={cycle.id}>
                       {cycle.name}
@@ -555,7 +557,7 @@ export const AddGoalModal = ({
             </div>
 
             <div>
-              <Label>상위 목표 (정렬)</Label>
+              <Label>{t("상위 목표 (정렬)")}</Label>
               <Select
                 value={newGoal.parentGoalId || '__none__'}
                 onValueChange={(value) =>
@@ -563,10 +565,10 @@ export const AddGoalModal = ({
                 }
               >
                 <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="상위 목표 선택" />
+                  <SelectValue placeholder={t("상위 목표 선택")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">없음</SelectItem>
+                  <SelectItem value="__none__">{t("없음")}</SelectItem>
                   {goals.map((g) => (
                     <SelectItem key={g.id} value={g.id}>
                       {g.title}
@@ -578,16 +580,16 @@ export const AddGoalModal = ({
           </div>
 
           <div>
-            <Label>상태 메모</Label>
+            <Label>{t("상태 메모")}</Label>
             <Input
               value={newGoal.statusNote}
               onChange={(e) => setNewGoal({ ...newGoal, statusNote: e.target.value })}
-              placeholder="현재 상태를 간단히 입력하세요"
+              placeholder={t("현재 상태를 간단히 입력하세요")}
             />
           </div>
 
           <div>
-            <Label>진행률: {newGoal.progress}%</Label>
+            <Label>{t("진행률:")} {newGoal.progress}%</Label>
             <Slider
               value={[newGoal.progress || 0]}
               onValueChange={([value]) => setNewGoal({ ...newGoal, progress: value })}
@@ -600,10 +602,10 @@ export const AddGoalModal = ({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button onClick={onClose} variant="outline">
-              취소
+              {t("취소")}
             </Button>
             <Button onClick={handleAdd}>
-              추가
+              {t("추가")}
             </Button>
           </div>
         </div>

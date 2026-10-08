@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +21,7 @@ export const SettingsDialog = ({
   onSaveUser,
   userSettings
 }: SettingsDialogProps) => {
+  useTranslation();
   // User settings
   const [localUserSettings, setLocalUserSettings] = useState<UserSettings>(userSettings);
 
@@ -53,14 +55,14 @@ export const SettingsDialog = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>개인 설정</DialogTitle>
+          <DialogTitle>{t("개인 설정")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
             <div className="grid gap-4">
               {/* 기본 뷰 모드 */}
               <div className="grid gap-2">
-                <Label htmlFor="viewMode">기본 뷰 모드</Label>
+                <Label htmlFor="viewMode">{t("기본 뷰 모드")}</Label>
                 <Select
                   value={localUserSettings.defaultViewMode}
                   onValueChange={(value: ViewMode) => updateUserSetting('defaultViewMode', value)}
@@ -69,18 +71,18 @@ export const SettingsDialog = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="compact">요약 보기</SelectItem>
-                    <SelectItem value="normal">상세 보기</SelectItem>
+                    <SelectItem value="compact">{t("요약 보기")}</SelectItem>
+                    <SelectItem value="normal">{t("상세 보기")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  앱을 열 때 기본으로 표시할 뷰 모드입니다
+                  {t("앱을 열 때 기본으로 표시할 뷰 모드입니다")}
                 </p>
               </div>
 
               {/* 테마 */}
               <div className="grid gap-2">
-                <Label htmlFor="theme">테마</Label>
+                <Label htmlFor="theme">{t("테마")}</Label>
                 <Select
                   value={localUserSettings.theme}
                   onValueChange={(value: Theme) => updateUserSetting('theme', value)}
@@ -89,22 +91,22 @@ export const SettingsDialog = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="system">시스템 설정 따라가기</SelectItem>
-                    <SelectItem value="light">라이트 모드</SelectItem>
-                    <SelectItem value="dark">다크 모드</SelectItem>
+                    <SelectItem value="system">{t("시스템 설정 따라가기")}</SelectItem>
+                    <SelectItem value="light">{t("라이트 모드")}</SelectItem>
+                    <SelectItem value="dark">{t("다크 모드")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  화면 색상 테마를 선택합니다
+                  {t("화면 색상 테마를 선택합니다")}
                 </p>
               </div>
 
               {/* 완료 항목 표시 기본값 */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="showCompleted">완료 항목 표시</Label>
+                  <Label htmlFor="showCompleted">{t("완료 항목 표시")}</Label>
                   <p className="text-xs text-muted-foreground">
-                    앱을 열 때 완료된 목표를 기본으로 표시합니다
+                    {t("앱을 열 때 완료된 목표를 기본으로 표시합니다")}
                   </p>
                 </div>
                 <Switch
@@ -117,9 +119,9 @@ export const SettingsDialog = ({
               {/* 자동 갱신 활성화 */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="autoRefresh">백그라운드 자동 갱신</Label>
+                  <Label htmlFor="autoRefresh">{t("백그라운드 자동 갱신")}</Label>
                   <p className="text-xs text-muted-foreground">
-                    다른 사용자의 변경사항을 자동으로 반영합니다
+                    {t("다른 사용자의 변경사항을 자동으로 반영합니다")}
                   </p>
                 </div>
                 <Switch
@@ -132,7 +134,7 @@ export const SettingsDialog = ({
               {/* 자동 갱신 주기 */}
               {localUserSettings.enableAutoRefresh && (
                 <div className="grid gap-2">
-                  <Label htmlFor="refreshInterval">자동 갱신 주기 (초)</Label>
+                  <Label htmlFor="refreshInterval">{t("자동 갱신 주기 (초)")}</Label>
                   <Input
                     id="refreshInterval"
                     type="number"
@@ -143,7 +145,7 @@ export const SettingsDialog = ({
                     onChange={(e) => updateUserSetting('autoRefreshInterval', parseInt(e.target.value) || 30)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    10초 ~ 300초 사이로 설정 가능합니다 (권장: 30초)
+                    {t("10초 ~ 300초 사이로 설정 가능합니다 (권장: 30초)")}
                   </p>
                 </div>
               )}
@@ -151,14 +153,14 @@ export const SettingsDialog = ({
 
             <div className="flex justify-between pt-4">
               <Button variant="outline" onClick={handleResetUser}>
-                기본값 복원
+                {t("기본값 복원")}
               </Button>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={handleClose}>
-                  취소
+                  {t("취소")}
                 </Button>
                 <Button onClick={() => { handleSaveUser(); handleClose(); }}>
-                  저장
+                  {t("저장")}
                 </Button>
               </div>
             </div>

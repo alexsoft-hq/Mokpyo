@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState } from 'react';
 import { LogOut, User, KeyRound, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -68,6 +69,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user, onLogout, onUserUpdate, onSettingsClick, extraItems }: UserMenuProps) {
+  useTranslation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
@@ -108,22 +110,22 @@ export function UserMenu({ user, onLogout, onUserUpdate, onSettingsClick, extraI
           {extraItems}
           <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
             <User className="mr-2 h-4 w-4" />
-            프로필 편집
+            {t("프로필 편집")}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsPasswordOpen(true)}>
             <KeyRound className="mr-2 h-4 w-4" />
-            비밀번호 변경
+            {t("비밀번호 변경")}
           </DropdownMenuItem>
           {onSettingsClick && (
             <DropdownMenuItem onClick={onSettingsClick}>
               <Settings className="mr-2 h-4 w-4" />
-              설정
+              {t("설정")}
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onLogout}>
             <LogOut className="mr-2 h-4 w-4" />
-            로그아웃
+            {t("로그아웃")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

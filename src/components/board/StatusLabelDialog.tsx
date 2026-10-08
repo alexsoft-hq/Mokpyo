@@ -1,3 +1,4 @@
+import { t, useTranslation } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ interface Props {
 
 /** 상태 라벨(칸반 컬럼) 추가·편집 다이얼로그. 시스템 라벨은 이름 변경 불가(서버가 400). */
 export function StatusLabelDialog({ open, onClose, label, onSubmit }: Props) {
+  useTranslation();
   const [name, setName] = useState('');
   const [color, setColor] = useState(PRESET_COLORS[1]);
   const [saving, setSaving] = useState(false);
@@ -44,21 +46,21 @@ export function StatusLabelDialog({ open, onClose, label, onSubmit }: Props) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-sm">
-        <DialogHeader><DialogTitle>{label ? '상태 편집' : '상태 추가'}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{label ? t("상태 편집") : t("상태 추가")}</DialogTitle></DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">이름</label>
+            <label className="text-sm font-medium">{t("이름")}</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => { if (e.nativeEvent.isComposing || e.keyCode === 229) return; if (e.key === 'Enter') submit(); }}
               disabled={isSystem}
-              placeholder="예: 검토 중"
+              placeholder={t("예: 검토 중")}
             />
-            {isSystem && <p className="text-xs text-muted-foreground">기본 상태는 이름을 변경할 수 없습니다(색상만 가능).</p>}
+            {isSystem && <p className="text-xs text-muted-foreground">{t("기본 상태는 이름을 변경할 수 없습니다(색상만 가능).")}</p>}
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">색상</label>
+            <label className="text-sm font-medium">{t("색상")}</label>
             <div className="flex flex-wrap gap-2">
               {PRESET_COLORS.map((c) => (
                 <button
@@ -66,7 +68,7 @@ export function StatusLabelDialog({ open, onClose, label, onSubmit }: Props) {
                   onClick={() => setColor(c)}
                   className={cn('w-7 h-7 rounded-full border-2', color === c ? 'border-foreground' : 'border-transparent')}
                   style={{ backgroundColor: c }}
-                  aria-label={`색상 ${c}`}
+                  aria-label={t("색상 {{value0}}", { value0: c })}
                   aria-pressed={color === c}
                 />
               ))}
@@ -74,8 +76,8 @@ export function StatusLabelDialog({ open, onClose, label, onSubmit }: Props) {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>취소</Button>
-          <Button onClick={submit} disabled={saving || !name.trim()}>{label ? '저장' : '추가'}</Button>
+          <Button variant="outline" onClick={onClose}>{t("취소")}</Button>
+          <Button onClick={submit} disabled={saving || !name.trim()}>{label ? t("저장") : t("추가")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
