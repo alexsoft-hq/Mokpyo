@@ -1,9 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { WorkspaceProvider, useWorkspace } from "./contexts/WorkspaceContext";
 import { ProjectProvider } from "./contexts/ProjectContext";
@@ -12,6 +12,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { SessionExpiryHandler } from "./components/SessionExpiryHandler";
 import { Loader2 } from "lucide-react";
+import { takeMcpLoginReturn } from "@/lib/api/mcp";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -35,6 +36,7 @@ const Landing = lazy(() => import("./pages/marketing/Landing"));
 const Pricing = lazy(() => import("./pages/marketing/Pricing"));
 const Terms = lazy(() => import("./pages/legal/Terms"));
 const Privacy = lazy(() => import("./pages/legal/Privacy"));
+const McpConsent = lazy(() => import("./pages/McpConsent"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +92,20 @@ function RootRoute() {
   );
 }
 
+// Resume only the scoped consent path saved before Google sign-in.
+function McpLoginReturn() {
+  const [hasCallbackToken] = useState(() => !!new URLSearchParams(window.location.search).get('token'));
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!hasCallbackToken || !isAuthenticated || isLoading || location.pathname !== '/') return;
+    const path = takeMcpLoginReturn();
+    if (path) navigate(path, { replace: true });
+  }, [hasCallbackToken, isAuthenticated, isLoading, location.pathname, navigate]);
+  return null;
+}
+
 const App = () => {
   // Get base URL from Vite config (matches VITE_BASE_URL)
   const basename = import.meta.env.BASE_URL;
@@ -101,6 +117,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter basename={basename}>
           <AuthProvider>
+            <McpLoginReturn />
             <WorkspaceProvider>
               <ProjectProvider>
                 <ThemeApplier>
@@ -110,6 +127,7 @@ const App = () => {
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/connect/mcp" element={<McpConsent />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />

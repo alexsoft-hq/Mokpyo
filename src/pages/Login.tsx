@@ -1,3 +1,4 @@
+import { rememberMcpLoginReturn } from '@/lib/api/mcp';
 import { useAuthFeedback } from './authFeedback';
 import { useTranslation, t } from '@/i18n';
 import { useState } from "react";
@@ -45,6 +46,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
+    rememberMcpLoginReturn(redirectTo);
     window.location.href = '/api/auth/google';
   };
 

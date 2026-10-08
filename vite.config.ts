@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => {
       host: "::",
       port: 8080,
       proxy: {
+        '/mcp': { target: 'http://127.0.0.1:3001', changeOrigin: false },
+        '/oauth/mcp': { target: 'http://127.0.0.1:3001', changeOrigin: false },
+        '/.well-known': { target: 'http://127.0.0.1:3001', changeOrigin: false },
         [apiProxyPath]: {
           target: 'http://127.0.0.1:3001',
           changeOrigin: true,

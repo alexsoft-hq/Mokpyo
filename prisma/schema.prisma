@@ -21,6 +21,11 @@ enum MemberRole {
 }
 
 model Organization {
+  mcpTokens McpToken[]
+  mcpCodes McpOAuthCode[]
+  mcpImportBatches McpImportBatch[]
+  externalReferences ExternalReference[]
+
   id            String    @id @default(uuid())
   name          String
   slug          String    @unique
@@ -266,6 +271,8 @@ model Category {
 }
 
 model Goal {
+  externalReferences ExternalReference[]
+
   id          String       @id @default(uuid())
   title       String
   description String?
@@ -329,6 +336,8 @@ model Comment {
 }
 
 model SubGoal {
+  externalReferences ExternalReference[]
+
   id          String   @id @default(uuid())
   title       String
   description String?
@@ -396,6 +405,11 @@ model Note {
 }
 
 model User {
+  mcpTokens McpToken[]
+  mcpCodes McpOAuthCode[]
+  mcpRequests McpOAuthRequest[]
+  mcpImportBatches McpImportBatch[]
+
   id                             String     @id @default(uuid())
   googleId                       String?    @unique
   email                          String     @unique
@@ -493,4 +507,113 @@ model ReportTemplate {
 
   @@index([projectId])
   @@index([organizationId])
+}
+
+// Opaque MCP tokens are separate from browser JWT sessions.
+model McpToken {
+  refreshTokens McpRefreshToken[]
+  id String @id @default(uuid())
+  organizationId String
+  userId String
+  name String
+  tokenHash String @unique
+  prefix String
+  scopes String[]
+  resource String
+  clientId String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  lastUsedAt DateTime?
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client McpOAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  @@index([organizationId, userId])
+}
+
+model McpOAuthClient {
+  id String @id @default(uuid())
+  metadata Json
+  createdAt DateTime @default(now())
+  tokens McpToken[]
+  requests McpOAuthRequest[]
+  codes McpOAuthCode[]
+}
+
+model McpOAuthRequest {
+  id String @id
+  clientId String
+  redirectUri String
+  resource String
+  scopes String[]
+  codeChallenge String
+  state String?
+  claimedById String?
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  client McpOAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  claimedBy User? @relation(fields: [claimedById], references: [id], onDelete: Cascade)
+  @@index([expiresAt])
+}
+
+model McpOAuthCode {
+  id String @id @default(uuid())
+  codeHash String @unique
+  clientId String
+  userId String
+  organizationId String
+  redirectUri String
+  resource String
+  scopes String[]
+  codeChallenge String
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  client McpOAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@index([expiresAt])
+}
+
+model McpImportBatch {
+  id String @id @default(uuid())
+  organizationId String
+  userId String
+  idempotencyKey String
+  requestHash String
+  result Json
+  createdAt DateTime @default(now())
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, userId, idempotencyKey])
+}
+
+model ExternalReference {
+  id String @id @default(uuid())
+  organizationId String
+  provider String
+  instance String
+  externalId String
+  url String
+  goalId String?
+  subGoalId String?
+  createdAt DateTime @default(now())
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  goal Goal? @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  subGoal SubGoal? @relation(fields: [subGoalId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, provider, instance, externalId])
+  @@index([goalId])
+  @@index([subGoalId])
+}
+
+model McpRefreshToken {
+  id String @id @default(uuid())
+  tokenId String
+  tokenHash String @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  token McpToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  @@index([tokenId])
 }

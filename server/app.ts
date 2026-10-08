@@ -36,6 +36,8 @@ import multer from 'multer';
 import { createStorageAdapter, decodeMultipartFilename } from './utils/storage';
 import { isAIAvailable, chatCompletion, chatCompletionStream, compressAuditLogs, formatGoalsForPrompt } from './utils/aiService';
 import pdfParse from 'pdf-parse';
+import { mountMcpAuth } from './mcp/oauth';
+import { mountMcpServer } from './mcp/server';
 
 // 단일 앱 모듈. server/index.ts(개발, tsx ESM)와 server/production.ts(운영, esbuild CJS 번들) 둘 다
 // 이 파일을 import 한다 — 엔드포인트·미들웨어는 여기 한 곳에만 둔다.
@@ -106,6 +108,10 @@ app.use(['/api/auth/login', '/api/auth/register', '/api/auth/verify-email', '/ap
 app.use('/api', apiLimiter);
 app.use(passport.initialize());
 app.use(passport.session());
+
+// MCP uses its own scoped, revocable OAuth credentials. Never accept app JWTs on /mcp.
+mountMcpAuth(app);
+mountMcpServer(app);
 
 // Account self-service (auth required) — /api/auth 보다 먼저 등록해 경로 우선순위 보장
 app.use('/api/auth/account', authenticateJWT, accountRoutes);

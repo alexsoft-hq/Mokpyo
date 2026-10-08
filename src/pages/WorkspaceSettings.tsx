@@ -26,6 +26,7 @@ import {
 import MemberInviteDialog from '@/components/MemberInviteDialog';
 import { PlanUsageCard } from '@/components/workspace/PlanUsageCard';
 import { DataExportCard } from '@/components/workspace/DataExportCard';
+import { McpConnectionsCard } from '@/components/workspace/McpConnectionsCard';
 
 const ROLE_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   OWNER: { label: '소유자', icon: <Crown className="h-3 w-3" />, color: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' },
@@ -316,6 +317,8 @@ export default function WorkspaceSettings() {
             </CardContent>
           </Card>
         )}
+
+        <McpConnectionsCard orgId={currentOrganization.id} />
 
         {/* Plan & usage / data export — ADMIN 이상 */}
         {isAdmin && <PlanUsageCard orgId={currentOrganization.id} isOwner={isOwner} />}
