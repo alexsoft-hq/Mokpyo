@@ -61,7 +61,8 @@ COPY --from=builder /app/dist            ./dist
 COPY --from=builder /app/server/production.cjs ./server/production.cjs
 COPY prisma/schema.prisma ./prisma/schema.prisma
 COPY prisma/migrations ./prisma/migrations
-COPY package.json package-lock.json LICENSE THIRD_PARTY_NOTICES.md ./
+COPY package.json package-lock.json LICENSE ./
+COPY docs/THIRD_PARTY_NOTICES.md ./THIRD_PARTY_NOTICES.md
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \

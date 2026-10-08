@@ -41,8 +41,11 @@ scripts/.env.backup
 # Backups
 backups/
 
-# Internal documents (private)
-docs/
+# Publish only the reviewed documentation; keep other local notes private.
+/docs/*
+!/docs/README.ko.md
+!/docs/THIRD_PARTY_NOTICES.md
+!/docs/images/
 
 # Windows Service files
 daemon/
@@ -54,8 +57,7 @@ server/fix-*.ts
 uploads/
 
 # Production deployment
-mokpyo-production/
-mokpyo-production.tar.gz
+artifacts/
 *.tar.gz
 
 # Temporary files

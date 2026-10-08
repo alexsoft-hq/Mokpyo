@@ -21,11 +21,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
 
-    "baseUrl": ".",
+    "baseUrl": "..",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["server/**/*.ts"],
-  "exclude": ["server/**/*.test.ts", "node_modules", "dist"]
+  "include": ["../server/**/*.ts"],
+  "exclude": ["../server/**/*.test.ts", "../node_modules", "../dist"]
 }

@@ -1,7 +1,7 @@
 # Contributing to Mokpyo
 
 Mokpyo is maintained by [ALEXSOFT](https://alexsoft.co.kr/) as a self-hosted,
-MIT-licensed team goals and OKR tool. See [README.md](README.md) for setup.
+MIT-licensed team goals and OKR tool. See [README.md](../README.md) for setup.
 
 ## Questions, bugs and changes
 
@@ -19,6 +19,16 @@ database dumps, uploads, dependencies or generated application bundles.
 
 Contributions are provided under the repository's MIT license. Only contribute
 material you have the right to license, and preserve third-party license notices.
+
+## Repository layout
+
+Application and API code live in `src/` and `server/`, with the database schema
+and migrations in `prisma/`. `config/` holds TypeScript app/node/server, Tailwind
+and Vitest configuration. `docker/Dockerfile` defines the image; `scripts/`
+contains `prepare-release.sh` (run it with `npm run release`) and operational helpers.
+`docs/` holds the Korean README, third-party notices and screenshots, while
+`.github/` holds contribution/security guides and workflows. Tool entrypoints for
+Vite, ESLint, PostCSS, root TypeScript, shadcn components and Compose stay at the root.
 
 ## Support boundaries
 

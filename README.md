@@ -2,13 +2,13 @@
 
 **Self-hosted, open-source goal and OKR management for teams.**
 
-[한국어](README.ko.md) · [MIT License](LICENSE) · [ALEXSOFT](https://alexsoft.co.kr/en/) · [Architecture & development enquiries](https://alexsoft.co.kr/diagnosis/#inquiry)
+[한국어](docs/README.ko.md) · [MIT License](LICENSE) · [ALEXSOFT](https://alexsoft.co.kr/en/) · [Architecture & development enquiries](https://alexsoft.co.kr/diagnosis/#inquiry)
 
 [AI workflows with MCP](#use-your-ai-with-mokpyo) · [Screenshots](#screenshots) · [Quick start](#quick-start-with-docker)
 
 Mokpyo (Korean for “goal”) brings goals, key results and project activity into card, table, board, timeline and dashboard views. Run it on your own infrastructure and adapt it to your organization. The published software has no per-seat fee or paid subscription; infrastructure and optional external services are paid by the operator. The interface supports English and Korean, with a language selector on the sign-in screen and in the app. Your choice is saved in your browser; user-authored content stays in its original language.
 
-![Mokpyo goal management demo](assets/readme/dashboard.png)
+![Mokpyo goal management demo](docs/images/dashboard.png)
 
 *A local demo workspace with fictional data. Sample goals describe illustrative work, not claims about shipped features.*
 
@@ -93,16 +93,16 @@ The same goals can be explored in several views. Click an image to inspect it at
 
 | Cards | Table |
 | --- | --- |
-| [![Goal cards with progress and owners](assets/readme/cards.png)](assets/readme/cards.png) | [![Editable goal table grouped by status](assets/readme/table.png)](assets/readme/table.png) |
+| [![Goal cards with progress and owners](docs/images/cards.png)](docs/images/cards.png) | [![Editable goal table grouped by status](docs/images/table.png)](docs/images/table.png) |
 
 | Board | Timeline |
 | --- | --- |
-| [![Kanban board with configurable statuses](assets/readme/board.png)](assets/readme/board.png) | [![Goal schedules in the timeline](assets/readme/timeline.png)](assets/readme/timeline.png) |
+| [![Kanban board with configurable statuses](docs/images/board.png)](docs/images/board.png) | [![Goal schedules in the timeline](docs/images/timeline.png)](docs/images/timeline.png) |
 
 <details>
 <summary>Goal details, key results, and collaboration</summary>
 
-![Goal details with custom fields and key results](assets/readme/goal-detail.png)
+![Goal details with custom fields and key results](docs/images/goal-detail.png)
 
 </details>
 
@@ -157,15 +157,15 @@ See [.env.example](.env.example) for configuration and the [Prisma guide](prisma
 - **Operator responsibilities:** Manage HTTPS, accounts and access, updates, monitoring, and backup and recovery for both the database and attachments.
 - **Access boundaries:** Organization membership controls access. Private permissions for individual projects within an organization are not implemented.
 - **Automation limits:** Automations run inside the application process, without a durable job queue or guaranteed retries.
-- **Security and privacy:** See [SECURITY.md](SECURITY.md) for known behavior and vulnerability reporting. Operators must also provide privacy information appropriate to their deployment.
+- **Security and privacy:** See [SECURITY.md](.github/SECURITY.md) for known behavior and vulnerability reporting. Operators must also provide privacy information appropriate to their deployment.
 
 To create a deployment archive without Docker:
 
 ```bash
-./prepare-release.sh
+npm run release
 ```
 
-The resulting `mokpyo-production.tar.gz` contains builds, schema, migrations, dependency manifests and lockfile, and an environment example. It excludes actual `.env` files, database data and uploads. **Installing dependencies on the target server requires internet access.** Follow the README inside the archive for configuration, installation, migrations and startup. Air-gapped deployment needs separate preparation for the target environment.
+The resulting `artifacts/release/mokpyo-production.tar.gz` contains builds, schema, migrations, dependency manifests and lockfile, and an environment example. It excludes actual `.env` files, database data and uploads. **Installing dependencies on the target server requires internet access.** Follow the README inside the archive for configuration, installation, migrations and startup. Air-gapped deployment needs separate preparation for the target environment.
 
 ## Architecture
 
@@ -181,8 +181,14 @@ server/          Express 5 · Prisma
   services/      Automation engine and scheduler
   utils/         File storage and AI integration
 prisma/          PostgreSQL schema, migrations and demo seed
-docker/          Container entrypoint and database initialization
+config/          TypeScript app/node/server, Tailwind and Vitest configuration
+docker/          Dockerfile, container entrypoint and database initialization
+scripts/         Release packaging (prepare-release.sh) and operational helpers
+docs/            Korean README, third-party notices and documentation images
+.github/         Contribution/security guides and workflows
 ```
+
+Vite, ESLint, PostCSS, the root TypeScript entrypoint, shadcn components configuration and Docker Compose stay at the repository root for tool discovery.
 
 Mokpyo is a public example of ALEXSOFT's product engineering, from design through implementation and verification. The code covers organization-aware data access, synchronized views, rule-based automation, storage adapters and tests.
 
@@ -202,8 +208,8 @@ The UI uses i18next and react-i18next. English catalogs live in [src/i18n/locale
 
 ## Use, contribute, or work with ALEXSOFT
 
-Report bugs and proposals through [GitHub Issues](https://github.com/alexsoft-hq/Mokpyo/issues). Read [CONTRIBUTING.md](CONTRIBUTING.md) and report vulnerabilities privately as described in [SECURITY.md](SECURITY.md). Community support is best effort with no guaranteed response or resolution time.
+Report bugs and proposals through [GitHub Issues](https://github.com/alexsoft-hq/Mokpyo/issues). Read [CONTRIBUTING.md](.github/CONTRIBUTING.md) and report vulnerabilities privately as described in [SECURITY.md](.github/SECURITY.md). Community support is best effort with no guaranteed response or resolution time.
 
 For architecture reviews, internal tools, deployment assistance, migrations, integrations or custom software development, [contact ALEXSOFT](https://alexsoft.co.kr/diagnosis/#inquiry) or email [contact@alexsoft.co.kr](mailto:contact@alexsoft.co.kr). Paid work has separately agreed scope, schedule, fees and support terms.
 
-Mokpyo is available under the [MIT License](LICENSE), including commercial use, modification and redistribution with the required notices retained. Third-party components retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Mokpyo is available under the [MIT License](LICENSE), including commercial use, modification and redistribution with the required notices retained. Third-party components retain their own licenses; see [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).

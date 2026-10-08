@@ -13,8 +13,8 @@ export default tseslint.config(
       'dist',
       'build',
       'coverage',
+      'artifacts',
       'node_modules',
-      'mokpyo-production',
       'server/production.cjs',
       'prisma/generated',
       '.github/appmod',
@@ -69,7 +69,7 @@ export default tseslint.config(
 
   // --- 설정 파일 / 시드 스크립트 ---
   {
-    files: ['*.config.{ts,js}', 'prisma/*.ts'],
+    files: ['*.config.{ts,js}', 'config/*.config.{ts,js}', 'prisma/*.ts'],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       globals: { ...globals.node },

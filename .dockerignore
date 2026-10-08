@@ -17,8 +17,7 @@ prisma/*.db
 prisma/*.db-journal
 
 # 오프라인 배포 산출물
-mokpyo-production
-mokpyo-production.tar.gz
+artifacts
 *.tar.gz
 server/production.cjs
 
@@ -27,10 +26,11 @@ server/production.cjs
 .vscode
 .idea
 .DS_Store
-Dockerfile
+docker/Dockerfile
 .dockerignore
 compose.yaml
 docs
+!docs/THIRD_PARTY_NOTICES.md
 etc
 scripts/.env.deploy
 scripts/.env.backup

@@ -2,17 +2,22 @@
 # Build a portable application archive. Install dependencies on the target host.
 set -euo pipefail
 
-cd "$(dirname "$0")"
-PROD_DIR="mokpyo-production"
-ARCHIVE="mokpyo-production.tar.gz"
+cd "$(dirname "$0")/.."
+PROD_DIR="artifacts/release/mokpyo-production"
+ARCHIVE="artifacts/release/mokpyo-production.tar.gz"
 
 # Refuse a symlink so generated output always stays inside this checkout.
-if [ -L "$PROD_DIR" ] || [ -L "$ARCHIVE" ]; then
-  echo "ERROR: Production output paths must not be symlinks." >&2
-  exit 1
-fi
+check_output_paths() {
+  for output_path in artifacts artifacts/release "$PROD_DIR" "$ARCHIVE"; do
+    if [ -L "$output_path" ]; then
+      echo "ERROR: Production output paths must not be symlinks: $output_path" >&2
+      exit 1
+    fi
+  done
+}
+check_output_paths
 
-for required in package.json package-lock.json prisma/schema.prisma .env.example LICENSE THIRD_PARTY_NOTICES.md; do
+for required in package.json package-lock.json prisma/schema.prisma .env.example LICENSE docs/THIRD_PARTY_NOTICES.md; do
   if [ ! -f "$required" ]; then
     echo "ERROR: Required bundle input is missing: $required" >&2
     exit 1
@@ -28,13 +33,15 @@ npm run build:root
 npm run build:server
 
 # This fixed directory contains only generated packaging output.
+check_output_paths
 rm -rf -- "$PROD_DIR"
 mkdir -p "$PROD_DIR/server" "$PROD_DIR/prisma"
 cp -R dist "$PROD_DIR/"
 cp server/production.cjs "$PROD_DIR/server/"
 cp prisma/schema.prisma "$PROD_DIR/prisma/"
 cp -R prisma/migrations "$PROD_DIR/prisma/"
-cp package.json package-lock.json .env.example LICENSE THIRD_PARTY_NOTICES.md "$PROD_DIR/"
+cp package.json package-lock.json .env.example LICENSE "$PROD_DIR/"
+cp docs/THIRD_PARTY_NOTICES.md "$PROD_DIR/THIRD_PARTY_NOTICES.md"
 
 cat > "$PROD_DIR/setup.sh" <<'SETUP'
 #!/usr/bin/env bash

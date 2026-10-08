@@ -2,7 +2,7 @@
 
 **조직의 목표를 함께 보고, 실행과 진행 상황을 관리하는 셀프호스팅 오픈소스.**
 
-[English](README.md) · [MIT License](LICENSE) · [ALEXSOFT](https://alexsoft.co.kr/) · [설계·개발 상담](https://alexsoft.co.kr/diagnosis/#inquiry)
+[English](../README.md) · [MIT License](../LICENSE) · [ALEXSOFT](https://alexsoft.co.kr/) · [설계·개발 상담](https://alexsoft.co.kr/diagnosis/#inquiry)
 
 [**Claude 연결: MCP로 리포트 작성·목표 가져오기**](#mcp)
 
@@ -10,7 +10,7 @@ Mokpyo는 목표·OKR·프로젝트를 카드, 테이블, 보드, 타임라인, 
 조직의 서버에 설치하고 업무에 맞게 수정해 사용할 수 있습니다. MIT 라이선스로 공개하며,
 공개된 소프트웨어 사용에 좌석 요금이나 유료 구독은 없습니다. 서버와 외부 서비스 비용은 운영자가 부담합니다.
 
-![Mokpyo 데모 워크스페이스의 목표 관리 화면](assets/readme/dashboard.png)
+![Mokpyo 데모 워크스페이스의 목표 관리 화면](images/dashboard.png)
 
 *가상의 데이터로 구성한 로컬 데모 워크스페이스입니다. 예시 목표는 업무 시나리오이며 제품에 구현된 기능을 뜻하지 않습니다.*
 
@@ -58,7 +58,7 @@ MCP 서버와 사용자 동의 화면은 구현되어 있습니다. 로컬 MCP S
 - 리버스 프록시는 기존 앱·API 경로에 더해 **`/mcp`, `/oauth/mcp/*`, `/.well-known/*`**를 서버로 전달해야 합니다. 앱이 `/dashboard/` 아래에 있어도 이 MCP·OAuth 경로는 호스트 루트에 있으며, 공개 `Host` 값을 유지해야 합니다.
 - 연결이 되지 않으면 공개 HTTPS 접근, 위 경로의 프록시 전달, `APP_URL`과 `MCP_PUBLIC_URL`, 마이그레이션 적용 상태를 확인합니다. 로컬 HTTP 루프백은 개발용으로 허용되지만 Claude 원격 커넥터의 공개 접속 요건을 대신하지 않습니다.
 
-설정 정의와 인증 구현은 [.env.example](.env.example), [MCP 설정](server/mcp/config.ts), [OAuth 구현](server/mcp/oauth.ts)을 참고하세요.
+설정 정의와 인증 구현은 [.env.example](../.env.example), [MCP 설정](../server/mcp/config.ts), [OAuth 구현](../server/mcp/oauth.ts)을 참고하세요.
 
 ### 시나리오 1: 목표와 실제 변경 기록으로 주간 리포트 작성
 
@@ -110,7 +110,7 @@ flowchart LR
 - **기존 목표에 추가:** `append_subgoals`에는 `get_goal`에서 읽은 현재 버전을 `expectedVersion`으로 전달해야 합니다. 기존 하위 목표를 교체하지 않고 추가하며, 부모의 집계 진행률과 버전을 갱신합니다. 진행률이 변하면 체크인을 남기고, 생성·추가 작업은 감사 기록으로 남깁니다.
 - **실행 범위:** 가져오기는 기존의 목표 생성 자동화·외부 웹훅·알림을 실행하지 않습니다. 현재 MCP 도구는 일반적인 목표 수정·삭제, 외부 원본 변경, 백그라운드 양방향 동기화를 제공하지 않습니다.
 
-도구 정의는 [MCP 서버](server/mcp/server.ts), 입력 한도와 필드는 [가져오기 스키마](server/mcp/importSchemas.ts), 저장 처리는 [가져오기 구현](server/mcp/import.ts)에서 확인할 수 있습니다.
+도구 정의는 [MCP 서버](../server/mcp/server.ts), 입력 한도와 필드는 [가져오기 스키마](../server/mcp/importSchemas.ts), 저장 처리는 [가져오기 구현](../server/mcp/import.ts)에서 확인할 수 있습니다.
 
 
 ## 화면 둘러보기
@@ -119,16 +119,16 @@ flowchart LR
 
 | 카드 | 테이블 |
 | --- | --- |
-| [![목표·진행률·담당자를 보여주는 카드](assets/readme/cards.png)](assets/readme/cards.png) | [![상태별로 묶은 편집 가능한 목표 테이블](assets/readme/table.png)](assets/readme/table.png) |
+| [![목표·진행률·담당자를 보여주는 카드](images/cards.png)](images/cards.png) | [![상태별로 묶은 편집 가능한 목표 테이블](images/table.png)](images/table.png) |
 
 | 보드 | 타임라인 |
 | --- | --- |
-| [![상태별 칸반 보드](assets/readme/board.png)](assets/readme/board.png) | [![목표 일정을 보여주는 타임라인](assets/readme/timeline.png)](assets/readme/timeline.png) |
+| [![상태별 칸반 보드](images/board.png)](images/board.png) | [![목표 일정을 보여주는 타임라인](images/timeline.png)](images/timeline.png) |
 
 <details>
 <summary>목표 상세·Key Result·협업 화면</summary>
 
-![커스텀 필드와 하위 목표가 있는 상세 화면](assets/readme/goal-detail.png)
+![커스텀 필드와 하위 목표가 있는 상세 화면](images/goal-detail.png)
 
 </details>
 
@@ -184,26 +184,26 @@ DEMO_USER_PASSWORD='choose-a-new-demo-password' npm run db:seed:demo:en
 `mokpyo.demo.en.owner@example.invalid`와 지정한 비밀번호로 로그인할 수 있습니다.
 로컬 루프백 PostgreSQL만 허용하고, 기존 데모 워크스페이스나 계정과 충돌하면 덮어쓰지 않고 중단합니다.
 `DEMO_OWNER_EMAIL`에 기존 로컬 계정 이메일을 지정하면 프로필을 변경하지 않고 추가 OWNER로 연결합니다.
-자세한 내용은 [영어 데모 시드](prisma/seed-demo-en.ts)를 참고하세요.
+자세한 내용은 [영어 데모 시드](../prisma/seed-demo-en.ts)를 참고하세요.
 
 ## 설치와 운영
 
-전체 환경변수는 [.env.example](.env.example), 데이터베이스 변경 절차는 [Prisma 안내](prisma/README.md)를 참고하세요.
+전체 환경변수는 [.env.example](../.env.example), 데이터베이스 변경 절차는 [Prisma 안내](../prisma/README.md)를 참고하세요.
 
 - **기본 구성:** Node.js 24, PostgreSQL, 로컬 첨부 저장소. Docker 이미지는 비특권 `node` 사용자로 실행됩니다.
 - **선택 기능:** SMTP, Google OAuth, Azure OpenAI, Amazon S3는 운영자가 별도로 설정합니다. 각 제공자의 이용료가 발생할 수 있습니다.
 - **운영 책임:** HTTPS, 계정과 접근 권한, 업데이트, 모니터링, DB와 첨부파일의 백업·복구는 운영자가 관리합니다.
 - **현재 권한 범위:** 조직 멤버십이 접근 경계입니다. 조직 내부의 프로젝트별 비공개 권한은 제공하지 않습니다.
 - **현재 자동화 범위:** 프로세스 내 실행 방식이며, 내구성 있는 작업 큐나 재시도 보장 서비스가 아닙니다.
-- **보안과 개인정보:** 알려진 동작과 보고 방법은 [SECURITY.md](SECURITY.md)에 있습니다. 실제 운영 환경에 맞는 개인정보 안내도 운영자가 마련해야 합니다.
+- **보안과 개인정보:** 알려진 동작과 보고 방법은 [SECURITY.md](../.github/SECURITY.md)에 있습니다. 실제 운영 환경에 맞는 개인정보 안내도 운영자가 마련해야 합니다.
 
 Docker를 쓰지 않을 때는 다음 명령으로 빌드 배포본을 만들 수 있습니다.
 
 ```bash
-./prepare-release.sh
+npm run release
 ```
 
-`mokpyo-production.tar.gz`에는 빌드 결과·스키마·마이그레이션·의존성 잠금파일·환경변수 예시가 들어갑니다.
+`artifacts/release/mokpyo-production.tar.gz`에는 빌드 결과·스키마·마이그레이션·의존성 잠금파일·환경변수 예시가 들어갑니다.
 **대상 서버에서 의존성 설치를 위한 인터넷 연결이 필요합니다.** 실제 `.env`, DB 데이터, 첨부파일은 포함하지 않습니다.
 압축 안의 README에 설정·설치·마이그레이션·실행 순서가 있습니다. 폐쇄망 반입은 대상 환경에 맞는 별도 준비가 필요합니다.
 
@@ -221,8 +221,14 @@ server/          Express 5 · Prisma
   services/      자동화 엔진과 스케줄러
   utils/         파일 저장소와 AI 연동
 prisma/          PostgreSQL 스키마 · 마이그레이션 · 데모 시드
-docker/          컨테이너 진입점과 DB 초기화
+config/          TypeScript app/node/server · Tailwind · Vitest 설정
+docker/          Dockerfile · 컨테이너 진입점과 DB 초기화
+scripts/         배포본 생성(prepare-release.sh)과 운영 보조 도구
+docs/            한국어 README · 제3자 고지 · 문서 이미지
+.github/         기여·보안 안내 · 워크플로
 ```
+
+도구가 기본 경로에서 찾는 Vite·ESLint·PostCSS·루트 TypeScript 설정, shadcn 컴포넌트 설정과 Docker Compose는 저장소 루트에 둡니다.
 
 ALEXSOFT가 제품 설계부터 구현·검증까지 다룬 사례로 공개합니다.
 조직별 데이터 접근, 여러 뷰의 상태 동기화, 규칙 기반 자동화, 저장소 분리와 테스트를 코드에서 살펴볼 수 있습니다.
@@ -240,17 +246,17 @@ CI 통과가 실제 DB 복구, 모든 배포 환경 또는 부하 검증을 대�
 
 ### 다국어 UI
 
-UI는 i18next와 react-i18next를 사용합니다. 영어 번역은 [src/i18n/locales](src/i18n/locales)에 있고, 한국어 원문을 번역 키와 한국어 기본 문구로 사용합니다. 변수는 보간 인자로 분리하고 문장 단위로 번역하며, 사용자가 작성한 데이터는 번역 대상으로 삼지 않습니다. 언어를 전환하면 앱을 다시 마운트하지 않고 문구와 날짜 표시가 바뀝니다.
+UI는 i18next와 react-i18next를 사용합니다. 영어 번역은 [src/i18n/locales](../src/i18n/locales)에 있고, 한국어 원문을 번역 키와 한국어 기본 문구로 사용합니다. 변수는 보간 인자로 분리하고 문장 단위로 번역하며, 사용자가 작성한 데이터는 번역 대상으로 삼지 않습니다. 언어를 전환하면 앱을 다시 마운트하지 않고 문구와 날짜 표시가 바뀝니다.
 
 ## 사용과 기여, 그리고 필요한 도움
 
 버그와 제안은 [GitHub Issues](https://github.com/alexsoft-hq/Mokpyo/issues)에 남겨주세요.
-기여 절차는 [CONTRIBUTING.md](CONTRIBUTING.md), 취약점의 비공개 보고 방법은 [SECURITY.md](SECURITY.md)에 있습니다.
+기여 절차는 [CONTRIBUTING.md](../.github/CONTRIBUTING.md), 취약점의 비공개 보고 방법은 [SECURITY.md](../.github/SECURITY.md)에 있습니다.
 커뮤니티 지원은 가능한 범위에서 제공하며 응답 시간이나 해결 일정을 보장하지 않습니다.
 
 **조직에 맞춘 설계·개발이 필요하면 [ALEXSOFT에 상담을 요청하세요](https://alexsoft.co.kr/diagnosis/#inquiry).**
 Mokpyo 도입뿐 아니라 시스템 설계 검토, 사내 도구 개발, 데이터 이관, 기존 시스템 연동과 맞춤 기능 개발을 상담할 수 있습니다.
 유료 업무는 범위·일정·비용·지원 조건을 별도로 합의합니다. 문의: [contact@alexsoft.co.kr](mailto:contact@alexsoft.co.kr).
 
-[MIT 라이선스](LICENSE)는 사용·수정·재배포·상업적 활용을 허용하며, 복사본이나 상당 부분에 저작권과 라이선스 고지를 유지해야 합니다.
+[MIT 라이선스](../LICENSE)는 사용·수정·재배포·상업적 활용을 허용하며, 복사본이나 상당 부분에 저작권과 라이선스 고지를 유지해야 합니다.
 종속성과 포함된 제3자 코드에는 각각의 라이선스가 적용됩니다. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 참고하세요.

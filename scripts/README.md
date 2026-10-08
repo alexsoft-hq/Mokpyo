@@ -1,7 +1,8 @@
 # 운영 보조 도구
 
 새 설치는 루트 [README](../README.md)의 Docker 절차를 먼저 참고하세요.
-Docker 없이 빌드 배포본이 필요하면 루트의 `./prepare-release.sh`를 사용합니다.
+Docker 없이 빌드 배포본이 필요하면 루트에서 `npm run release`를 사용합니다.
+배포본은 `artifacts/release/mokpyo-production.tar.gz`에 생성됩니다.
 대상 서버에서 의존성 설치와 Prisma 생성에 인터넷 연결이 필요합니다.
 
 ## PostgreSQL 백업
