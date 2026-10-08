@@ -1,0 +1,20 @@
+# A public source archive must not contain local tooling or private deployment data.
+.claude export-ignore
+CLAUDE.md export-ignore
+etc export-ignore
+docs export-ignore
+.env export-ignore
+scripts/.env.deploy export-ignore
+scripts/.env.backup export-ignore
+scripts/.env.aws export-ignore
+uploads export-ignore
+backups export-ignore
+prisma/*.db export-ignore
+
+# Private deployment helpers are not part of the public distribution.
+prepare-production.sh export-ignore
+scripts/deploy-to-server.sh export-ignore
+scripts/deploy-to-aws.sh export-ignore
+scripts/download-backup.sh export-ignore
+scripts/.env.deploy.example export-ignore
+scripts/.env.aws.example export-ignore

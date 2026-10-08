@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 같은 브랜치/PR 에서 새 푸시가 오면 진행 중인 실행은 취소한다.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: typecheck · lint · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # 테스트는 Prisma 클라이언트를 목(mock)하므로 실제 DB 는 필요 없다.
+      # prisma generate 가 스키마의 env("DATABASE_URL") 을 읽을 수 있도록 더미 값만 준다.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run CI pipeline
+        run: npm run ci

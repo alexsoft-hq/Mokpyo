@@ -1,0 +1,48 @@
+name: mokpyo
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mokpyo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-mokpyo_dev}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - mokpyo_pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # 전체 스택(앱 + DB)을 컨테이너로 띄운다.
+  #   docker compose --profile full up --build
+  # profiles 가 붙어 있으므로 기본 `docker compose up -d db` 동작에는 영향이 없다.
+  app:
+    profiles: ["full"]
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # .env 의 DATABASE_URL 은 호스트(localhost) 기준이므로 컨테이너 네트워크로 덮어쓴다.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mokpyo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@db:5432/${POSTGRES_DB:-mokpyo_dev}?schema=dashboard
+      NODE_ENV: production
+      PORT: "3001"
+      UPLOADS_DIR: /app/uploads
+    ports:
+      - "${APP_PORT:-3001}:3001"
+    volumes:
+      - mokpyo_uploads:/app/uploads
+
+volumes:
+  mokpyo_pgdata:
+  mokpyo_uploads:

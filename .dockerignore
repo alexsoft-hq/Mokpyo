@@ -1,0 +1,49 @@
+.git
+.github
+node_modules
+dist
+dist-ssr
+coverage
+logs
+*.log
+
+# 로컬 시크릿·데이터
+.env
+.env.*
+!.env.example
+uploads
+backups
+prisma/*.db
+prisma/*.db-journal
+
+# 오프라인 배포 산출물
+mokpyo-production
+mokpyo-production.tar.gz
+*.tar.gz
+server/production.cjs
+
+# 도구·에디터
+.claude
+.vscode
+.idea
+.DS_Store
+Dockerfile
+.dockerignore
+compose.yaml
+docs
+etc
+scripts/.env.deploy
+scripts/.env.backup
+scripts/.env.aws
+
+# Local database sidecars and operator dumps
+**/*.db-wal
+**/*.db-shm
+**/*.sqlite
+**/*.sqlite3
+**/*.dump
+CLAUDE.md
+prepare-production.sh
+scripts/deploy-to-server.sh
+scripts/deploy-to-aws.sh
+scripts/download-backup.sh

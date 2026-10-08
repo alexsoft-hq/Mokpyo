@@ -1,0 +1,496 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Organization {
+  id            String    @id @default(uuid())
+  name          String
+  slug          String    @unique
+  plan          Plan      @default(FREE)
+  planUpdatedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  members         OrganizationMember[]
+  projects        Project[]
+  settings        Setting[]
+  auditLogs       AuditLog[]
+  invitations     Invitation[]
+  reportTemplates ReportTemplate[]
+  notifications   Notification[]
+  cycles          Cycle[]
+  statusLabels    StatusLabel[]
+  savedViews      SavedView[]
+  automationRules AutomationRule[]
+
+  @@index([slug])
+}
+
+// monday.com식 상태 라벨. 조직 스코프(칸반 컬럼 일관성) — 프로젝트별로 갈라지지 않게.
+// kind 는 completed/onHold 브리지 플래그와 동기화되는 시맨틱: active | done | on_hold.
+model StatusLabel {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  color          String   // hex, Category.color 관례
+  kind           String   @default("active") // active | done | on_hold
+  order          Int      @default(0)         // 칸반 컬럼 순서
+  isSystem       Boolean  @default(false)     // 앵커(시작 전/진행 중/보류/완료): 삭제·kind 변경 금지
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  goals          Goal[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, order])
+}
+
+// 자동화 규칙 — "~할 때 [트리거] ~라면 [조건] ~한다 [액션]". 디스패치 축만 정규 컬럼, 나머지 JSON.
+model AutomationRule {
+  id             String   @id @default(uuid())
+  organizationId String
+  projectId      String   // v1 프로젝트 스코프
+  name           String
+  enabled        Boolean  @default(true)
+  triggerType    String   // goal_created | status_changed | assignee_changed | progress_reached | due_date_approaching | due_date_arrived
+  triggerConfig  Json     @default("{}") // { statusId?, threshold?, daysBefore?, dateAttr? }
+  condition      Json?    // [{ attr, op, value }] (AND, ≤5)
+  actions        Json     @default("[]") // [{ type, config }] (≤5)
+  createdById    String?
+  disabledReason String?
+  lastRunAt      DateTime?
+  runCount       Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  executions   AutomationExecution[]
+
+  @@index([projectId, triggerType, enabled])
+  @@index([organizationId])
+}
+
+// 자동화 실행 로그(디버깅·멱등). @@unique([ruleId, eventId]) 로 같은 이벤트 중복 실행 차단.
+model AutomationExecution {
+  id             String   @id @default(uuid())
+  ruleId         String
+  organizationId String
+  goalId         String?
+  eventId        String   // 뮤테이션=uuid, 스케줄러=결정적 키
+  status         String   // SUCCESS | FAILED | CONDITION_NOT_MET | SKIPPED_LOOP | SKIPPED_RATE_LIMIT
+  detail         Json?    // { event, actionResults[], error? }
+  durationMs     Int?
+  createdAt      DateTime @default(now())
+  rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, eventId])
+  @@index([ruleId, createdAt])
+  @@index([organizationId, createdAt])
+}
+
+// 저장된 뷰(테이블/보드/대시보드 설정). 대시보드 위젯도 config 에 저장 — 별도 Dashboard 모델 없음.
+model SavedView {
+  id             String   @id @default(uuid())
+  organizationId String
+  projectId      String
+  createdById    String?
+  name           String
+  type           String   @default("table") // table | board | dashboard | cards | timeline
+  isShared       Boolean  @default(false)    // false = 생성자 개인
+  isDefault      Boolean  @default(false)    // 프로젝트 기본(공유 뷰만, ADMIN 설정)
+  config         Json     @default("{}")     // { v:1, filters, groupBy, sortBy, visibleColumns, columnWidths, kanbanFieldId, widgets }
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, isShared])
+  @@index([createdById])
+}
+
+// monday.com식 사용자 정의 컬럼. per-project(Category 선례). 값은 Goal.customFields JSONB.
+model CustomFieldDefinition {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  type      String   // text | number | date | person | dropdown | priority
+  config    Json     @default("{}") // 타입별 설정: {unit},{options:[{id,label,color}],multi} 등
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+  @@index([projectId, order])
+}
+
+model Cycle {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  type           String   @default("quarter") // quarter | half | annual | custom
+  startDate      String   // YYYY-MM-DD
+  endDate        String   // YYYY-MM-DD
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  goals          Goal[]
+
+  @@index([organizationId])
+}
+
+model CheckIn {
+  id         String   @id @default(uuid())
+  goalId     String
+  userId     String?
+  progress   Int
+  confidence String?  // on_track | at_risk | off_track
+  note       String?
+  createdAt  DateTime @default(now())
+  goal       Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([goalId, createdAt])
+}
+
+model Notification {
+  id             String   @id @default(uuid())
+  organizationId String
+  recipientId    String
+  actorId        String?
+  actorName      String?
+  type           String
+  title          String
+  body           String?
+  entityType     String?
+  entityId       String?
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recipient      User         @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, read])
+  @@index([recipientId, createdAt])
+  @@index([organizationId])
+}
+
+model OrganizationMember {
+  id             String     @id @default(uuid())
+  organizationId String
+  userId         String
+  role           MemberRole @default(MEMBER)
+  createdAt      DateTime   @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id             String     @id @default(uuid())
+  organizationId String
+  email          String
+  role           MemberRole @default(MEMBER)
+  invitedById    String
+  token          String     @unique @default(uuid())
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime   @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, email])
+}
+
+model Project {
+  id                String     @id @default(uuid())
+  name              String
+  description       String?
+  dashboardTitle    String     @default("Mokpyo")
+  dashboardSubtitle String     @default("")
+  parentId          String?
+  organizationId    String
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  categories        Category[]
+  goals             Goal[]
+  customFieldDefs   CustomFieldDefinition[]
+  savedViews        SavedView[]
+  automationRules   AutomationRule[]
+  parent            Project?   @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children          Project[]  @relation("ProjectHierarchy")
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([name, organizationId])
+  @@index([name])
+  @@index([parentId])
+  @@index([organizationId])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  color     String
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  goals     Goal[]   @relation("CategoryToGoal")
+
+  @@unique([name, projectId])
+  @@index([projectId])
+}
+
+model Goal {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  owner       String
+  projectId   String
+  progress    Int          @default(0)
+  size        String       @default("medium")
+  startDate   String?
+  dueDate     String?
+  statusNote  String?
+  order       Int          @default(0)
+  completed   Boolean      @default(false)
+  onHold      Boolean      @default(false)
+  version     Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  parentGoalId String?
+  cycleId      String?
+  statusId     String?     // monday식 상태 라벨(FK). completed/onHold 는 이 라벨 kind의 브리지 미러
+  customFields Json         @default("{}") // { [customFieldDefId]: value }
+  attachments Attachment[]
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  notes       Note[]
+  subGoals    SubGoal[]
+  categories  Category[]   @relation("CategoryToGoal")
+  goalOwners  GoalOwner[]
+  parentGoal   Goal?       @relation("GoalAlignment", fields: [parentGoalId], references: [id], onDelete: SetNull)
+  alignedGoals Goal[]      @relation("GoalAlignment")
+  cycle        Cycle?      @relation(fields: [cycleId], references: [id], onDelete: SetNull)
+  status       StatusLabel? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  checkIns     CheckIn[]
+  comments     Comment[]
+
+  @@index([owner])
+  @@index([projectId])
+  @@index([projectId, completed, onHold])
+  @@index([parentGoalId])
+  @@index([cycleId])
+  @@index([projectId, statusId])
+}
+
+// 목표 협업 스레드(업데이트). Note(고정 메모)와 별개 — 저자 서명 + @멘션 대화.
+// body 에 @[이름](userId) 마커. soft delete(deletedAt), 1단계 답글(parentId).
+model Comment {
+  id         String    @id @default(uuid())
+  goalId     String
+  authorId   String?   // SetNull(작성자 탈퇴 대비) — 표시는 authorName 스냅샷
+  authorName String
+  parentId   String?   // 1단계 답글(부모는 top-level 이어야 함)
+  body       String
+  editedAt   DateTime?
+  deletedAt  DateTime? // soft delete
+  createdAt  DateTime  @default(now())
+  goal    Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  author  User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([goalId, createdAt])
+  @@index([parentId])
+}
+
+model SubGoal {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  owner       String
+  progress    Int      @default(0)
+  startDate   String?
+  dueDate     String?
+  statusNote  String?
+  goalId      String
+  order       Int      @default(0)
+  version     Int      @default(0)
+  targetValue  Float?
+  currentValue Float?
+  startValue   Float?
+  unit         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  goal           Goal           @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  subGoalOwners  SubGoalOwner[]
+
+  @@index([goalId])
+}
+
+model GoalOwner {
+  id        String @id @default(uuid())
+  goalId    String
+  ownerName String
+  userId    String?
+  order     Int    @default(0)
+  goal      Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user      User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([goalId, ownerName])
+  @@index([goalId])
+  @@index([ownerName])
+  @@index([userId])
+}
+
+model SubGoalOwner {
+  id        String  @id @default(uuid())
+  subGoalId String
+  ownerName String
+  userId    String?
+  order     Int     @default(0)
+  subGoal   SubGoal @relation(fields: [subGoalId], references: [id], onDelete: Cascade)
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([subGoalId, ownerName])
+  @@index([subGoalId])
+  @@index([ownerName])
+  @@index([userId])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  content   String
+  isPinned  Boolean  @default(false)
+  goalId    String
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+}
+
+model User {
+  id                             String     @id @default(uuid())
+  googleId                       String?    @unique
+  email                          String     @unique
+  name                           String
+  picture                        String?
+  passwordHash                   String?
+  isEmailVerified                Boolean    @default(false)
+  emailVerificationCode          String?
+  emailVerificationCodeExpiresAt DateTime?
+  passwordResetTokenHash         String?
+  passwordResetExpiresAt         DateTime?
+  createdAt                      DateTime   @default(now())
+  updatedAt                      DateTime   @updatedAt
+  auditLogs                      AuditLog[]
+  memberships                    OrganizationMember[]
+  sentInvitations                Invitation[]
+  goalOwnerships                 GoalOwner[]
+  subGoalOwnerships              SubGoalOwner[]
+  notifications                  Notification[]
+  checkIns                       CheckIn[]
+  comments                       Comment[]
+  savedViews                     SavedView[]
+  automationRules                AutomationRule[]
+
+  @@index([email])
+  @@index([googleId])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  action         String   // CREATE, UPDATE, DELETE, REORDER
+  entityType     String   // Goal, SubGoal, Note, Attachment, Category, Project
+  entityId       String
+  entityTitle    String?
+  goalId         String?  // 연관 목표 ID (목표별 이력 조회용)
+  projectId      String?  // 프로젝트 ID (프로젝트별 조회용)
+  organizationId String?  // 워크스페이스 ID (조직별 조회용)
+  summary        String?  // 사람이 읽기 쉬운 요약
+  ipAddress      String?  // 사용자 IP 주소
+  userId         String?
+  changes        String?  // JSON 형태의 변경 내용
+  createdAt      DateTime @default(now())
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([entityId])
+  @@index([goalId])
+  @@index([projectId])
+  @@index([organizationId])
+  @@index([ipAddress])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Setting {
+  id             String   @id @default(uuid())
+  key            String
+  value          String
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([key, organizationId])
+  @@index([key])
+  @@index([organizationId])
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  fileName     String
+  originalName String
+  mimeType     String
+  size         Int
+  goalId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+}
+
+model ReportTemplate {
+  id               String   @id @default(uuid())
+  name             String
+  description      String?
+  extractedText    String
+  originalFileName String?
+  fileName         String?
+  projectId        String?
+  organizationId   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([organizationId])
+}
